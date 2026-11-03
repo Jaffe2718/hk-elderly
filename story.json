@@ -1,0 +1,17 @@
+{
+  "item_id": "7e2cd654bad349c38a5658d7c23822af",
+  "reference_id": "4c71a0f011514bc39069cf7708ad2a1c",
+  "title": "HK Elderly Interactive Map",
+  "subtitle": "Exploring Population Patterns and Access to Services in Hong Kong",
+  "cover_type": "full",
+  "byline": "Group 13",
+  "members": ["Wu Jihui", "Li Changzhe", "Hu Jiaming", "She Xiaolai", "Zhao Yuexiang", "Hu Yang"],
+  "pages_base_url": "https://jaffe2718.github.io/hk-elderly/",
+  "sections": [
+    {"id": "background", "title": "01 | Background", "layout": "docked-panel", "panel_position": "start", "slides": [{"title": "Research Questions"}]},
+    {"id": "data", "title": "02 | Data & Methods", "layout": "docked-panel", "panel_position": "end", "slides": [{"title": "Data Sources"}, {"title": "Methodology"}]},
+    {"id": "patterns", "title": "03 | Spatial Patterns", "layout": "docked-panel", "panel_position": "start", "slides": [{"title": "Population Distribution"}, {"title": "Spatial Comparison"}]},
+    {"id": "access", "title": "04 | Accessibility & Service Provision", "layout": "floating-panel", "panel_position": "end", "slides": [{"title": "Service Distribution", "text": "Explore the neighbourhood elderly centre coverage demo. Select an area, compare distance thresholds, and toggle map layers. Open the map in a new tab for a larger view.", "media": {"type": "embed", "path": "embeds/elderly-map/index.html"}}, {"title": "Areas of Need"}]},
+    {"id": "conclusion", "title": "05 | Discussion & Conclusions", "layout": "slideshow", "panel_position": "start", "slides": [{"title": "Key Findings"}, {"title": "Recommendations"}]}
+  ]
+}
