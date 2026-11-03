@@ -3,10 +3,108 @@ import argparse
 import copy
 import html
 import json
+import hashlib
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 ROOT = Path(__file__).resolve().parent
+
+
+def fingerprint(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
+
+
+def inspect_story(cfg):
+    """Read-only export, including unknown nodes and all item resource files."""
+    from arcgis.gis import GIS
+    from arcgis.apps.storymap import StoryMap
+    import datetime as dt
+    gis = GIS('pro')
+    item = gis.content.get(cfg['item_id'])
+    if not item or item.type != 'StoryMap':
+        raise RuntimeError('StoryMap is not accessible')
+    story = StoryMap(item, gis=gis)
+    folder = ROOT / 'snapshots' / dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    folder.mkdir(parents=True)
+
+    def write(name, value):
+        (folder / name).write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding='utf-8')
+
+    draft = copy.deepcopy(story._properties)
+    write('draft.json', draft)
+    write('item.json', dict(item))
+    write('item-data.json', item.get_data())
+    write('local-config.json', cfg)
+    resources = item.resources.list()
+    write('resource-list.json', resources)
+    downloads, errors = [], []
+    for resource in resources:
+        name = resource['resource']
+        target = (folder / 'resources' / name).resolve()
+        try:
+            if not target.is_relative_to((folder / 'resources').resolve()):
+                raise ValueError('Unsafe resource path')
+            target.parent.mkdir(parents=True, exist_ok=True)
+            result = item.resources.get(name, try_json=False, out_folder=str(target.parent), out_file_name=target.name)
+            if not target.is_file():
+                raise RuntimeError(f'Resource was not downloaded: {type(result).__name__}')
+            downloads.append({'resource': name, 'sha256': hashlib.sha256(target.read_bytes()).hexdigest(), 'bytes': target.stat().st_size})
+        except Exception as exc:
+            errors.append({'resource': name, 'error': str(exc)})
+    # Re-read to detect changes made while the snapshot was being collected.
+    stable = fingerprint(StoryMap(cfg['item_id'], gis=gis)._properties) == fingerprint(draft)
+    manifest = {'item_id': cfg['item_id'], 'draft_sha256': fingerprint(draft), 'stable': stable,
+                'complete_item_resources': not errors, 'resources': downloads, 'errors': errors}
+    write('manifest.json', manifest)
+    nodes = draft.get('nodes', {})
+    lines = ['# StoryMap inspection', '', 'Read-only export. Review this report and the full JSON before changing the generator.',
+             '', f'Item: {cfg["item_id"]}', f'Draft fingerprint: {manifest["draft_sha256"]}',
+             f'Stable during export: {stable}', f'Resource download errors: {len(errors)}', '',
+             '## Reading order', '']
+    visited = set()
+
+    def walk(node_id, depth=0):
+        if node_id in visited:
+            lines.append('  ' * depth + f'- {node_id} (already listed)')
+            return
+        visited.add(node_id)
+        node = nodes.get(node_id, {})
+        text = node.get('data', {}).get('text') or node.get('data', {}).get('title', '')
+        lines.append('  ' * depth + f'- {node_id}: {node.get("type", "MISSING")} {text}')
+        for child in node.get('children', []):
+            walk(child, depth + 1)
+    walk(draft['root'])
+    lines += ['', '## Nodes outside the reading tree', '', ', '.join(sorted(set(nodes) - visited)) or 'None',
+              '', '## Complete node inventory', '', 'Includes all data, configuration, links, actions, and unknown node types.']
+    for node_id, node in nodes.items():
+        lines += ['', f'### {node_id} ({node.get("type")})', '', '```json', json.dumps(node, ensure_ascii=False, indent=2), '```']
+    lines += ['', '## Complete top-level styles and non-node data', '', '```json',
+              json.dumps({k: v for k, v in draft.items() if k != 'nodes'}, ensure_ascii=False, indent=2), '```',
+              '', '## Review workflow', '',
+              'Compare this snapshot with local-config.json and storymap.py. List manual additions, removals, reordering, text edits, layout changes, and unsupported components.',
+              'Do not flatten unknown content into the current limited schema. Extend the generator or preserve the original node/resource graph first.',
+              'Ask the user to approve the proposed synchronization before editing story.json or the generator to adopt manual edits.',
+              '', '## Scope and limitations', '',
+              'Item resources and raw story JSON are included. External URLs, web maps/layers, and custom theme items remain references: their remote contents are not an offline backup.',
+              'Inspect referenced items and browser rendering when needed. This report cannot capture viewport-dependent rendering, live data, or unpublished browser edits.',
+              'Any errors or an unstable export make this snapshot ineligible as an apply baseline.']
+    (folder / 'REPORT.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    print(f'Inspection saved: {folder}', flush=True)
+    print(f'{len(nodes)} nodes; {len(downloads)}/{len(resources)} resources; stable={stable}', flush=True)
+    if errors or not stable:
+        raise RuntimeError('Snapshot is incomplete or changed during export; see manifest.json')
+    return folder
+
+
+def check_baseline(story, cfg, baseline):
+    if not baseline:
+        raise RuntimeError('Run --inspect, review manual edits, obtain user approval, then use --apply --based-on SNAPSHOT_FOLDER')
+    folder = Path(baseline)
+    manifest = json.loads((folder / 'manifest.json').read_text(encoding='utf-8'))
+    saved = json.loads((folder / 'draft.json').read_text(encoding='utf-8'))
+    if (manifest['item_id'] != cfg['item_id'] or not manifest['stable'] or not manifest['complete_item_resources']
+            or fingerprint(saved) != manifest['draft_sha256'] or fingerprint(story._properties) != manifest['draft_sha256']):
+        raise RuntimeError('Online draft changed or baseline is invalid. Inspect again and review the new differences before applying.')
 
 
 def load_config():
@@ -60,7 +158,7 @@ def embed_url(cfg, path):
     return url
 
 
-def apply(cfg):
+def apply(cfg, baseline=None):
     # Lazy import allows offline validation without ArcGIS or a Pro license.
     import arcgis
     from arcgis.gis import GIS
@@ -86,6 +184,7 @@ def apply(cfg):
     if not me or not item or item.type != 'StoryMap' or item.owner != me.username:
         raise RuntimeError('Target must be a StoryMap owned by the signed-in user')
     story = StoryMap(item, gis=gis)
+    check_baseline(story, cfg, baseline)
     import datetime as dt
     stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     backup = ROOT / 'backups' / stamp
@@ -165,6 +264,7 @@ def apply(cfg):
     # SharingGroupManager.update method. Prepare the same draft, then update
     # metadata WITHOUT an access field so existing sharing stays untouched.
     from arcgis.apps.storymap import _utils
+    check_baseline(StoryMap(cfg['item_id'], gis=gis), cfg, baseline)
     props = _utils.prepare_story_for_save(
         story, False, None, None, cfg['title'], None, _utils.get_version(story)
     )
@@ -209,12 +309,18 @@ def apply(cfg):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--apply', action='store_true', help='Overwrite all draft content from story.json')
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument('--apply', action='store_true', help='Overwrite draft after inspection and user-approved reconciliation')
+    actions.add_argument('--inspect', action='store_true', help='Read-only export of the current story and all item resources')
+    parser.add_argument('--based-on', help='Reviewed snapshot folder required by --apply')
     args = parser.parse_args()
-    cfg = load_config()
+    cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8')) if args.inspect else load_config()
+    if args.inspect:
+        inspect_story(cfg)
+        return
     print(f'{cfg["title"]}: {len(cfg["sections"])} sections, {sum(len(s["slides"]) for s in cfg["sections"])} slides', flush=True)
     if args.apply:
-        apply(cfg)
+        apply(cfg, args.based_on)
     else:
         print('Configuration valid. Use --apply to overwrite the online draft.')
 

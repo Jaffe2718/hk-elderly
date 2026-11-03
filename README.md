@@ -4,7 +4,7 @@
 
 - Use English for repository documentation, code comments, and story text. The collaborator's demo HTML is temporarily exempt; keep its content unchanged unless requested.
 - `story.json` is the source of truth for chapter order, text, layouts, and asset references. `storymap.py` is the single entry point for rebuilding the online draft.
-- Every apply run replaces all draft content while retaining the item ID and URL. Manual edits in the online builder are overwritten on the next run.
+- Every apply run replaces all draft content while retaining the item ID and URL. Before applying, export the current online state, reconcile manual edits, and obtain explicit user approval to update the generator. Never silently discard collaborators' manual changes.
 - Keep the current chapter order until a new outline is agreed. Titles and the subtitle remain editable placeholders, not research conclusions.
 - Use the built-in Summit theme, a compact minimal cover, a title, subtitle, and member names without student IDs.
 - Use owned or appropriately licensed assets. Never commit credentials, tokens, login profiles, sensitive source data, or local backups.
@@ -35,7 +35,7 @@ python storymap.py
 Replace the online draft using the signed-in ArcGIS Pro account:
 
 ```powershell
-& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' -u storymap.py --apply
+& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' -u storymap.py --apply --based-on snapshots/REVIEWED_SNAPSHOT
 ```
 
 In Codex, the apply command requires execution outside the sandbox to access the Pro license. ArcGIS API for Python is pinned to **2.4.3**. After saving, the script reads back the draft and verifies chapter and slide counts, layouts, panel placements, cover text, embed settings, chapter navigation, and the theme reference.
@@ -88,3 +88,26 @@ Push new embed assets and wait for Pages deployment to succeed before applying t
 The current reference is recorded in `reference_id`. Keep the white Summit theme and a compact title/subtitle/member block while no cover image is available. Chapter headings are followed by short editorial introductions, separators between chapters, and mixed Sidecar layouts. Slide summaries describe the intended reading task without inventing findings; media remains empty where no asset is configured.
 
 The visible top chapter navigation is mandatory. Each apply run binds it to the five chapter headings using builder-compatible `nodeId` link objects, and verifies the saved links and visibility. The SDK 2.4.3 navigation setter writes a different schema, so the adapter sets these link objects directly. Preserve this navigation when changing chapter order.
+
+## Inspect manual edits before rebuilding
+
+Export the current online StoryMap without changing it or adopting changes into the local generator:
+
+```powershell
+& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' -u storymap.py --inspect
+```
+
+Each ignored `snapshots/TIMESTAMP/` directory contains:
+
+- `REPORT.md`: reading order, complete per-node data/configuration, disconnected nodes, complete top-level styles/resources/actions, and review instructions.
+- `draft.json`: the complete current draft graph, without filtering unknown node types or fields.
+- `item.json` and `item-data.json`: item metadata and item data, including published content where stored there.
+- `resource-list.json` and `resources/`: every resource listed by ArcGIS, including draft/published JSON and media files.
+- `manifest.json`: the item ID, draft fingerprint, download hashes, errors, and an export stability check.
+- `local-config.json`: the local configuration at inspection time for comparison.
+
+Agent workflow: read the report and original JSON, compare against the generator, list differences, and propose how to preserve each manual change. Request explicit user approval before adopting the online state into `story.json` or `storymap.py`. Unsupported components must be represented or preserved before a rebuild; never ignore them just because the local schema is narrower.
+
+After approval, update the generator/configuration, validate locally, and apply using `--based-on` with the reviewed snapshot directory. An apply without a baseline is blocked. The script checks that the online draft still matches the reviewed fingerprint both before building and immediately before saving; if collaborators changed it again, inspect and review again. This is a drift check, not an atomic server lock. Close editor tabs during the final apply.
+
+Snapshots are local and ignored by Git because manually added content may not be intended for public sharing. Remote web maps, layers, custom themes, and embeds remain references, not complete offline copies. The report explicitly records this scope; inspect those referenced items and browser rendering when necessary. Unsaved browser edits cannot be exported. An incomplete or unstable snapshot cannot be used as a rebuild baseline.
