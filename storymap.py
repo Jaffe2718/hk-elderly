@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parent
 
 def load_config():
     cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8'))
+    if cfg.get('theme', 'summit') not in {'summit', 'tidal', 'mesa', 'ridgeline', 'slate', 'obsidian'}:
+        raise ValueError('Unsupported built-in theme')
     if len(cfg['item_id']) != 32 or not all(c in '0123456789abcdef' for c in cfg['item_id']):
         raise ValueError('Invalid target item ID')
     ids = [s['id'] for s in cfg['sections']]
@@ -62,7 +64,7 @@ def apply(cfg):
     # Lazy import allows offline validation without ArcGIS or a Pro license.
     import arcgis
     from arcgis.gis import GIS
-    from arcgis.apps.storymap import StoryMap
+    from arcgis.apps.storymap import StoryMap, Themes
     from arcgis.apps.storymap.story_content import (
         Cover, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed,
     )
@@ -92,14 +94,17 @@ def apply(cfg):
     (backup / 'config.json').write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f'Backed up draft JSON: {backup}', flush=True)
 
-    reference = StoryMap(cfg['reference_id'], gis=gis)
     # Version-pinned adapter: reset IN MEMORY using Esri's own blank template.
     # Do not delete the item or its resources: old assets remain available for recovery.
     template = story._get_storymap_template()
     story._customize_template(template)
     story._create_unique_story_node(template)
     story._properties = copy.deepcopy(template)
-    story.theme(reference.get_theme())
+    # Strings are custom theme item IDs in SDK 2.4.3. Built-ins require enums.
+    story.theme(Themes(cfg.get('theme', 'summit')))
+    for resource in story._properties['resources'].values():
+        if resource.get('type') == 'story-theme':
+            resource['data'].pop('themeItemId', None)
     cover = next(c for c in story.contents if isinstance(c, Cover))
     cover.title = cfg['title']
     cover.summary = cfg.get('subtitle', '')
@@ -153,6 +158,9 @@ def apply(cfg):
         raise RuntimeError('ArcGIS rejected draft metadata update')
     # Read back the server's latest draft instead of assuming a save succeeded.
     actual = StoryMap(cfg['item_id'], gis=gis)
+    themes = [r['data'] for r in actual._properties['resources'].values() if r.get('type') == 'story-theme']
+    if len(themes) != 1 or themes[0].get('themeId') != cfg.get('theme', 'summit') or 'themeItemId' in themes[0]:
+        raise RuntimeError('Saved built-in theme contains an invalid reference')
     sidecars = [c for c in actual.contents if isinstance(c, Sidecar)]
     if len(sidecars) != len(cfg['sections']) or [len(c.slides) for c in sidecars] != [len(s['slides']) for s in cfg['sections']]:
         raise RuntimeError('Saved draft structure did not match configuration')
