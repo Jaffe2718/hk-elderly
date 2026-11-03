@@ -6,7 +6,7 @@
 - `story.json` is the source of truth for chapter order, text, layouts, and asset references. `storymap.py` is the single entry point for rebuilding the online draft.
 - Every apply run replaces all draft content while retaining the item ID and URL. Before applying, export the current online state, reconcile manual edits, and obtain explicit user approval to update the generator. Never silently discard collaborators' manual changes.
 - Keep the current chapter order until a new outline is agreed. Titles and the subtitle remain editable placeholders, not research conclusions.
-- Use the built-in Summit theme, a compact minimal cover, a title, subtitle, and member names without student IDs.
+- Use the built-in Summit theme, a full cover with a top-left themed title panel, a title, subtitle, and member names without student IDs.
 - Use owned or appropriately licensed assets. Never commit credentials, tokens, login profiles, sensitive source data, or local backups.
 - Sign into ArcGIS Pro as the StoryMap owner. Close the StoryMap editor tab before applying changes to prevent stale browser autosaves; reopen it afterward to preview.
 - Apply runs save unpublished drafts and preserve sharing settings. Review the result in the StoryMaps builder before publishing.
@@ -85,7 +85,7 @@ Push new embed assets and wait for Pages deployment to succeed before applying t
 
 ## Visual structure
 
-The current reference is recorded in `reference_id`. Keep the white Summit theme and a compact title/subtitle/member block while no cover image is available. Chapter headings are followed by short editorial introductions, separators between chapters, and mixed Sidecar layouts. Slide summaries describe the intended reading task without inventing findings; media remains empty where no asset is configured.
+The current reference is recorded in `reference_id`. Keep the white Summit theme and a top-left title/subtitle/member block while no cover image is available. Chapter headings are followed by short editorial introductions, separators between chapters, and mixed Sidecar layouts. Slide summaries describe the intended reading task without inventing findings; media remains empty where no asset is configured.
 
 The visible top chapter navigation is mandatory. Each apply run binds it to the five chapter headings using builder-compatible `nodeId` link objects, and verifies the saved links and visibility. The SDK 2.4.3 navigation setter writes a different schema, so the adapter sets these link objects directly. Preserve this navigation when changing chapter order.
 
@@ -111,3 +111,9 @@ Agent workflow: read the report and original JSON, compare against the generator
 After approval, update the generator/configuration, validate locally, and apply using `--based-on` with the reviewed snapshot directory. An apply without a baseline is blocked. The script checks that the online draft still matches the reviewed fingerprint both before building and immediately before saving; if collaborators changed it again, inspect and review again. This is a drift check, not an atomic server lock. Close editor tabs during the final apply.
 
 Snapshots are local and ignored by Git because manually added content may not be intended for public sharing. Remote web maps, layers, custom themes, and embeds remain references, not complete offline copies. The report explicitly records this scope; inspect those referenced items and browser rendering when necessary. Unsaved browser edits cannot be exported. An incomplete or unstable snapshot cannot be used as a rebuild baseline.
+
+## Cover-only updates
+
+`course` adds the course code to the byline. The current cover uses Full with a themed title panel at the top left. `cover_vertical_position`, `cover_horizontal_position`, `cover_style`, and `cover_size` control its placement and appearance. Missing cover imagery remains empty.
+
+After inspection and approval of a cover change, use `--update-cover --based-on snapshots/REVIEWED_SNAPSHOT` instead of `--apply` to preserve manually edited content outside the cover. The command verifies that every non-cover node remains unchanged. This targeted operation does not reconcile other manual edits into the full-rebuild configuration; those still require a separate approved reconciliation before a full rebuild.

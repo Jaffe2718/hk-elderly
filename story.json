@@ -3,7 +3,7 @@
   "reference_id": "a9b67d4b282b44f8a0c1003ff61566c7",
   "title": "HK Elderly Interactive Map",
   "subtitle": "Exploring Population Patterns and Access to Services in Hong Kong",
-  "cover_type": "minimal",
+  "cover_type": "full",
   "byline": "Group 13",
   "members": [
     "Wu Jihui",
@@ -102,5 +102,10 @@
       "intro": "Bring the spatial evidence together, consider its limitations, and outline priorities for further investigation."
     }
   ],
-  "theme": "summit"
+  "theme": "summit",
+  "course": "GEOG7302",
+  "cover_style": "themed",
+  "cover_vertical_position": "top",
+  "cover_horizontal_position": "start",
+  "cover_size": "large"
 }

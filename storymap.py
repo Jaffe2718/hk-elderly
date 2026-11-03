@@ -158,7 +158,30 @@ def embed_url(cfg, path):
     return url
 
 
-def apply(cfg, baseline=None):
+def configure_cover(story, cfg):
+    from arcgis.apps.storymap.story_content import Cover
+    cover = next(c for c in story.contents if isinstance(c, Cover))
+    cover.title = cfg['title']
+    cover.summary = cfg.get('subtitle', '')
+    cover.byline = ' '.join(filter(None, [cfg.get('course'), cfg['byline']])) + ' | ' + ' · '.join(cfg.get('members', []))
+    cover.type = cfg.get('cover_type', 'full')
+    if cover.type == 'full':
+        cover.style = cfg.get('cover_style', 'themed')
+        cover.vertical_position = cfg.get('cover_vertical_position', 'top')
+        cover.horizontal_position = cfg.get('cover_horizontal_position', 'start')
+        cover.size = cfg.get('cover_size', 'large')
+    return cover
+
+
+def save_draft(story, cfg):
+    from arcgis.apps.storymap import _utils
+    props = _utils.prepare_story_for_save(story, False, None, None, cfg['title'], None, _utils.get_version(story))
+    props.pop('access', None)
+    if not story._item.update(item_properties=props):
+        raise RuntimeError('ArcGIS rejected draft metadata update')
+
+
+def apply(cfg, baseline=None, cover_only=False):
     # Lazy import allows offline validation without ArcGIS or a Pro license.
     import arcgis
     from arcgis.gis import GIS
@@ -193,6 +216,20 @@ def apply(cfg, baseline=None):
     (backup / 'config.json').write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f'Backed up draft JSON: {backup}', flush=True)
 
+    if cover_only:
+        original_nodes = copy.deepcopy(story._properties['nodes'])
+        cover = configure_cover(story, cfg)
+        check_baseline(StoryMap(cfg['item_id'], gis=gis), cfg, baseline)
+        save_draft(story, cfg)
+        actual = StoryMap(cfg['item_id'], gis=gis)
+        if actual._properties['nodes'][cover._node] != story._properties['nodes'][cover._node]:
+            raise RuntimeError('Saved cover did not match requested design')
+        for node_id, node in original_nodes.items():
+            if node_id != cover._node and actual._properties['nodes'].get(node_id) != node:
+                raise RuntimeError(f'Unexpected non-cover change: {node_id}')
+        print('Cover updated; all non-cover nodes preserved. Draft saved; not published.')
+        return
+
     # Version-pinned adapter: reset IN MEMORY using Esri's own blank template.
     # Do not delete the item or its resources: old assets remain available for recovery.
     template = story._get_storymap_template()
@@ -204,16 +241,7 @@ def apply(cfg, baseline=None):
     for resource in story._properties['resources'].values():
         if resource.get('type') == 'story-theme':
             resource['data'].pop('themeItemId', None)
-    cover = next(c for c in story.contents if isinstance(c, Cover))
-    cover.title = cfg['title']
-    cover.summary = cfg.get('subtitle', '')
-    cover.byline = cfg['byline'] + ' | ' + ' · '.join(cfg.get('members', []))
-    cover.type = cfg.get('cover_type', 'full')
-    if cover.type == 'full':
-        cover.style = 'themed'
-        cover.vertical_position = 'middle'
-        cover.horizontal_position = 'start'
-        cover.size = 'large'
+    cover = configure_cover(story, cfg)
 
     chapter_headings = []
     for index, section in enumerate(cfg['sections']):
@@ -312,6 +340,7 @@ def main():
     actions = parser.add_mutually_exclusive_group()
     actions.add_argument('--apply', action='store_true', help='Overwrite draft after inspection and user-approved reconciliation')
     actions.add_argument('--inspect', action='store_true', help='Read-only export of the current story and all item resources')
+    actions.add_argument('--update-cover', action='store_true', help='Update only the cover, preserving manual edits elsewhere')
     parser.add_argument('--based-on', help='Reviewed snapshot folder required by --apply')
     args = parser.parse_args()
     cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8')) if args.inspect else load_config()
@@ -319,8 +348,8 @@ def main():
         inspect_story(cfg)
         return
     print(f'{cfg["title"]}: {len(cfg["sections"])} sections, {sum(len(s["slides"]) for s in cfg["sections"])} slides', flush=True)
-    if args.apply:
-        apply(cfg, args.based_on)
+    if args.apply or args.update_cover:
+        apply(cfg, args.based_on, cover_only=args.update_cover)
     else:
         print('Configuration valid. Use --apply to overwrite the online draft.')
 
