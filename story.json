@@ -1,9 +1,9 @@
 {
   "item_id": "7e2cd654bad349c38a5658d7c23822af",
-  "reference_id": "4c71a0f011514bc39069cf7708ad2a1c",
+  "reference_id": "a9b67d4b282b44f8a0c1003ff61566c7",
   "title": "HK Elderly Interactive Map",
   "subtitle": "Exploring Population Patterns and Access to Services in Hong Kong",
-  "cover_type": "full",
+  "cover_type": "minimal",
   "byline": "Group 13",
   "members": [
     "Wu Jihui",
@@ -22,9 +22,11 @@
       "panel_position": "start",
       "slides": [
         {
-          "title": "Research Questions"
+          "title": "Research Questions",
+          "summary": "Where do older residents live, and how does the distribution of services relate to their needs?"
         }
-      ]
+      ],
+      "intro": "An introduction to the geography of ageing in Hong Kong and the questions guiding this study."
     },
     {
       "id": "data",
@@ -33,12 +35,15 @@
       "panel_position": "end",
       "slides": [
         {
-          "title": "Data Sources"
+          "title": "Data Sources",
+          "summary": "Document the origin, coverage, dates, and spatial resolution of each dataset."
         },
         {
-          "title": "Methodology"
+          "title": "Methodology",
+          "summary": "Explain the spatial measures and assumptions used to compare population and service provision."
         }
-      ]
+      ],
+      "intro": "The evidence behind the maps: data sources, spatial units, and the methods used to examine service provision."
     },
     {
       "id": "patterns",
@@ -47,12 +52,15 @@
       "panel_position": "start",
       "slides": [
         {
-          "title": "Population Distribution"
+          "title": "Population Distribution",
+          "summary": "Examine the distribution of older residents across the study area."
         },
         {
-          "title": "Spatial Comparison"
+          "title": "Spatial Comparison",
+          "summary": "Compare local patterns using consistent spatial units and measures."
         }
-      ]
+      ],
+      "intro": "A geographic perspective on where older residents live and how population patterns vary across Hong Kong."
     },
     {
       "id": "access",
@@ -66,12 +74,15 @@
           "media": {
             "type": "embed",
             "path": "embeds/elderly-map/index.html"
-          }
+          },
+          "summary": "Explore neighbourhood centre locations and compare distance thresholds using the interactive demo."
         },
         {
-          "title": "Areas of Need"
+          "title": "Areas of Need",
+          "summary": "Identify locations that warrant closer investigation, alongside the assumptions behind each comparison."
         }
-      ]
+      ],
+      "intro": "Explore the relationship between elderly populations, neighbourhood centres, and access to local services."
     },
     {
       "id": "conclusion",
@@ -80,12 +91,15 @@
       "panel_position": "start",
       "slides": [
         {
-          "title": "Key Findings"
+          "title": "Key Findings",
+          "summary": "Summarise the main observations supported by the completed analysis."
         },
         {
-          "title": "Recommendations"
+          "title": "Recommendations",
+          "summary": "Consider practical implications, uncertainty, and opportunities for further work."
         }
-      ]
+      ],
+      "intro": "Bring the spatial evidence together, consider its limitations, and outline priorities for further investigation."
     }
   ],
   "theme": "summit"

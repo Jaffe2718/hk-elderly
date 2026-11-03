@@ -6,7 +6,7 @@
 - `story.json` is the source of truth for chapter order, text, layouts, and asset references. `storymap.py` is the single entry point for rebuilding the online draft.
 - Every apply run replaces all draft content while retaining the item ID and URL. Manual edits in the online builder are overwritten on the next run.
 - Keep the current chapter order until a new outline is agreed. Titles and the subtitle remain editable placeholders, not research conclusions.
-- Use the built-in Summit theme, a full cover with a themed title panel, a title, subtitle, and member names without student IDs.
+- Use the built-in Summit theme, a compact minimal cover, a title, subtitle, and member names without student IDs.
 - Use owned or appropriately licensed assets. Never commit credentials, tokens, login profiles, sensitive source data, or local backups.
 - Sign into ArcGIS Pro as the StoryMap owner. Close the StoryMap editor tab before applying changes to prevent stale browser autosaves; reopen it afterward to preview.
 - Apply runs save unpublished drafts and preserve sharing settings. Review the result in the StoryMaps builder before publishing.
@@ -38,7 +38,7 @@ Replace the online draft using the signed-in ArcGIS Pro account:
 & 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' -u storymap.py --apply
 ```
 
-In Codex, the apply command requires execution outside the sandbox to access the Pro license. ArcGIS API for Python is pinned to **2.4.3**. After saving, the script reads back the draft and verifies chapter and slide counts, layouts, panel placements, cover text, embed settings, and the theme reference.
+In Codex, the apply command requires execution outside the sandbox to access the Pro license. ArcGIS API for Python is pinned to **2.4.3**. After saving, the script reads back the draft and verifies chapter and slide counts, layouts, panel placements, cover text, embed settings, chapter navigation, and the theme reference.
 
 ## Theme and SDK compatibility
 
@@ -82,3 +82,9 @@ Use relative URLs inside hosted pages to support the repository URL prefix. Page
 The collaborator's demo is stored unchanged at `docs/embeds/elderly-map/index.html`. Leaflet, styles, and data are embedded in the file, with no additional linked assets or fetch requests. It appears in chapter 04, **Service Distribution**. Treat it as an interactive preview rather than validated final research findings.
 
 Push new embed assets and wait for Pages deployment to succeed before applying the StoryMap configuration. Pages deployment and StoryMap updates are separate operations; StoryMap updates currently use local ArcGIS Pro authentication.
+
+## Visual structure
+
+The current reference is recorded in `reference_id`. Keep the white Summit theme and a compact title/subtitle/member block while no cover image is available. Chapter headings are followed by short editorial introductions, separators between chapters, and mixed Sidecar layouts. Slide summaries describe the intended reading task without inventing findings; media remains empty where no asset is configured.
+
+The visible top chapter navigation is mandatory. Each apply run binds it to the five chapter headings using builder-compatible `nodeId` link objects, and verifies the saved links and visibility. The SDK 2.4.3 navigation setter writes a different schema, so the adapter sets these link objects directly. Preserve this navigation when changing chapter order.

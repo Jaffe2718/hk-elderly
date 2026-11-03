@@ -66,7 +66,7 @@ def apply(cfg):
     from arcgis.gis import GIS
     from arcgis.apps.storymap import StoryMap, Themes
     from arcgis.apps.storymap.story_content import (
-        Cover, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed,
+        Cover, Navigation, Separator, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed,
     )
     if arcgis.__version__ != '2.4.3':
         raise RuntimeError('Revalidate template adapter before changing arcgis 2.4.3')
@@ -116,13 +116,22 @@ def apply(cfg):
         cover.horizontal_position = 'start'
         cover.size = 'large'
 
-    for section in cfg['sections']:
-        story.add(Text(html.escape(section['title']), style=TextStyles.HEADING))
+    chapter_headings = []
+    for index, section in enumerate(cfg['sections']):
+        if index:
+            story.add(Separator())
+        heading = Text(html.escape(section['title']), style=TextStyles.HEADING)
+        story.add(heading)
+        chapter_headings.append(heading)
+        if section.get('intro'):
+            story.add(Text(html.escape(section['intro'])))
         sidecar = Sidecar(style=section.get('layout', 'docked-panel'))
         story.add(sidecar)
         slides = []
         for slide in section['slides']:
             texts = [Text(html.escape(slide['title']), style=TextStyles.SUBHEADING)]
+            if slide.get('summary'):
+                texts.append(Text(html.escape(slide['summary'])))
             if slide.get('text'):
                 texts.append(Text(html.escape(slide['text']).replace('\n', '<br>')))
             media = slide.get('media')
@@ -145,6 +154,12 @@ def apply(cfg):
             panel = story._properties['nodes'][slide._node]['children'][0]
             panel_position = position + '-top' if section.get('layout') == 'slideshow' else position
             story._properties['nodes'][panel]['data']['position'] = panel_position
+    navigation = next(c for c in story.contents if isinstance(c, Navigation))
+    navigation.hidden = False
+    # SDK 2.4.3's setter writes bare IDs, but the builder expects link objects.
+    story._properties['nodes'][navigation._node]['data']['links'] = [
+        {'nodeId': heading._node} for heading in chapter_headings
+    ]
     (backup / 'generated.json').write_text(json.dumps(story._properties, ensure_ascii=False, indent=2), encoding='utf-8')
     # SDK 2.4.3 save() tries to reapply access='shared' via a missing
     # SharingGroupManager.update method. Prepare the same draft, then update
@@ -161,6 +176,10 @@ def apply(cfg):
     themes = [r['data'] for r in actual._properties['resources'].values() if r.get('type') == 'story-theme']
     if len(themes) != 1 or themes[0].get('themeId') != cfg.get('theme', 'summit') or 'themeItemId' in themes[0]:
         raise RuntimeError('Saved built-in theme contains an invalid reference')
+    saved_nav = next(c for c in actual.contents if isinstance(c, Navigation))
+    nav_node = actual._properties['nodes'][saved_nav._node]
+    if nav_node['config']['isHidden'] or nav_node['data']['links'] != [{'nodeId': h._node} for h in chapter_headings]:
+        raise RuntimeError('Saved chapter navigation did not match the headings')
     sidecars = [c for c in actual.contents if isinstance(c, Sidecar)]
     if len(sidecars) != len(cfg['sections']) or [len(c.slides) for c in sidecars] != [len(s['slides']) for s in cfg['sections']]:
         raise RuntimeError('Saved draft structure did not match configuration')
