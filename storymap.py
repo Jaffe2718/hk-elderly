@@ -259,7 +259,7 @@ def configure_embeds(story):
         parts = urlparse(url)
         data.update(isEmbedSupported=True, display='inline', embedSrc=url,
                     providerUrl=f'{parts.scheme}://{parts.netloc}',
-                    hasPlaceholderOpenButton=False, hasEmbedOpenButton=True, isLiveOnMobile=True)
+                    hasPlaceholderOpenButton=False, hasEmbedOpenButton=False, isLiveOnMobile=True)
         data['caption'] = data.get('caption', data.get('description', ''))
         if node.get('config', {}).get('size') == 'full':
             node['config']['size'] = 'wide'

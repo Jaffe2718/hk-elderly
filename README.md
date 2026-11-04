@@ -149,7 +149,7 @@ Final figure policy: no PDF crops are used. Population composition uses a native
 
 - Six navigation chapters end with References, followed by a native Credit acknowledgement.
 - Native Web Map nodes each receive an isolated resource and an explicit Hong Kong centre, extent and positive scale, including matched case-study Swipe views.
-- HTML embeds declare supported inline rendering rather than link cards.
+- HTML embeds declare supported inline rendering rather than link cards and hide the StoryMaps open-in-new-window button.
 - The workflow uses five architecture layers, category colours, line icons and an English colour legend with step counts. All connections retain static centre lines. Only the selected step's outgoing connections carry glowing green packets; the packets fade at the ports and wrap seamlessly at a constant path speed. Reduced-motion settings disable animation. Inactive labels remain fully readable. SVG exports include the legend.
 - The workflow omits the duplicate heading, sizes its SVG viewport to the actual iframe container and focuses the current step on narrow frames. Search, Previous/Next, Fit and pan/zoom remain available.
 - Interactive housing/district coverage and distance/age decision charts are generated from the supplied CSVs with `scripts/prepare_chart_data.py`. They support exact-value inspection, table view and CSV download; coverage bars also support facility-scope filtering and sorting.
