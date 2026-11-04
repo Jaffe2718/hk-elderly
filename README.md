@@ -163,7 +163,7 @@ Final figure policy: no PDF crops are used. Population composition uses a native
 - `assets/references.json` holds APA-formatted scholarly and dataset references. The A503 release date is verified against the Census main-table register. Unknown release dates remain `n.d.`; retrieval dates identify the changing facility datasets. The discussion cites Geurs and van Wee (2004) for the distinction between a proximity measure and the wider concept of accessibility.
 - Both distance and age matrices appear together in the sensitivity embed. The component sizes itself to the iframe height. District bars use six-row pages; the table view and CSV export still include all rows. Teal/blue colours and coloured outer glows replace purple bars and dark hover borders. Selection remains encoded by explicit 1/0 values.
 - The 18 supplied district polygons are dissolved locally with ArcPy. The outline retains island exteriors and removes internal district lines and hole boundaries. Geometry repair and independent-union checks are recorded in `assets/boundaries/provenance.json`.
-- Native maps use rose population circles, orange NEC diamonds, green DECC triangles, a label-free native vector basemap with pale-blue water, and the red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
+- Native maps use pale-purple population circles, dark-green NEC diamonds and DECC triangles, a label-free native vector basemap with pale-blue water, and the dark-red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
 
 To regenerate the map presentation after importing the original handoff:
 

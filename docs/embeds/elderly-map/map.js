@@ -5,10 +5,10 @@ Promise.all(['data.json','study-outline.geojson'].map(path=>fetch(path).then(r=>
 function start(D){
  $('loading').remove();const map=L.map('map',{preferCanvas:false,zoomControl:false,minZoom:8,maxZoom:18});L.control.zoom({position:'topright'}).addTo(map);L.control.scale({imperial:false}).addTo(map);
  const bg=L.geoJSON(D.districts,{style:{stroke:false,fillColor:'#f6f8f7',fillOpacity:1},interactive:false}).addTo(map);map.fitBounds(bg.getBounds());
- const studyOutline=L.geoJSON(D.outline,{style:{color:'#c03035',weight:1.5,opacity:.95},interactive:false}).addTo(map);
+ const studyOutline=L.geoJSON(D.outline,{style:{color:'#802835',weight:1.5,opacity:.95},interactive:false}).addTo(map);
  let radius=800,areas;const layers={},groupLayers={};
  const sites=(fc,color,type)=>L.geoJSON(fc,{pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:type==='NEC'?3:4,fillColor:color,color:'white',weight:.7,fillOpacity:.9}),onEachFeature:(f,l)=>l.bindPopup(`<b>${esc(f.properties.name_en||type+' location')}</b><p>${type} mapped premises</p><small>Locations do not indicate capacity or independent service units.</small>`)});
- layers.nec=sites(D.centres.nec,'#d2582c','NEC').addTo(map);layers.decc=sites(D.centres.decc,'#006c67','DECC');layers.residential=L.imageOverlay(D.resImage,D.resBounds,{opacity:.75,interactive:false});
+ layers.nec=sites(D.centres.nec,'#145341','NEC').addTo(map);layers.decc=sites(D.centres.decc,'#145341','DECC');layers.residential=L.imageOverlay(D.resImage,D.resBounds,{opacity:.75,interactive:false});
  const key=L.control({position:'bottomright'});key.onAdd=()=>{key.el=L.DomUtil.create('div','map-key');L.DomEvent.disableClickPropagation(key.el);return key.el};key.addTo(map);
  const home=L.control({position:'topright'});home.onAdd=()=>{const d=L.DomUtil.create('button');d.type='button';d.textContent='All Hong Kong';L.DomEvent.disableClickPropagation(d);d.onclick=()=>map.fitBounds(bg.getBounds());return d};home.addTo(map);
  const row=(a,b)=>`<div class="popup-row"><span>${a}</span><strong>${b}</strong></div>`;

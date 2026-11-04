@@ -23,7 +23,7 @@ def run():
     dx=(xmax-xmin)*.05;dy=(ymax-ymin)*.05
     study_extent={'xmin':xmin-dx,'xmax':xmax+dx,'ymin':ymin-dy,'ymax':ymax+dy,'spatialReference':{'wkid':4326}}
     land_layer=collection('study_land','Study area land','esriGeometryPolygon',{'rings':rings,'spatialReference':{'wkid':4326}}, {'type':'esriSFS','style':'esriSFSSolid','color':[249,251,250,225],'outline':{'type':'esriSLS','style':'esriSLSNull'}})
-    outline_layer=collection('study_outline','Hong Kong study area outline','esriGeometryPolyline',{'paths':line['coordinates'],'spatialReference':{'wkid':4326}},{'type':'esriSLS','style':'esriSLSSolid','color':[192,48,53,245],'width':1.2})
+    outline_layer=collection('study_outline','Hong Kong study area outline','esriGeometryPolyline',{'paths':line['coordinates'],'spatialReference':{'wkid':4326}},{'type':'esriSLS','style':'esriSLSSolid','color':[128,40,53,245],'width':1.2})
     for path in sorted((ROOT/'assets/webmaps').glob('M*.json')):
         data=json.loads(path.read_text(encoding='utf-8'))
         layers=[l for l in data['operationalLayers'] if l['id'] not in {'study_land','study_outline'}]
@@ -33,10 +33,10 @@ def run():
             for sub in layer.get('featureCollection',{}).get('layers',[]):
                 renderer=sub['layerDefinition'].get('drawingInfo',{}).get('renderer',{})
                 if key in {'nec_sites','decc_sites'}:
-                    renderer['symbol']={'type':'esriSMS','style':'esriSMSDiamond' if key=='nec_sites' else 'esriSMSTriangle','color':[210,88,44,245] if key=='nec_sites' else [0,108,103,245],'size':5.5 if key=='nec_sites' else 7,'outline':{'type':'esriSLS','style':'esriSLSSolid','color':[255,255,255,250],'width':.7}}
+                    renderer['symbol']={'type':'esriSMS','style':'esriSMSDiamond' if key=='nec_sites' else 'esriSMSTriangle','color':[20,83,65,245] if key=='nec_sites' else [20,83,65,245],'size':5.5 if key=='nec_sites' else 7,'outline':{'type':'esriSLS','style':'esriSLSSolid','color':[255,255,255,250],'width':.7}}
                 if key=='population60':
                     for info,size in zip(renderer['classBreakInfos'],[6,10,15,21,27]):
-                        info['symbol'].update(color=[166,50,101,190],size=size)
+                        info['symbol'].update(color=[190,173,218,155],size=size)
                     renderer['defaultSymbol']=copy.deepcopy(renderer['classBreakInfos'][0]['symbol'])
                 if key=='age_share':
                     for info,colour in zip(renderer['classBreakInfos'],[[229,242,249,240],[172,210,231,240],[96,160,196,240],[36,103,145,245]]):info['symbol']['color']=colour
@@ -46,6 +46,6 @@ def run():
         path.write_text(json.dumps(data,ensure_ascii=False)+'\n',encoding='utf-8')
     (ROOT/'docs/embeds/elderly-map/study-outline.geojson').write_bytes((ROOT/'assets/boundaries/hk-study-area-outline.geojson').read_bytes())
     (ROOT/'docs/embeds/elderly-map/native-basemap.json').write_bytes((ROOT/'assets/basemaps/minimal-vector.json').read_bytes())
-    print('Styled 12 native Web Maps: rose population circles, orange NEC diamonds, pale-blue water and red exterior outline.')
+    print('Styled 12 native Web Maps: pale-purple circles, dark-green facility points, pale-blue water and dark-red exterior outline.')
 
 if __name__=='__main__':run()
