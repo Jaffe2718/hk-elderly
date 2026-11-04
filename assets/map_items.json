@@ -1,0 +1,51 @@
+{
+  "M01_population": {
+    "item_id": "aee24fd2b38740a9bea1fbf82e52e5c1",
+    "title": "GEOG7302  Population",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  },
+  "M02_coverage": {
+    "item_id": "f59e0193cc854652b671234ea633efea",
+    "title": "GEOG7302  Coverage",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  },
+  "M03_binary800": {
+    "item_id": "2dee76f43d254fe3b51e0e8e6d37da2e",
+    "title": "GEOG7302  Binary800",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  },
+  "M06_sensitivity27": {
+    "item_id": "48b2c17abaad43249bcfc665e3c05405",
+    "title": "GEOG7302  Sensitivity27",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  },
+  "M09_centroid_comparison": {
+    "item_id": "fab2fe9a9d204d559c9e4f12a276f571",
+    "title": "GEOG7302  Centroid Comparison",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  },
+  "M10_facility_definition": {
+    "item_id": "1ae9624129ca4962b5de8f36028426f7",
+    "title": "GEOG7302  Facility Definition",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  },
+  "M11_residential_nec": {
+    "item_id": "0f029b836ccf4943ad91b54bc183135b",
+    "title": "GEOG7302  Residential Nec",
+    "groups": [
+      "16d0debba6b24c88afffca891f37958a"
+    ]
+  }
+}

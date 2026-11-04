@@ -1,8 +1,8 @@
 {
   "item_id": "7e2cd654bad349c38a5658d7c23822af",
   "reference_id": "a9b67d4b282b44f8a0c1003ff61566c7",
-  "title": "HK Elderly Interactive Map",
-  "subtitle": "Exploring Population Patterns and Access to Services in Hong Kong",
+  "title": "Spatial coverage of Neighbourhood Elderly Centres and priority areas for community support review in Hong Kong",
+  "subtitle": "Where population concentration meets weaker residential proximity",
   "cover_type": "full",
   "byline": "Group 13",
   "members": [
@@ -16,90 +16,334 @@
   "pages_base_url": "https://jaffe2718.github.io/hk-elderly/",
   "sections": [
     {
-      "id": "background",
-      "title": "01 | Background",
-      "layout": "docked-panel",
+      "id": "introduction",
+      "title": "Introduction",
+      "intro": "A community may contain many older residents yet have few Neighbourhood Elderly Centre locations nearby. How can spatial evidence help identify places worth a closer look?",
+      "layout": "floating-panel",
       "panel_position": "start",
       "slides": [
         {
-          "title": "Research Questions",
-          "summary": "Where do older residents live, and how does the distribution of services relate to their needs?"
+          "title": "Start with where people live",
+          "summary": "Population counts and age proportions answer different questions.",
+          "text": "The 2021 Census records 2,065,146 residents aged 60+ across 211 small tertiary planning unit groups (STPUGs). Our screening uses the number of older residents to represent the scale of potential demand, rather than treating a high elderly percentage as a large population.\n\nA centre just across a statistical boundary may still be nearby. Conversely, a centre inside a large area may be far from its housing. We therefore examine distances from residential land, not simply facility counts inside boundaries.",
+          "media": {
+            "type": "map",
+            "webmap": "M01_population"
+          }
         }
       ],
-      "intro": "An introduction to the geography of ageing in Hong Kong and the questions guiding this study."
+      "before": [
+        {
+          "type": "quote",
+          "text": "Where do substantial older populations coincide with weaker residential proximity to neighbourhood centres?"
+        }
+      ],
+      "after": [
+        {
+          "type": "text",
+          "text": "This story combines population, residential land and facility locations in a transparent two-condition Binary screen. Its outcome is a shortlist for further community-support review, not proof of unmet demand and not a prescription for new-centre sites."
+        }
+      ]
     },
     {
       "id": "data",
-      "title": "02 | Data & Methods",
-      "layout": "floating-panel",
+      "title": "Data & Objective",
+      "intro": "Link older-population counts to residential proximity, identify areas meeting explicit conditions, and examine how the shortlist changes when those conditions change.",
+      "layout": "slideshow",
       "panel_position": "end",
       "slides": [
         {
-          "title": "Data Sources",
-          "summary": "Document the origin, coverage, dates, and spatial resolution of each dataset."
+          "title": "Locations are not capacity",
+          "summary": "215 unique NEC sites and 62 DECC sites support two facility scenarios.",
+          "text": "The SWD snapshot retrieved on 2 November 2026 contains 216 NEC records at 215 distinct coordinates. Only exactly coincident coordinates were deduplicated; premises and sub-bases remain represented. These are mapped locations, not 215 independent service units, and their number does not measure capacity or utilisation.\n\nDistrict Elderly Community Centres (DECCs) form a supplementary comparison. Their inclusion tests geographical complementarity; it does not make NEC and DECC services interchangeable.",
+          "media": {
+            "type": "map",
+            "webmap": "M11_residential_nec"
+          }
         },
         {
-          "title": "Methodology",
-          "summary": "Explain the spatial measures and assumptions used to compare population and service provision."
+          "title": "Counts and proportions describe different things",
+          "summary": "Age composition helps interpret the map, but the Binary rule uses counts.",
+          "text": "A high proportion of older residents does not necessarily indicate a large older population. The main model uses the number aged 60+, while this supplementary map describes age composition. Both refer to the entire statistical group rather than only the location of its symbol.",
+          "media": {
+            "type": "image",
+            "path": "assets/figures/02_population_share_en.png"
+          }
         }
       ],
-      "intro": "The evidence behind the maps: data sources, spatial units, and the methods used to examine service provision."
+      "before": [
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Evidence",
+              "Reference",
+              "Analytical role"
+            ],
+            [
+              "Census A503 + STPUG boundaries",
+              "2021 / 211 groups",
+              "Counts and shares for ages 60+, 65+ and 75+"
+            ],
+            [
+              "NEC premises",
+              "2 Nov 2026 / 215 sites",
+              "Main proximity and location-choice measures"
+            ],
+            [
+              "DECC premises",
+              "2 Nov 2026 / 62 sites",
+              "Supplementary facility scenario"
+            ],
+            [
+              "Residential land-use classes 1–3",
+              "2021 / 10 m cells",
+              "Private, public and rural residential support"
+            ],
+            [
+              "District boundaries",
+              "2021 / 18 districts",
+              "Residential-area summaries by district"
+            ]
+          ]
+        }
+      ],
+      "after": [
+        {
+          "type": "text",
+          "text": "We assess 210 STPUGs with usable residential cells. Group 295 has no usable residential support and remains unassessed. Of 792,158 source residential cells, 792,049 were assigned to a group; 109 were not. The coverage denominator is 79.2049 km² of assigned residential land."
+        }
+      ]
     },
     {
-      "id": "patterns",
-      "title": "03 | Spatial Patterns",
-      "layout": "slideshow",
+      "id": "methodology",
+      "title": "Methodology",
+      "intro": "Follow the evidence from three data streams to an explicit Binary decision, then inspect how alternative definitions change that decision.",
+      "layout": "docked-panel",
+      "panel_position": "start",
+      "slides": [],
+      "before": [
+        {
+          "type": "embed",
+          "path": "embeds/workflow/index.html",
+          "caption": "Select a step to inspect its inputs, assumptions and outputs. Use the walkthrough, search and zoom controls."
+        },
+        {
+          "type": "heading",
+          "text": "One model, two conditions"
+        },
+        {
+          "type": "quote",
+          "text": "Age 60+ count ≥ 14,695 AND more than 50% of residential land beyond 800 m from the nearest NEC."
+        },
+        {
+          "type": "text",
+          "text": "14,695 is the 75th percentile among the 210 assessed groups. The 800 m distance and 50% share are screening choices, not official service standards. A group meeting both conditions receives 1; other assessed groups receive 0. Missing residential support is kept separate."
+        },
+        {
+          "type": "heading",
+          "text": "Measure from residential land"
+        },
+        {
+          "type": "text",
+          "text": "Join population to boundaries using string group codes and project distance layers to Hong Kong 1980 Grid (EPSG:2326). Extract residential classes 1–3 and assign 10 m cell centres to groups through a spatial join. Calculate nearest and second-nearest NEC distances and the number of distinct locations within 800 m. Use 500, 800 and 1,000 m dissolved buffers and residential overlays as coverage explanations and consistency checks."
+        },
+        {
+          "type": "text",
+          "text": "For each group, the share beyond 800 m is the number of assigned residential-cell centres farther than 800 m from the nearest NEC divided by all assigned residential cells. Equal cell areas make this an area-weighted measure. Neither entire statistical polygons nor non-residential land enter the coverage denominator."
+        },
+        {
+          "type": "heading",
+          "text": "Test the definitions"
+        },
+        {
+          "type": "text",
+          "text": "Cross population P60/P75/P90, distances of 500/800/1,000 m, and uncovered shares of 25/50/75% to produce 27 threshold scenarios. Repeat the main rule for ages 65+ and 75+ using their own P75 cutoffs. Compare NEC-only with NEC+DECC coverage and residential-cell distances with a centroid-distance alternative. These are sensitivity checks, not independent validation or additional weighted models."
+        }
+      ],
+      "after": []
+    },
+    {
+      "id": "analysis",
+      "title": "Spatial Analysis",
+      "intro": "Read the spatial contrasts, inspect the four main-scenario cases, and test how firmly each finding depends on the chosen definitions.",
+      "layout": "docked-panel",
       "panel_position": "start",
       "slides": [
         {
-          "title": "Population Distribution",
-          "summary": "Examine the distribution of older residents across the study area."
+          "title": "Coverage follows housing geography",
+          "summary": "Public residential land has substantially stronger NEC proximity than rural settlements.",
+          "text": "Within 800 m of an NEC, coverage is 91.5% for public residential land, 53.4% for private residential land and 17.9% for rural settlements. Ground area does not imply equal population density: these percentages cannot be read as the share of older people served.\n\nThe district comparison is summarised from residential-cell locations. It does not assign the entire population of a cross-district STPUG to a single district.",
+          "media": {
+            "type": "map",
+            "webmap": "M02_coverage"
+          }
         },
         {
-          "title": "Spatial Comparison",
-          "summary": "Compare local patterns using consistent spatial units and measures."
-        }
-      ],
-      "intro": "A geographic perspective on where older residents live and how population patterns vary across Hong Kong."
-    },
-    {
-      "id": "access",
-      "title": "04 | Accessibility & Service Provision",
-      "layout": "docked-panel",
-      "panel_position": "end",
-      "slides": [
+          "title": "Four areas meet both conditions",
+          "summary": "524, 628, 833 and 950S form the main-scenario shortlist.",
+          "text": "The four selected groups contain 78,526 residents aged 60+. This is their total older population, not a count of unserved residents. The remaining 206 assessed groups do not meet both criteria; one further group is unassessed.\n\nThe population–coverage classification distinguishes 4 higher-population/weaker-coverage groups, 49 higher-population/stronger-coverage groups, 72 lower-population/weaker-coverage groups and 85 lower-population/stronger-coverage groups. All labels use this study’s relative thresholds.",
+          "media": {
+            "type": "map",
+            "webmap": "M03_binary800"
+          }
+        },
         {
-          "title": "Service Distribution",
-          "text": "Explore the neighbourhood elderly centre coverage demo. Select an area, compare distance thresholds, and toggle map layers. Open the map in a new tab for a larger view.",
+          "title": "Explore the thresholds",
+          "summary": "Change the distance, age definition and facility scope.",
+          "text": "At fixed population and residential-share cutoffs, the shortlist contains 11 groups at 500 m, 4 at 800 m and 2 at 1,000 m. Eastern Yuen Long and Tiu Keng Leng remain selected at all three distances.\n\nUse the embedded explorer to compare these scenarios and inspect an area’s attributes. Expanded age and NEC+DECC scenarios are provided at 800 m. The map’s counts describe the selected rule, not service capacity.",
           "media": {
             "type": "embed",
             "path": "embeds/elderly-map/index.html"
-          },
-          "summary": "Explore neighbourhood centre locations and compare distance thresholds using the interactive demo."
+          }
         },
         {
-          "title": "Areas of Need",
-          "summary": "Identify locations that warrant closer investigation, alongside the assumptions behind each comparison."
+          "title": "Read parameter sensitivity",
+          "summary": "Selection frequency describes dependence on assumptions.",
+          "text": "Across 27 threshold combinations, groups 524 and 833 are selected 16 times, 628 is selected 12 times and 950S is selected 10 times. These counts are scenario frequencies, not probabilities, confidence levels or suitability scores.\n\nAt 800 m, group 833 is selected under the age-60+ definition but not under 65+ or 75+. Its age-60+ population exceeds the main threshold by only 158. The alternative P75 cutoffs are 10,629.75 for age 65+ and 4,317.5 for age 75+.",
+          "media": {
+            "type": "map",
+            "webmap": "M06_sensitivity27"
+          }
+        },
+        {
+          "title": "The representative location matters",
+          "summary": "A polygon centroid can give a different answer from residential support.",
+          "text": "Centroid-distance screening selects six groups and disagrees with the residential-distribution method in eight group classifications. Southern Fanling is selected by residential support but not by the centroid alternative.\n\nThis comparison explains why the analysis follows residential land rather than a single geometric centre. It is a methodological diagnostic, not evidence that one distance captures real pedestrian access.",
+          "media": {
+            "type": "map",
+            "webmap": "M09_centroid_comparison"
+          }
+        },
+        {
+          "title": "Facility scope changes the picture",
+          "summary": "NEC and NEC+DECC maps must be read as different definitions.",
+          "text": "When DECC sites are included, none of the four main-scenario groups continues to meet the same uncovered-residential-share condition. In Tiu Keng Leng, the share beyond 800 m drops from 98.9% with NEC only to 8.5% with NEC+DECC.\n\nThis suggests a need to review how nearby services connect. It does not show that a DECC provides the same service, has spare capacity, or removes unmet demand.",
+          "media": {
+            "type": "map",
+            "webmap": "M10_facility_definition"
+          }
         }
       ],
-      "intro": "Explore the relationship between elderly populations, neighbourhood centres, and access to local services."
+      "before": [],
+      "after": [
+        {
+          "type": "heading",
+          "text": "Local cases in context"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Area",
+              "Residents 60+",
+              "Beyond NEC 800 m",
+              "Review focus"
+            ],
+            [
+              "524 Eastern Yuen Long",
+              "16,891",
+              "75.0%",
+              "Persistent across three distances"
+            ],
+            [
+              "628 Southern Fanling",
+              "22,684",
+              "57.7%",
+              "Residential support versus centroid"
+            ],
+            [
+              "833 Tiu Keng Leng",
+              "14,853",
+              "98.9%",
+              "Facility scope and age definition"
+            ],
+            [
+              "950S Tung Chung / Chek Lap Kok",
+              "24,098",
+              "52.4%",
+              "Near the 50% threshold; exclude airport land"
+            ]
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Tiu Keng Leng: change the facility scope"
+        },
+        {
+          "type": "text",
+          "text": "Drag the native Swipe divider between matched NEC-only and NEC+DECC views. The residential footprint and map extent are held constant. The comparison concerns spatial proximity, not interchangeable services or operating capacity."
+        },
+        {
+          "type": "swipe",
+          "images": [
+            "assets/figures/case_833_nec_en.png",
+            "assets/figures/case_833_combined_en.png"
+          ],
+          "caption": "Left: NEC only. Right: NEC + DECC. Tiu Keng Leng, group 833."
+        },
+        {
+          "type": "heading",
+          "text": "Coverage by residential type"
+        },
+        {
+          "type": "image",
+          "path": "assets/figures/11_housing_type_coverage_en.png",
+          "caption": "Share of residential ground area within 800 m, grouped by land-use class. This is not population coverage."
+        },
+        {
+          "type": "heading",
+          "text": "Age and distance definitions"
+        },
+        {
+          "type": "image",
+          "path": "assets/figures/12_age_distance_sensitivity_en.png",
+          "caption": "1 means the Binary rule is met. Each age cohort uses its own P75 population cutoff."
+        }
+      ]
     },
     {
-      "id": "conclusion",
-      "title": "05 | Discussion & Conclusions",
-      "layout": "floating-panel",
+      "id": "conclusions",
+      "title": "Conclusions",
+      "intro": "The analysis offers a transparent starting point for community-support review, with the meaning of “priority” kept tied to explicit assumptions.",
+      "layout": "docked-panel",
       "panel_position": "start",
-      "slides": [
+      "slides": [],
+      "before": [
         {
-          "title": "Key Findings",
-          "summary": "Summarise the main observations supported by the completed analysis."
+          "type": "quote",
+          "text": "A screening result is a reason to investigate further, not proof of service inadequacy."
         },
         {
-          "title": "Recommendations",
-          "summary": "Consider practical implications, uncertainty, and opportunities for further work."
+          "type": "heading",
+          "text": "What the evidence supports"
+        },
+        {
+          "type": "text",
+          "text": "Four groups combine an upper-quartile age-60+ population with more than half their residential land beyond 800 m of an NEC. Public residential land has stronger geographical coverage than rural settlement land, and nearby facility choices vary. Local cases reveal why a single boundary count or centroid can conceal residential patterns."
+        },
+        {
+          "type": "heading",
+          "text": "What changes the interpretation"
+        },
+        {
+          "type": "text",
+          "text": "Distance thresholds, age definitions, representative locations and facility categories change the shortlist. The main Binary model remains the reference; alternative scenarios expose sensitivity. Priorities for follow-up include how NEC and DECC services connect, whether residents can reach them, and which forms of supplementary community support are appropriate."
+        },
+        {
+          "type": "heading",
+          "text": "Limits and next steps"
+        },
+        {
+          "type": "text",
+          "text": "Straight-line distance excludes roads, slopes, sea barriers and accessible entrances. Residential ground area does not represent equal numbers of people. Capacity and actual utilisation are unavailable. Pairing 2021 population and land use with a 2026 premises snapshot makes this an initial spatial screen, not a same-year assessment of service adequacy."
+        },
+        {
+          "type": "text",
+          "text": "The supplied results were produced through Python/GDAL pre-analysis and local checks. ArcGIS Web Maps reproduce the supplied geometry and attributes; importing them does not establish that the core geoprocessing was independently rerun in ArcGIS Pro. Final review should verify the analytical workflow in Pro, confirm local access conditions and service functions, and test the published story with group-member accounts."
         }
       ],
-      "intro": "Bring the spatial evidence together, consider its limitations, and outline priorities for further investigation."
+      "after": []
     }
   ],
   "theme": "summit",
@@ -107,5 +351,31 @@
   "cover_style": "themed",
   "cover_vertical_position": "top",
   "cover_horizontal_position": "start",
-  "cover_size": "large"
+  "cover_size": "large",
+  "sources": [
+    {
+      "name": "C&SD: 2021 Population Census, A503 and statistical boundaries",
+      "url": "https://www.census2021.gov.hk/en/main_tables.html"
+    },
+    {
+      "name": "SWD: Neighbourhood Elderly Centre premises (retrieved 2 Nov 2026)",
+      "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"
+    },
+    {
+      "name": "SWD: District Elderly Community Centre premises (retrieved 2 Nov 2026)",
+      "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_34036"
+    },
+    {
+      "name": "Planning Department: Land Utilization in Hong Kong 2021",
+      "url": "https://portal.csdi.gov.hk/csdi-webpage/metadata/pland_rcd_1634024370851_27769/html"
+    },
+    {
+      "name": "C&SD: 2021 statistical boundaries by STPUG",
+      "url": "https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-stpu"
+    },
+    {
+      "name": "C&SD: 2021 district boundaries",
+      "url": "https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-dcd"
+    }
+  ]
 }

@@ -1,0 +1,30 @@
+'use strict';
+const $=id=>document.getElementById(id),nf=new Intl.NumberFormat('en-GB'),pct=v=>v==null?'Not assessed':v.toFixed(1)+'%',names={'524':'Eastern Yuen Long','628':'Southern Fanling','833':'Tiu Keng Leng','950S':'Tung Chung / Chek Lap Kok'};
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+fetch('data.json').then(r=>{if(!r.ok)throw Error('Data unavailable');return r.json()}).then(start).catch(e=>{$('loading').textContent='Unable to load map. Please refresh.';console.error(e)});
+function start(D){
+ $('loading').remove();const map=L.map('map',{preferCanvas:true,zoomControl:false,minZoom:8,maxZoom:18});L.control.zoom({position:'topright'}).addTo(map);L.control.scale({imperial:false}).addTo(map);
+ const bg=L.geoJSON(D.districts,{style:{color:'#cdd7d4',weight:.65,fillColor:'#f6f8f7',fillOpacity:1},interactive:false}).addTo(map);map.fitBounds(bg.getBounds());
+ let radius=800,areas;const layers={},groupLayers={};
+ const sites=(fc,color,type)=>L.geoJSON(fc,{pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:type==='NEC'?3:4,fillColor:color,color:'white',weight:.7,fillOpacity:.9}),onEachFeature:(f,l)=>l.bindPopup(`<b>${esc(f.properties.name_en||type+' location')}</b><p>${type} mapped premises</p><small>Locations do not indicate capacity or independent service units.</small>`)});
+ layers.nec=sites(D.centres.nec,'#087e80','NEC').addTo(map);layers.decc=sites(D.centres.decc,'#8c6cab','DECC');layers.residential=L.imageOverlay(D.resImage,D.resBounds,{opacity:.75,interactive:false});
+ const key=L.control({position:'bottomright'});key.onAdd=()=>{key.el=L.DomUtil.create('div','map-key');L.DomEvent.disableClickPropagation(key.el);return key.el};key.addTo(map);
+ const home=L.control({position:'topright'});home.onAdd=()=>{const d=L.DomUtil.create('button');d.type='button';d.textContent='All Hong Kong';L.DomEvent.disableClickPropagation(d);d.onclick=()=>map.fitBounds(bg.getBounds());return d};home.addTo(map);
+ const row=(a,b)=>`<div class="popup-row"><span>${a}</span><strong>${b}</strong></div>`;
+ function decision(p){if(!p.assessed)return null;return $('combined').checked?p.nec_decc_priority_800:$('age').value==='60'?p['priority_'+radius]:p['priority_age'+$('age').value]}
+ function popup(p){return `<b>${esc(names[p.stpug_id]||'Statistical area '+p.stpug_id)}</b>${row('Area code',esc(p.stpug_id))}${row('Residents aged 60+',nf.format(p.elderly_n))}${row('Residents aged 65+',nf.format(p.pop_65plus))}${row('Residents aged 75+',nf.format(p.pop_75plus))}${row('Residential area',p.res_area_km2?.toFixed(3)+' km²')}${row('Beyond NEC 800 m',pct(p.nec_out800_pct))}${row('Beyond NEC + DECC 800 m',pct(p.any_out800_pct))}${row('Selected scenarios',p.assessed?p.sensitivity_hits27+' / 27':'Not assessed')}<p class="popup-note">Residential land coverage, not population coverage. Selected areas warrant further review.</p>`}
+ function update(){
+  const view=$('view').value,alternative=$('age').value!=='60'||$('combined').checked;if(alternative)radius=800;
+  document.querySelectorAll('[data-distance]').forEach(b=>{b.disabled=alternative&&b.dataset.distance!=='800';b.setAttribute('aria-pressed',Number(b.dataset.distance)===radius)});$('age').disabled=$('combined').checked;
+  if(areas)map.removeLayer(areas);const pal=['#eff4f2','#cde2dc','#8dc3b7','#4a9d90','#08786e'];
+  function fill(p){if(!p.assessed)return '#a7afac';if(view==='priority')return decision(p)===1?'#b8414c':'#e5ece9';let v=view==='coverage'?100-($('combined').checked?p.any_out800_pct:p.nec_out800_pct):view==='choices'?p.nec2plus_pct800:p.sensitivity_hits27/27*100;return pal[Math.min(4,Math.floor(v/20))]}
+  areas=L.geoJSON(D.groups,{style:f=>({color:decision(f.properties)===1&&view==='priority'?'#8c2934':'#b9c7c1',weight:decision(f.properties)===1&&view==='priority'?1.5:.5,fillColor:fill(f.properties),fillOpacity:.85}),onEachFeature:(f,l)=>{groupLayers[f.properties.stpug_id]=l;l.bindPopup(()=>popup(f.properties));l.on('mouseover',()=>l.setStyle({weight:2,color:'#172e27'}));l.on('mouseout',()=>areas.resetStyle(l));}}).addTo(map);layers.nec.bringToFront();layers.decc.bringToFront();
+  const count=D.groups.features.filter(f=>decision(f.properties)===1).length;$('count').textContent=count;
+  const title={priority:'Binary priority screen',coverage:'Residential land within 800 m (%)',choices:'Residential land with 2+ NECs nearby (%)',sensitivity:'Selections across 27 scenarios'}[view];
+  key.el.innerHTML=`<b>${title}</b>`+(view==='priority'?'<div><i class="swatch" style="background:#b8414c"></i>Meets both conditions</div><div><i class="swatch" style="background:#e5ece9"></i>Does not meet both</div>':pal.map((c,i)=>`<div><i class="swatch" style="background:${c}"></i>${view==='sensitivity'?['0–5','6–10','11–16','17–21','22–27'][i]:i*20+'–'+(i+1)*20+'%'}</div>`).join(''))+'<div><i class="swatch" style="background:#a7afac"></i>Not assessed</div>';
+  $('status').textContent=view==='priority'?`${$('combined').checked?'NEC + DECC':$('age').value+'+ / NEC'} · ${radius.toLocaleString()} m · population ≥ cohort P75 · >50% residential land beyond reach`:'Area-weighted spatial measures. No capacity or walking-route model.';
+  window.__mapReview={map,data:D,setView:v=>{$('view').value=v;update()},selectedCount:count,groupLayers};
+ }
+ for(const id of ['nec','decc','residential'])$(id).addEventListener('change',e=>e.target.checked?layers[id].addTo(map):map.removeLayer(layers[id]));for(const id of ['view','age','combined'])$(id).addEventListener('change',update);document.querySelectorAll('[data-distance]').forEach(b=>b.onclick=()=>{radius=Number(b.dataset.distance);update()});
+ for(const id of ['524','628','833','950S']){const b=document.createElement('button');b.innerHTML=`${id}<small>${names[id]}</small>`;b.onclick=()=>{map.fitBounds(groupLayers[id].getBounds().pad(.2));groupLayers[id].openPopup()};$('cases').append(b)}update();new ResizeObserver(()=>map.invalidateSize()).observe($('map'));
+}

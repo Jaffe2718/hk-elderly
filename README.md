@@ -2,7 +2,7 @@
 
 ## Editing rules
 
-- Use English for repository documentation, code comments, and story text. The collaborator's demo HTML is temporarily exempt; keep its content unchanged unless requested.
+- Use English for all repository documentation, story text, interface labels, map popups, figures and tables. Original bilingual handoff files remain only in ignored local preparation folders.
 - `story.json` is the source of truth for chapter order, text, layouts, and asset references. `storymap.py` is the single entry point for rebuilding the online draft.
 - Every apply run replaces all draft content while retaining the item ID and URL. Before applying, export the current online state, reconcile manual edits, and obtain explicit user approval to update the generator. Never silently discard collaborators' manual changes.
 - Keep the current chapter order until a new outline is agreed. Titles and the subtitle remain editable placeholders, not research conclusions.
@@ -14,15 +14,15 @@
 
 ## Layout
 
-| Chapter | Layout | Narrative panel |
-| --- | --- | --- |
-| 01 Background | Docked | Left |
-| 02 Data & Methods | Floating | Right |
-| 03 Spatial Patterns | Slideshow | Top left |
-| 04 Accessibility & Service Provision | Docked | Right |
-| 05 Discussion & Conclusions | Floating | Left |
+| Chapter | Native composition |
+| --- | --- |
+| Introduction | Opening question, Floating Sidecar and population Web Map |
+| Data & Objective | Native evidence table, Slideshow, premises Web Map and age-share illustration |
+| Methodology | Interactive workflow embed, native headings, quotation and explanatory text |
+| Spatial Analysis | Docked Sidecar, five analytical Web Maps, coverage-explorer embed, case table, native Swipe and analytical figures |
+| Conclusions | Native headings, evidence-based synthesis, limitations and next steps |
 
-Chapter 04 uses Docked to reserve a separate media area for the embedded map. Available `layout` values are `docked-panel`, `floating-panel`, and `slideshow`. `panel_position` accepts `start` (left) and `end` (right) for this English story; slideshow panels use the corresponding top corners. Media areas stay empty until assets are supplied.
+The visible top navigation always links to these five chapter headings. The white Summit theme, top-left cover, course code and English member names are retained. Only the workflow and coverage explorer use GitHub Pages. All other content uses native StoryMap components. The HTML map's analytical attributes come from the supplied Web Map definitions; inherited geometry and the illustrative residential overlay come from the original collaborator demo.
 
 ## Run
 
@@ -117,3 +117,27 @@ Snapshots are local and ignored by Git because manually added content may not be
 `course` adds the course code to the byline. The current cover uses Full with a themed title panel at the top left. `cover_vertical_position`, `cover_horizontal_position`, `cover_style`, and `cover_size` control its placement and appearance. Missing cover imagery remains empty.
 
 After inspection and approval of a cover change, use `--update-cover --based-on snapshots/REVIEWED_SNAPSHOT` instead of `--apply` to preserve manually edited content outside the cover. The command verifies that every non-cover node remains unchanged. This targeted operation does not reconcile other manual edits into the full-rebuild configuration; those still require a separate approved reconciliation before a full rebuild.
+
+## Rebuild and publication
+
+The source handoff was reviewed before composition. It contains 12 embedded-feature Web Map definitions, 22 distinct English PNG/SVG figure pairs, chart tables and a private-import helper. The delivered ZIP is an asset subset, not the complete raw-data/geodatabase package described in the handoff PDF. Original inputs and full ArcGIS Pro reproduction are not claimed here.
+
+- `scripts/prepare_assets.py`: creates English-only derivatives from the ignored local handoff and archived original HTML. It does not modify source materials.
+- `scripts/compose_story.py`: optional bootstrap for the supplied narrative. It overwrites `story.json`; do not run it after manual content reconciliation without review.
+- `scripts/arcgis_maps.py`: called by the main generator to import and verify referenced Web Maps. `assets/map_items.json` records item IDs and their exact sharing groups; it contains no credentials.
+- `storymap.py --apply --based-on SNAPSHOT`: imports native map dependencies and writes a verified draft. Snapshot and drift requirements still apply.
+- `storymap.py --publish --based-on SNAPSHOT`: publishes the reviewed current draft, refreshes native Credits, preserves its exact group-only audience, and enables duplication. Run only with explicit user authorization to publish. It refuses unexpected sharing scopes or a missing original group.
+
+Before publication, deploy the two embeds, check the live endpoints, review the current draft and take a fresh snapshot. Publication verifies the stored content, status, copyability and sharing. API publication bypasses the StoryMaps builder issue checker, so browser review and dependency-sharing checks remain important.
+
+### Evidence and interpretation
+
+The main rule is residents aged 60+ >= 14,695 AND over 50% of residential land beyond 800 m of the nearest NEC. It selects 524, 628, 833 and 950S among 210 assessed groups; group 295 remains unassessed. Source and interpretation notes appear in native Credits. All distances are planar; coverage describes residential ground area, not people served, centre capacity or walking accessibility. The published analysis reproduces supplied Python/GDAL results; it does not claim an independent ArcGIS Pro geoprocessing rerun.
+
+### Interactive assets
+
+- `docs/embeds/workflow/`: original SVG/HTML implementation with node detail panels, linked-path highlighting, search, walkthrough, pan, zoom and SVG export. Interaction direction is inspired by dsh-archify; no Archify source code is incorporated.
+- `docs/embeds/elderly-map/`: English-only Leaflet explorer with distance/age/facility scenarios, area popups and case navigation. Main-scenario counts and alternatives are checked against the handoff data.
+- `docs/vendor/`: Leaflet 1.9.4 and its BSD 2-Clause license.
+
+Snapshots, local QA screenshots and raw handoff materials remain ignored. Only public-safe English derivatives and generator sources are committed.

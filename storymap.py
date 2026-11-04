@@ -121,7 +121,7 @@ def load_config():
             raise ValueError('Invalid Sidecar layout')
         if section.get('panel_position', 'start') not in {'start', 'end'}:
             raise ValueError('Panel position must be start or end')
-        if not section['title'] or not section['slides']:
+        if not section['title'] or not (section.get('slides') or section.get('before') or section.get('after')):
             raise ValueError('Each section needs a title and slides')
         for slide in section['slides']:
             if not slide['title']:
@@ -132,6 +132,9 @@ def load_config():
                     local_asset(media['path'])
                 elif media['type'] == 'embed':
                     embed_url(cfg, media['path'])
+                elif media['type'] == 'swipe':
+                    for image_path in media['images']:
+                        local_asset(image_path)
                 elif media['type'] != 'map':
                     raise ValueError('Media type must be image, embed, or map')
     return cfg
@@ -181,13 +184,63 @@ def save_draft(story, cfg):
         raise RuntimeError('ArcGIS rejected draft metadata update')
 
 
+def configure_credits(story, cfg):
+    credits = next((n for n in story._properties['nodes'].values() if n.get('type') == 'credits'), None)
+    if credits is not None:
+        credits['children'] = []
+        credits.setdefault('config', {})['isHidden'] = False
+    story.credits(heading='Credits and sources', description='GEOG7302 | Group 13')
+    story.credits(content='Research and authorship', attribution=' · '.join(cfg['members']))
+    story.credits(content='Study scope', attribution='Residential-area proximity and explicit Binary screening. 2021 Census and land use; SWD premises snapshot retrieved 2 November 2026.')
+    for source in cfg.get('sources', []):
+        story.credits(content=html.escape(source['name']), attribution=f'<a href="{html.escape(source["url"], quote=True)}" target="_blank" rel="noopener noreferrer">Official source</a>')
+    story.credits(content='Maps and analytical graphics', attribution='Group 13 collaborator handoff: supplied Python/GDAL pre-analysis, English figures and Web Map definitions. ArcGIS account import and StoryMap assembly completed in this project.')
+    story.credits(content='Interactive components', attribution='Project-specific workflow and coverage explorer; Leaflet 1.9.4. Workflow interaction direction inspired by Archify (GongYuanCaiJi/dsh-archify).')
+    story.credits(content='Interpretation', attribution='Priority areas warrant further investigation. Distances are planar, not walking routes; residential-area coverage is not people served; premises counts are not capacity.')
+
+
+def publish_current(cfg, baseline):
+    """Publish reviewed content without changing its existing group-only audience."""
+    from arcgis.gis import GIS
+    from arcgis.apps.storymap import StoryMap, _utils
+    gis = GIS('pro')
+    item = gis.content.get(cfg['item_id'])
+    story = StoryMap(item, gis=gis)
+    check_baseline(story, cfg, baseline)
+    groups = {g.id: g.title for g in item.sharing.groups.list()}
+    if item.owner != gis.users.me.username or item.access not in {'private', 'shared'} or not groups:
+        raise RuntimeError('Expected owner account and existing group-only sharing')
+    if '16d0debba6b24c88afffca891f37958a' not in groups:
+        raise RuntimeError('The original GEOG-7302 Group 13 is not in the sharing list')
+    configure_credits(story, cfg)
+    # Keep publication metadata consistent while avoiding the SDK access='shared' bug.
+    props = _utils.prepare_story_for_save(story, True, True, False, cfg['title'], None, _utils.get_version(story))
+    props.pop('access', None)
+    for resource in item.resources.list():
+        if resource['resource'] == 'published_data.json':
+            _utils.remove_resource(story, file='published_data.json')
+    _utils.add_resource(story, resource_name='published_data.json', text=json.dumps(story._properties))
+    props.update(text=json.dumps(story._properties), url=f'https://storymaps.arcgis.com/stories/{item.id}')
+    if not item.update(item_properties=props):
+        raise RuntimeError('Publication update failed')
+    actual = gis.content.get(item.id)
+    if actual.access not in {'private', 'shared'} or {g.id for g in actual.sharing.groups.list()} != set(groups):
+        raise RuntimeError('Publication audience changed unexpectedly')
+    if 'Viewer Copyable' not in actual.typeKeywords or 'smstatuspublished' not in actual.typeKeywords:
+        raise RuntimeError('Publication or duplication flag is missing')
+    if fingerprint(actual.get_data()) != fingerprint(story._properties):
+        raise RuntimeError('Published content readback failed')
+    print('Published and verified. Group-only audience preserved:', groups, flush=True)
+    print(f'https://storymaps.arcgis.com/stories/{item.id}')
+
+
 def apply(cfg, baseline=None, cover_only=False):
     # Lazy import allows offline validation without ArcGIS or a Pro license.
     import arcgis
     from arcgis.gis import GIS
     from arcgis.apps.storymap import StoryMap, Themes
     from arcgis.apps.storymap.story_content import (
-        Cover, Navigation, Separator, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed,
+        Cover, Navigation, Separator, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed, Swipe, Table,
     )
     if arcgis.__version__ != '2.4.3':
         raise RuntimeError('Revalidate template adapter before changing arcgis 2.4.3')
@@ -243,6 +296,42 @@ def apply(cfg, baseline=None, cover_only=False):
             resource['data'].pop('themeItemId', None)
     cover = configure_cover(story, cfg)
 
+    from scripts.arcgis_maps import ensure_maps
+    all_media = [s.get('media', {}) for section in cfg['sections'] for s in section['slides']]
+    map_keys = [m['webmap'] for m in all_media if m.get('type') == 'map' and m.get('webmap')]
+    ledger = ensure_maps(gis, item, map_keys)
+
+    def native_table(rows):
+        import pandas as pd
+        return Table(df=pd.DataFrame([[{'value': str(c)} for c in row] for row in rows],
+                                    index=[str(i) for i in range(len(rows))], columns=[str(i) for i in range(len(rows[0]))]))
+
+    def make_media(media):
+        if not media:
+            return None
+        kind = media['type']
+        if kind == 'image':
+            return Image(str(local_asset(media['path'])))
+        if kind == 'map':
+            return Map(gis.content.get(ledger[media['webmap']]['item_id'] if media.get('webmap') else media['item_id']))
+        if kind == 'swipe':
+            return Swipe(content=[Image(str(local_asset(p))) for p in media['images']])
+        return Embed(embed_url(cfg, media['path']))
+
+    def add_block(block):
+        kind = block['type']
+        if kind == 'table':
+            story.add(native_table(block['rows']))
+        elif kind in {'text', 'quote', 'heading'}:
+            style = {'text': TextStyles.PARAGRAPH, 'quote': TextStyles.QUOTE, 'heading': TextStyles.SUBHEADING}[kind]
+            story.add(Text(html.escape(block['text']), style=style))
+        else:
+            content = make_media(block)
+            story.add(content, caption=block.get('caption'), alt_text=block.get('alt', block.get('caption', '')))
+            if isinstance(content, Embed):
+                content.display = 'inline'
+                story._properties['nodes'][content._node].setdefault('config', {})['size'] = 'full'
+
     chapter_headings = []
     for index, section in enumerate(cfg['sections']):
         if index:
@@ -252,35 +341,33 @@ def apply(cfg, baseline=None, cover_only=False):
         chapter_headings.append(heading)
         if section.get('intro'):
             story.add(Text(html.escape(section['intro'])))
-        sidecar = Sidecar(style=section.get('layout', 'docked-panel'))
-        story.add(sidecar)
-        slides = []
-        for slide in section['slides']:
-            texts = [Text(html.escape(slide['title']), style=TextStyles.SUBHEADING)]
-            if slide.get('summary'):
-                texts.append(Text(html.escape(slide['summary'])))
-            if slide.get('text'):
-                texts.append(Text(html.escape(slide['text']).replace('\n', '<br>')))
-            media = slide.get('media')
-            content = None
-            if media:
-                if media['type'] == 'image':
-                    content = Image(str(local_asset(media['path'])))
-                elif media['type'] == 'map':
-                    content = Map(gis.content.get(media['item_id']))
-                else:
-                    content = Embed(embed_url(cfg, media['path']))
-            slides.append(TemplateSlide(content=texts, media=content))
-        sidecar.slides = slides
-        # SDK has no public switch-panel-placement setter in 2.4.3.
-        position = section.get('panel_position', 'start')
-        story._properties['nodes'][sidecar._node]['data']['narrativePanelPosition'] = position
-        for slide in slides:
-            if isinstance(slide.media, Embed):
-                slide.media.display = 'inline'
-            panel = story._properties['nodes'][slide._node]['children'][0]
-            panel_position = position + '-top' if section.get('layout') == 'slideshow' else position
-            story._properties['nodes'][panel]['data']['position'] = panel_position
+        for block in section.get('before', []):
+            add_block(block)
+        if section['slides']:
+            sidecar = Sidecar(style=section.get('layout', 'docked-panel'))
+            story.add(sidecar)
+            slides = []
+            for slide in section['slides']:
+                texts = [Text(html.escape(slide['title']), style=TextStyles.SUBHEADING)]
+                if slide.get('summary'):
+                    texts.append(Text(html.escape(slide['summary'])))
+                if slide.get('text'):
+                    texts.append(Text(html.escape(slide['text']).replace('\n', '<br>')))
+                content = make_media(slide.get('media'))
+                slides.append(TemplateSlide(content=texts, media=content))
+            sidecar.slides = slides
+            # SDK has no public switch-panel-placement setter in 2.4.3.
+            position = section.get('panel_position', 'start')
+            story._properties['nodes'][sidecar._node]['data']['narrativePanelPosition'] = position
+            for slide in slides:
+                if isinstance(slide.media, Embed):
+                    slide.media.display = 'inline'
+                panel = story._properties['nodes'][slide._node]['children'][0]
+                panel_position = position + '-top' if section.get('layout') == 'slideshow' else position
+                story._properties['nodes'][panel]['data']['position'] = panel_position
+        for block in section.get('after', []):
+            add_block(block)
+    configure_credits(story, cfg)
     navigation = next(c for c in story.contents if isinstance(c, Navigation))
     navigation.hidden = False
     # SDK 2.4.3's setter writes bare IDs, but the builder expects link objects.
@@ -309,9 +396,10 @@ def apply(cfg, baseline=None, cover_only=False):
     if nav_node['config']['isHidden'] or nav_node['data']['links'] != [{'nodeId': h._node} for h in chapter_headings]:
         raise RuntimeError('Saved chapter navigation did not match the headings')
     sidecars = [c for c in actual.contents if isinstance(c, Sidecar)]
-    if len(sidecars) != len(cfg['sections']) or [len(c.slides) for c in sidecars] != [len(s['slides']) for s in cfg['sections']]:
+    immersive_sections = [s for s in cfg['sections'] if s['slides']]
+    if len(sidecars) != len(immersive_sections) or [len(c.slides) for c in sidecars] != [len(s['slides']) for s in immersive_sections]:
         raise RuntimeError('Saved draft structure did not match configuration')
-    for sidecar, section in zip(sidecars, cfg['sections']):
+    for sidecar, section in zip(sidecars, immersive_sections):
         node = actual._properties['nodes'][sidecar._node]
         if node['data']['subtype'] != section.get('layout', 'docked-panel') or node['data']['narrativePanelPosition'] != section.get('panel_position', 'start'):
             raise RuntimeError('Saved layout or panel placement did not match configuration')
@@ -341,6 +429,7 @@ def main():
     actions.add_argument('--apply', action='store_true', help='Overwrite draft after inspection and user-approved reconciliation')
     actions.add_argument('--inspect', action='store_true', help='Read-only export of the current story and all item resources')
     actions.add_argument('--update-cover', action='store_true', help='Update only the cover, preserving manual edits elsewhere')
+    actions.add_argument('--publish', action='store_true', help='Publish reviewed draft, preserving exact group sharing and allowing duplication')
     parser.add_argument('--based-on', help='Reviewed snapshot folder required by --apply')
     args = parser.parse_args()
     cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8')) if args.inspect else load_config()
@@ -348,7 +437,9 @@ def main():
         inspect_story(cfg)
         return
     print(f'{cfg["title"]}: {len(cfg["sections"])} sections, {sum(len(s["slides"]) for s in cfg["sections"])} slides', flush=True)
-    if args.apply or args.update_cover:
+    if args.publish:
+        publish_current(cfg, args.based_on)
+    elif args.apply or args.update_cover:
         apply(cfg, args.based_on, cover_only=args.update_cover)
     else:
         print('Configuration valid. Use --apply to overwrite the online draft.')
