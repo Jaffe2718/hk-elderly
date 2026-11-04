@@ -1,8 +1,8 @@
 {
   "item_id": "7e2cd654bad349c38a5658d7c23822af",
   "reference_id": "a9b67d4b282b44f8a0c1003ff61566c7",
-  "title": "Spatial coverage of Neighbourhood Elderly Centres and priority areas for community support review in Hong Kong",
-  "subtitle": "Where population concentration meets weaker residential proximity",
+  "title": "Elderly Centre Coverage in Hong Kong",
+  "subtitle": "Neighbourhood Elderly Centres and priority areas for community support review",
   "cover_type": "full",
   "byline": "Group 13",
   "members": [
@@ -66,8 +66,13 @@
           "summary": "Age composition helps interpret the map, but the Binary rule uses counts.",
           "text": "A high proportion of older residents does not necessarily indicate a large older population. The main model uses the number aged 60+, while this supplementary map describes age composition. Both refer to the entire statistical group rather than only the location of its symbol.",
           "media": {
-            "type": "image",
-            "path": "assets/figures/02_population_share_en.png"
+            "type": "map",
+            "webmap": "M01_population",
+            "visible_layers": [
+              "district_context",
+              "age_share",
+              "nec_sites"
+            ]
           }
         }
       ],
@@ -276,29 +281,37 @@
         },
         {
           "type": "swipe",
-          "images": [
-            "assets/figures/case_833_nec_en.png",
-            "assets/figures/case_833_combined_en.png"
+          "maps": [
+            {
+              "type": "map",
+              "webmap": "M11_residential_nec",
+              "bookmark": "833 "
+            },
+            {
+              "type": "map",
+              "webmap": "M12_residential_combined",
+              "bookmark": "833 "
+            }
           ],
-          "caption": "Left: NEC only. Right: NEC + DECC. Tiu Keng Leng, group 833."
+          "caption": "Matched native Web Maps: NEC only on the left; NEC + DECC on the right. Tiu Keng Leng, group 833."
         },
         {
           "type": "heading",
           "text": "Coverage by residential type"
         },
         {
-          "type": "image",
-          "path": "assets/figures/11_housing_type_coverage_en.png",
-          "caption": "Share of residential ground area within 800 m, grouped by land-use class. This is not population coverage."
+          "type": "embed",
+          "path": "embeds/charts/index.html#housing",
+          "caption": "Explore residential-area coverage by housing class or district. Compare facility definitions, sort values, or download the source table."
         },
         {
           "type": "heading",
           "text": "Age and distance definitions"
         },
         {
-          "type": "image",
-          "path": "assets/figures/12_age_distance_sensitivity_en.png",
-          "caption": "1 means the Binary rule is met. Each age cohort uses its own P75 population cutoff."
+          "type": "embed",
+          "path": "embeds/charts/index.html#sensitivity",
+          "caption": "Inspect Binary decisions across distance and age definitions. Each age cohort uses its own P75 cutoff."
         }
       ]
     },
@@ -344,6 +357,21 @@
         }
       ],
       "after": []
+    },
+    {
+      "id": "references",
+      "title": "References",
+      "intro": "Official datasets and sources used in this study. Population and residential land refer to 2021; facility premises were retrieved on 2 November 2026.",
+      "slides": [],
+      "before": [
+        {
+          "type": "references"
+        },
+        {
+          "type": "text",
+          "text": "Maps and the Binary screening reproduce the supplied Group 13 analysis. Interactive components use Leaflet 1.9.4 and project-specific SVG/HTML; workflow interaction direction was informed by dsh-archify. Selection frequency is a sensitivity measure, not probability."
+        }
+      ]
     }
   ],
   "theme": "summit",

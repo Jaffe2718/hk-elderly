@@ -133,7 +133,7 @@ def load_config():
                 elif media['type'] == 'embed':
                     embed_url(cfg, media['path'])
                 elif media['type'] == 'swipe':
-                    for image_path in media['images']:
+                    for image_path in media.get('images', []):
                         local_asset(image_path)
                 elif media['type'] != 'map':
                     raise ValueError('Media type must be image, embed, or map')
@@ -154,7 +154,7 @@ def embed_url(cfg, path):
         base = cfg['pages_base_url']
         if not base:
             raise ValueError('Set pages_base_url before using hosted embeds')
-        local_asset('docs/' + path)
+        local_asset('docs/' + urlparse(path).path)
         url = urljoin(base.rstrip('/') + '/', path)
     if urlparse(url).scheme != 'https':
         raise ValueError('Embeds require HTTPS')
@@ -189,17 +189,83 @@ def configure_credits(story, cfg):
     if credits is not None:
         credits['children'] = []
         credits.setdefault('config', {})['isHidden'] = False
-    story.credits(heading='Credits and sources', description='GEOG7302 | Group 13')
-    story.credits(content='Research and authorship', attribution=' · '.join(cfg['members']))
-    story.credits(content='Study scope', attribution='Residential-area proximity and explicit Binary screening. 2021 Census and land use; SWD premises snapshot retrieved 2 November 2026.')
-    for source in cfg.get('sources', []):
-        story.credits(content=html.escape(source['name']), attribution=f'<a href="{html.escape(source["url"], quote=True)}" target="_blank" rel="noopener noreferrer">Official source</a>')
-    story.credits(content='Maps and analytical graphics', attribution='Group 13 collaborator handoff: supplied Python/GDAL pre-analysis, English figures and Web Map definitions. ArcGIS account import and StoryMap assembly completed in this project.')
-    story.credits(content='Interactive components', attribution='Project-specific workflow and coverage explorer; Leaflet 1.9.4. Workflow interaction direction inspired by Archify (GongYuanCaiJi/dsh-archify).')
-    story.credits(content='Interpretation', attribution='Priority areas warrant further investigation. Distances are planar, not walking routes; residential-area coverage is not people served; premises counts are not capacity.')
+    description = ('We acknowledge the <a href="https://www.census2021.gov.hk/en/main_tables.html" target="_blank" rel="noopener noreferrer">Census and Statistics Department</a> for the 2021 Census and statistical boundaries, the '
+                   '<a href="https://www.swd.gov.hk/" target="_blank" rel="noopener noreferrer">Social Welfare Department</a> for elderly-centre premises data, and the '
+                   '<a href="https://www.pland.gov.hk/" target="_blank" rel="noopener noreferrer">Planning Department</a> for 2021 land-use data, accessed through the '
+                   '<a href="https://portal.csdi.gov.hk/" target="_blank" rel="noopener noreferrer">CSDI Portal</a> and DATA.GOV.HK. Analysis and presentation by GEOG7302 Group 13.')
+    story.credits(heading='Credit', description=description)
 
 
-def publish_current(cfg, baseline):
+def configure_map_views(story, cfg):
+    """Give each displayed map its own valid extent, scale and layer state."""
+    import math
+    import uuid
+    ledger_path = ROOT / 'assets/map_items.json'
+    if not ledger_path.exists():
+        return
+    ledger = json.loads(ledger_path.read_text(encoding='utf-8'))
+    media_queue = []
+    def collect(media):
+        if media.get('type') == 'map': media_queue.append(media)
+        for child in media.get('maps', []): collect(child)
+    for section in cfg['sections']:
+        for block in section.get('before', []): collect(block)
+        for slide in section['slides']: collect(slide.get('media', {}))
+        for block in section.get('after', []): collect(block)
+    by_item = {}
+    for media in media_queue:
+        key = media.get('webmap')
+        item_id = ledger[key]['item_id'] if key else media['item_id']
+        by_item.setdefault(item_id, []).append(media)
+    resources = story._properties['resources']
+    for node in story._properties['nodes'].values():
+        if node.get('type') != 'webmap': continue
+        original = resources[node['data']['map']]
+        item_id = original['data']['itemId']
+        if not by_item.get(item_id):
+            raise RuntimeError(f'No configured map view for {item_id}')
+        media = by_item[item_id].pop(0)
+        data = json.loads(local_asset('assets/webmaps/' + media['webmap'] + '.json').read_text(encoding='utf-8'))
+        extent = data['initialState']['viewpoint']['targetGeometry']
+        if media.get('bookmark'):
+            extent = next(b['extent'] for b in data['bookmarks'] if b['name'].startswith(media['bookmark']))
+        extent = copy.deepcopy(extent)
+        if extent['spatialReference']['wkid'] != 4326: raise RuntimeError('Review projected extent before applying view fix')
+        x=(extent['xmin']+extent['xmax'])/2; y=(extent['ymin']+extent['ymax'])/2
+        if not (113 < x < 115 and 21 < y < 24): raise RuntimeError('Map extent is outside Hong Kong')
+        width=(extent['xmax']-extent['xmin'])*111320*math.cos(math.radians(y))
+        height=(extent['ymax']-extent['ymin'])*111320
+        scale=max(width,height)*3779.52756/750*1.18
+        center={'x':x,'y':y,'spatialReference':{'wkid':4326}}
+        viewpoint={'rotation':0,'scale':scale,'targetGeometry':center}
+        layer_state=[{'id':l['id'],'title':l['title'],'visible':l.get('visibility',True)} for l in data['operationalLayers']]
+        if media.get('visible_layers'):
+            for layer in layer_state: layer['visible']=layer['id'] in media['visible_layers']
+        resource_id='r-'+uuid.uuid4().hex[:12]
+        resource=copy.deepcopy(original)
+        resource['data'].update(extent=extent,center=center,viewpoint=viewpoint,zoom=math.log2(591657527.59/scale),mapLayers=layer_state)
+        resources[resource_id]=resource
+        node['data'].update(map=resource_id,extent=extent,center=center,viewpoint=viewpoint,mapLayers=layer_state)
+
+
+def configure_embeds(story):
+    # SDK 2.4.3 omits isEmbedSupported; the reader falls back to a link card.
+    # These flags match a working published StoryMaps inline embed.
+    for node in story._properties['nodes'].values():
+        if node.get('type') != 'embed':
+            continue
+        data = node['data']
+        url = data['url']
+        parts = urlparse(url)
+        data.update(isEmbedSupported=True, display='inline', embedSrc=url,
+                    providerUrl=f'{parts.scheme}://{parts.netloc}',
+                    hasPlaceholderOpenButton=False, hasEmbedOpenButton=True, isLiveOnMobile=True)
+        data['caption'] = data.get('caption', data.get('description', ''))
+        if node.get('config', {}).get('size') == 'full':
+            node['config']['size'] = 'wide'
+
+
+def publish_current(cfg, baseline, generated=None):
     """Publish reviewed content without changing its existing group-only audience."""
     from arcgis.gis import GIS
     from arcgis.apps.storymap import StoryMap, _utils
@@ -212,7 +278,23 @@ def publish_current(cfg, baseline):
         raise RuntimeError('Expected owner account and existing group-only sharing')
     if '16d0debba6b24c88afffca891f37958a' not in groups:
         raise RuntimeError('The original GEOG-7302 Group 13 is not in the sharing list')
+    if generated:
+        path = local_asset(generated)
+        staged_config = json.loads((path.parent / 'config.json').read_text(encoding='utf-8'))
+        if fingerprint(staged_config) != fingerprint(cfg):
+            raise RuntimeError('Staged graph was generated from a different configuration')
+        story._properties = json.loads(path.read_text(encoding='utf-8'))
+        nodes = story._properties['nodes']
+        for node in nodes.values():
+            if any(child not in nodes for child in node.get('children', [])):
+                raise RuntimeError('Staged graph has a missing child node')
+        headings = [nodes[n]['data']['text'] for link in next(n for n in nodes.values() if n['type']=='navigation')['data']['links'] for n in [link['nodeId']]]
+        if headings != [html.escape(s['title']) for s in cfg['sections']]:
+            raise RuntimeError('Staged graph navigation does not match configuration')
     configure_credits(story, cfg)
+    configure_embeds(story)
+    configure_map_views(story, cfg)
+    check_baseline(StoryMap(cfg['item_id'], gis=gis), cfg, baseline)
     # Keep publication metadata consistent while avoiding the SDK access='shared' bug.
     props = _utils.prepare_story_for_save(story, True, True, False, cfg['title'], None, _utils.get_version(story))
     props.pop('access', None)
@@ -298,6 +380,8 @@ def apply(cfg, baseline=None, cover_only=False):
 
     from scripts.arcgis_maps import ensure_maps
     all_media = [s.get('media', {}) for section in cfg['sections'] for s in section['slides']]
+    all_media += [b for section in cfg['sections'] for b in section.get('before', [])+section.get('after', [])]
+    all_media += [m for b in list(all_media) for m in b.get('maps', [])]
     map_keys = [m['webmap'] for m in all_media if m.get('type') == 'map' and m.get('webmap')]
     ledger = ensure_maps(gis, item, map_keys)
 
@@ -313,8 +397,18 @@ def apply(cfg, baseline=None, cover_only=False):
         if kind == 'image':
             return Image(str(local_asset(media['path'])))
         if kind == 'map':
-            return Map(gis.content.get(ledger[media['webmap']]['item_id'] if media.get('webmap') else media['item_id']))
+            item = gis.content.get(ledger[media['webmap']]['item_id'] if media.get('webmap') else media['item_id'])
+            result = Map(item)
+            if media.get('visible_layers'):
+                for layer in result.map_layers:
+                    result.update_map_layers(layer['id'], layer['id'] in media['visible_layers'])
+            if media.get('bookmark'):
+                bookmark = next(b for b in item.get_data()['bookmarks'] if b['name'].startswith(media['bookmark']))
+                result.set_viewpoint(extent=bookmark['extent'])
+            return result
         if kind == 'swipe':
+            if media.get('maps'):
+                return Swipe(content=[make_media(m) for m in media['maps']])
             return Swipe(content=[Image(str(local_asset(p))) for p in media['images']])
         return Embed(embed_url(cfg, media['path']))
 
@@ -325,6 +419,11 @@ def apply(cfg, baseline=None, cover_only=False):
         elif kind in {'text', 'quote', 'heading'}:
             style = {'text': TextStyles.PARAGRAPH, 'quote': TextStyles.QUOTE, 'heading': TextStyles.SUBHEADING}[kind]
             story.add(Text(html.escape(block['text']), style=style))
+        elif kind == 'references':
+            for source in cfg.get('sources', []):
+                url = html.escape(source['url'], quote=True)
+                label = html.escape(source['name'])
+                story.add(Text(f'{label}. <a href="{url}" target="_blank" rel="noopener noreferrer">Source and metadata</a>.'))
         else:
             content = make_media(block)
             story.add(content, caption=block.get('caption'), alt_text=block.get('alt', block.get('caption', '')))
@@ -368,6 +467,8 @@ def apply(cfg, baseline=None, cover_only=False):
         for block in section.get('after', []):
             add_block(block)
     configure_credits(story, cfg)
+    configure_embeds(story)
+    configure_map_views(story, cfg)
     navigation = next(c for c in story.contents if isinstance(c, Navigation))
     navigation.hidden = False
     # SDK 2.4.3's setter writes bare IDs, but the builder expects link objects.
@@ -431,6 +532,7 @@ def main():
     actions.add_argument('--update-cover', action='store_true', help='Update only the cover, preserving manual edits elsewhere')
     actions.add_argument('--publish', action='store_true', help='Publish reviewed draft, preserving exact group sharing and allowing duplication')
     parser.add_argument('--based-on', help='Reviewed snapshot folder required by --apply')
+    parser.add_argument('--generated', help='Optional reviewed generated.json from a matching local backup, for publication')
     args = parser.parse_args()
     cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8')) if args.inspect else load_config()
     if args.inspect:
@@ -438,7 +540,7 @@ def main():
         return
     print(f'{cfg["title"]}: {len(cfg["sections"])} sections, {sum(len(s["slides"]) for s in cfg["sections"])} slides', flush=True)
     if args.publish:
-        publish_current(cfg, args.based_on)
+        publish_current(cfg, args.based_on, args.generated)
     elif args.apply or args.update_cover:
         apply(cfg, args.based_on, cover_only=args.update_cover)
     else:

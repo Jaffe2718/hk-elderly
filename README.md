@@ -17,12 +17,13 @@
 | Chapter | Native composition |
 | --- | --- |
 | Introduction | Opening question, Floating Sidecar and population Web Map |
-| Data & Objective | Native evidence table, Slideshow, premises Web Map and age-share illustration |
+| Data & Objective | Native evidence table, Slideshow, premises Web Map and age-share Web Map |
 | Methodology | Interactive workflow embed, native headings, quotation and explanatory text |
-| Spatial Analysis | Docked Sidecar, five analytical Web Maps, coverage-explorer embed, case table, native Swipe and analytical figures |
+| Spatial Analysis | Docked Sidecar, analytical Web Maps, coverage-explorer embed, case table, native Web Map Swipe and interactive CSV-backed charts |
 | Conclusions | Native headings, evidence-based synthesis, limitations and next steps |
+| References | Native official-source links, followed by a native Credit acknowledgement |
 
-The visible top navigation always links to these five chapter headings. The white Summit theme, top-left cover, course code and English member names are retained. Only the workflow and coverage explorer use GitHub Pages. All other content uses native StoryMap components. The HTML map's analytical attributes come from the supplied Web Map definitions; inherited geometry and the illustrative residential overlay come from the original collaborator demo.
+The visible top navigation always links to these six chapter headings. The white Summit theme, top-left cover, course code and English member names are retained. Only the workflow, coverage explorer and interactive charts use GitHub Pages. All other content uses native StoryMap components. The HTML map's analytical attributes come from the supplied Web Map definitions; inherited geometry and the illustrative residential overlay come from the original collaborator demo.
 
 ## Run
 
@@ -87,7 +88,7 @@ Push new embed assets and wait for Pages deployment to succeed before applying t
 
 The current reference is recorded in `reference_id`. Keep the white Summit theme and a top-left title/subtitle/member block while no cover image is available. Chapter headings are followed by short editorial introductions, separators between chapters, and mixed Sidecar layouts. Slide summaries describe the intended reading task without inventing findings; media remains empty where no asset is configured.
 
-The visible top chapter navigation is mandatory. Each apply run binds it to the five chapter headings using builder-compatible `nodeId` link objects, and verifies the saved links and visibility. The SDK 2.4.3 navigation setter writes a different schema, so the adapter sets these link objects directly. Preserve this navigation when changing chapter order.
+The visible top chapter navigation is mandatory. Each apply run binds it to the configured chapter headings using builder-compatible `nodeId` link objects, and verifies the saved links and visibility. The SDK 2.4.3 navigation setter writes a different schema, so the adapter sets these link objects directly. Preserve this navigation when changing chapter order.
 
 ## Inspect manual edits before rebuilding
 
@@ -128,7 +129,7 @@ The source handoff was reviewed before composition. It contains 12 embedded-feat
 - `storymap.py --apply --based-on SNAPSHOT`: imports native map dependencies and writes a verified draft. Snapshot and drift requirements still apply.
 - `storymap.py --publish --based-on SNAPSHOT`: publishes the reviewed current draft, refreshes native Credits, preserves its exact group-only audience, and enables duplication. Run only with explicit user authorization to publish. It refuses unexpected sharing scopes or a missing original group.
 
-Before publication, deploy the two embeds, check the live endpoints, review the current draft and take a fresh snapshot. Publication verifies the stored content, status, copyability and sharing. API publication bypasses the StoryMaps builder issue checker, so browser review and dependency-sharing checks remain important.
+Before publication, deploy the workflow, map and chart embeds, check the live endpoints, review the current draft and take a fresh snapshot. Publication verifies the stored content, status, copyability and sharing. API publication bypasses the StoryMaps builder issue checker, so browser review and dependency-sharing checks remain important.
 
 ### Evidence and interpretation
 
@@ -141,3 +142,15 @@ The main rule is residents aged 60+ >= 14,695 AND over 50% of residential land b
 - `docs/vendor/`: Leaflet 1.9.4 and its BSD 2-Clause license.
 
 Snapshots, local QA screenshots and raw handoff materials remain ignored. Only public-safe English derivatives and generator sources are committed.
+
+Final figure policy: no PDF crops are used. Population composition uses a native Web Map with its age-share layer enabled. Housing/district coverage and age/distance decisions use interactive HTML charts generated from the supplied CSV tables. The Tiu Keng Leng comparison uses two native Web Maps with the same bookmark extent. `scripts/render_charts.py` remains an optional static fallback and is not inserted into the story. The original English handoff PNGs remain available as reference assets.
+
+### Preview revision
+
+- Six navigation chapters end with References, followed by a native Credit acknowledgement.
+- Native Web Map nodes each receive an isolated resource and an explicit Hong Kong centre, extent and positive scale, including matched case-study Swipe views.
+- HTML embeds declare supported inline rendering rather than link cards.
+- The workflow uses five architecture layers, category colours, line icons and an English colour legend with step counts. All connections retain static centre lines. Only the selected step's outgoing connections carry glowing green packets; the packets fade at the ports and wrap seamlessly at a constant path speed. Reduced-motion settings disable animation. Inactive labels remain fully readable. SVG exports include the legend.
+- The workflow omits the duplicate heading, sizes its SVG viewport to the actual iframe container and focuses the current step on narrow frames. Search, Previous/Next, Fit and pan/zoom remain available.
+- Interactive housing/district coverage and distance/age decision charts are generated from the supplied CSVs with `scripts/prepare_chart_data.py`. They support exact-value inspection, table view and CSV download; coverage bars also support facility-scope filtering and sorting.
+- Draft updates and publishing are separate. The current review authorises pushing assets and replacing the draft only; it does not authorise a new publication.

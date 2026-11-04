@@ -1,4 +1,4 @@
-"""Compose the approved five-chapter English narrative from the supplied handoff."""
+"""Compose the approved six-chapter English narrative from the supplied handoff."""
 import json
 from pathlib import Path
 
@@ -13,8 +13,8 @@ def section(id, title, intro, slides, before=None, after=None, layout='docked-pa
 
 def compose():
     cfg = json.loads((ROOT/'story.json').read_text(encoding='utf-8'))
-    cfg['title'] = 'Spatial coverage of Neighbourhood Elderly Centres and priority areas for community support review in Hong Kong'
-    cfg['subtitle'] = 'Where population concentration meets weaker residential proximity'
+    cfg['title'] = 'Elderly Centre Coverage in Hong Kong'
+    cfg['subtitle'] = 'Neighbourhood Elderly Centres and priority areas for community support review'
     cfg['cover_size'] = 'large'
     cfg['sections'] = [
       section('introduction', 'Introduction',
@@ -91,7 +91,16 @@ def compose():
       {'name':'Planning Department: Land Utilization in Hong Kong 2021','url':'https://portal.csdi.gov.hk/csdi-webpage/metadata/pland_rcd_1634024370851_27769/html'}
     ]
     cfg['sources'] += [{'name':'C&SD: 2021 statistical boundaries by STPUG','url':'https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-stpu'},{'name':'C&SD: 2021 district boundaries','url':'https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-dcd'}]
+    cfg['sections'][1]['slides'][1]['media'] = {'type':'map','webmap':'M01_population','visible_layers':['district_context','age_share','nec_sites']}
+    for i, block in enumerate(cfg['sections'][3]['after']):
+        if block['type']=='swipe':
+            cfg['sections'][3]['after'][i] = {'type':'swipe','maps':[{'type':'map','webmap':'M11_residential_nec','bookmark':'833 '},{'type':'map','webmap':'M12_residential_combined','bookmark':'833 '}],'caption':'Matched native Web Maps: NEC only on the left; NEC + DECC on the right. Tiu Keng Leng, group 833.'}
+        elif block.get('path','').endswith('11_housing_type_coverage_en.png'):
+            cfg['sections'][3]['after'][i] = {'type': 'embed', 'path': 'embeds/charts/index.html#housing', 'caption': 'Explore residential-area coverage by housing class or district. Compare facility definitions, sort values, or download the source table.'}
+        elif block.get('path','').endswith('12_age_distance_sensitivity_en.png'):
+            cfg['sections'][3]['after'][i] = {'type': 'embed', 'path': 'embeds/charts/index.html#sensitivity', 'caption': 'Inspect Binary decisions across distance and age definitions. Each age cohort uses its own P75 cutoff.'}
+    cfg['sections'].append({'id': 'references', 'title': 'References', 'intro': 'Official datasets and sources used in this study. Population and residential land refer to 2021; facility premises were retrieved on 2 November 2026.', 'slides': [], 'before': [{'type': 'references'}, {'type': 'text', 'text': 'Maps and the Binary screening reproduce the supplied Group 13 analysis. Interactive components use Leaflet 1.9.4 and project-specific SVG/HTML; workflow interaction direction was informed by dsh-archify. Selection frequency is a sensitivity measure, not probability.'}]})
     (ROOT/'story.json').write_text(json.dumps(cfg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    print('Composed five chapters from supplied evidence')
+    print('Composed six chapters from supplied evidence')
 
 if __name__=='__main__': compose()
