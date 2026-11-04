@@ -1,0 +1,16 @@
+{
+  "version": 8,
+  "sources": {
+    "esri": {
+      "type": "vector",
+      "url": "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
+    }
+  },
+  "layers": [
+    {"id":"Sea background","type":"background","paint":{"background-color":"#e3f0f7"}},
+    {"id":"Land","type":"fill","source":"esri","source-layer":"Land","filter":["==","_symbol",0],"minzoom":0,"paint":{"fill-color":"#f7f9f8"}},
+    {"id":"Small-scale water","type":"fill","source":"esri","source-layer":"Water area small scale","paint":{"fill-color":"#e3f0f7"}},
+    {"id":"Medium-scale water","type":"fill","source":"esri","source-layer":"Water area medium scale","paint":{"fill-color":"#e3f0f7"}},
+    {"id":"Large-scale water","type":"fill","source":"esri","source-layer":"Water area large scale","paint":{"fill-color":"#e3f0f7"}}
+  ]
+}

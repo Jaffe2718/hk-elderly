@@ -1,0 +1,9 @@
+[
+  {"html":"Census and Statistics Department. (n.d.-a). <em>2021 Population Census (statistics and boundaries of District Council districts)</em> [Data set]. DATA.GOV.HK.","url":"https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-dcd"},
+  {"html":"Census and Statistics Department. (n.d.-b). <em>2021 Population Census (statistics and boundaries of small tertiary planning unit groups)</em> [Data set]. DATA.GOV.HK.","url":"https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-stpu"},
+  {"html":"Census and Statistics Department. (2022, October 28). <em>A503: Population by small tertiary planning unit group, sex, year and age</em> [Data set]. 2021 Population Census.","url":"https://www.census2021.gov.hk/en/main_tables.html"},
+  {"html":"Geurs, K. T., &amp; van Wee, B. (2004). Accessibility evaluation of land-use and transport strategies: Review and research directions. <em>Journal of Transport Geography, 12</em>(2), 127–140.","url":"https://doi.org/10.1016/j.jtrangeo.2003.10.005"},
+  {"html":"Planning Department. (n.d.). <em>Land utilization in Hong Kong 2021</em> [Data set]. Common Spatial Data Infrastructure Portal.","url":"https://portal.csdi.gov.hk/csdi-webpage/metadata/pland_rcd_1634024370851_27769/html"},
+  {"html":"Social Welfare Department. (n.d.-a). <em>District Elderly Community Centres</em> [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 2, 2026, from","url":"https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_34036"},
+  {"html":"Social Welfare Department. (n.d.-b). <em>Neighbourhood Elderly Centres</em> [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 2, 2026, from","url":"https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"}
+]

@@ -17,7 +17,7 @@
 | Chapter | Native composition |
 | --- | --- |
 | Introduction | Opening question, Floating Sidecar and population Web Map |
-| Data & Objective | Native evidence table, Slideshow, premises Web Map and age-share Web Map |
+| Data & Objective | Native evidence table, Floating Sidecar, premises Web Map and age-share Web Map |
 | Methodology | Interactive workflow embed, native headings, quotation and explanatory text |
 | Spatial Analysis | Docked Sidecar, analytical Web Maps, coverage-explorer embed, case table, native Web Map Swipe and interactive CSV-backed charts |
 | Conclusions | Native headings, evidence-based synthesis, limitations and next steps |
@@ -154,3 +154,26 @@ Final figure policy: no PDF crops are used. Population composition uses a native
 - The workflow omits the duplicate heading, sizes its SVG viewport to the actual iframe container and focuses the current step on narrow frames. Search, Previous/Next, Fit and pan/zoom remain available.
 - Interactive housing/district coverage and distance/age decision charts are generated from the supplied CSVs with `scripts/prepare_chart_data.py`. They support exact-value inspection, table view and CSV download; coverage bars also support facility-scope filtering and sorting.
 - Draft updates and publishing are separate. The current review authorises pushing assets and replacing the draft only; it does not authorise a new publication.
+
+### Cartographic and editorial revision
+
+- Number the six chapter headings and navigation entries. Credit is an unnumbered footer paragraph and is excluded from navigation. Native separator blocks plus two blank paragraph lines provide extra space between chapters.
+- Use Floating Sidecars for Introduction and Data & Objective and a Docked Sidecar for Spatial Analysis. Slideshow is no longer used.
+- Use native figure captions in reading order outside Sidecars: **Fig. N. Short title.** followed by the explanation. Native caption typography distinguishes them from body paragraphs; Sidecar media is not numbered.
+- `assets/references.json` holds APA-formatted scholarly and dataset references. The A503 release date is verified against the Census main-table register. Unknown release dates remain `n.d.`; retrieval dates identify the changing facility datasets. The discussion cites Geurs and van Wee (2004) for the distinction between a proximity measure and the wider concept of accessibility.
+- Both distance and age matrices appear together in the sensitivity embed. The component sizes itself to the iframe height. District bars use six-row pages; the table view and CSV export still include all rows. Teal/blue colours and coloured outer glows replace purple bars and dark hover borders. Selection remains encoded by explicit 1/0 values.
+- The 18 supplied district polygons are dissolved locally with ArcPy. The outline retains island exteriors and removes internal district lines and hole boundaries. Geometry repair and independent-union checks are recorded in `assets/boundaries/provenance.json`.
+- Native maps use rose population circles, orange NEC diamonds, green DECC triangles, a label-free native vector basemap with pale-blue water, and the red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
+
+To regenerate the map presentation after importing the original handoff:
+
+```powershell
+& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' scripts/prepare_study_area.py
+python scripts/style_webmaps.py
+python scripts/editorial_policy.py
+python scripts/prepare_chart_data.py
+```
+
+`story.json` is used for normal draft rebuilds. `scripts/compose_story.py` is an optional narrative bootstrap and reapplies `scripts/editorial_policy.py`; running it intentionally replaces configured narrative sections.
+
+The outline exporter explicitly projects back to WGS84 using the same Hong Kong 1980 datum transformation before serializing GeoJSON. A round-trip check must remain below 2 cm; the corrected asset measures approximately 0.25 mm in the sampled check. This prevents the approximately 305 m shift found when relying on automatic GeoJSON projection.

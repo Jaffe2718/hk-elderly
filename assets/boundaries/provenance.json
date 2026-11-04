@@ -1,0 +1,29 @@
+{
+  "source": "assets/webmaps/M01_population.json / district_context",
+  "source_sha256": "b59fd379eb579b407071856d8a04ebbf445216a52f9ef8072a43fa37e399955f",
+  "input_districts": 18,
+  "processing_crs": "EPSG:2326",
+  "input_geometry_issues_repaired": [
+    {
+      "feature_id": 6,
+      "problem": "self intersections"
+    }
+  ],
+  "repair_area_change_m2": 0.0,
+  "geographic_transformation": "Hong_Kong_1980_To_WGS_1984_1",
+  "output_crs": "EPSG:4326",
+  "arcpy_version": "3.7.1",
+  "dissolved_features": 1,
+  "exterior_rings_retained": 220,
+  "hole_rings_excluded_from_outline": 148,
+  "land_area_km2": 1110.069527218894,
+  "relative_sum_area_difference_due_to_overlaps": 5.566384304155227e-05,
+  "source_overlap_area_m2": 61794.175629615784,
+  "independent_union_symmetric_difference_m2": 0.0,
+  "sampled_export_roundtrip_max_offset_m": 0.0002451708597948269,
+  "export_projection": "Explicit Project to WGS84 with the same datum transformation before GeoJSON serialization",
+  "sum_input_perimeters_km": 1596.5086420852826,
+  "exterior_outline_length_km": 1115.5735291653875,
+  "geometry_checks": "passed",
+  "scope": "Land extent from supplied display polygons; not a maritime administrative boundary. All island exteriors retained. Internal district lines and hole boundaries omitted from the line asset."
+}

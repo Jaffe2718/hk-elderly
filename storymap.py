@@ -158,6 +158,10 @@ def embed_url(cfg, path):
         url = urljoin(base.rstrip('/') + '/', path)
     if urlparse(url).scheme != 'https':
         raise ValueError('Embeds require HTTPS')
+    if cfg.get('asset_revision') and url.startswith(cfg.get('pages_base_url','__none__').rstrip('/')+'/'):
+        parts=urlparse(url)
+        query=(parts.query+'&' if parts.query else '')+'v='+cfg['asset_revision']
+        url=parts._replace(query=query).geturl()
     return url
 
 
@@ -194,6 +198,15 @@ def configure_credits(story, cfg):
                    '<a href="https://www.pland.gov.hk/" target="_blank" rel="noopener noreferrer">Planning Department</a> for 2021 land-use data, accessed through the '
                    '<a href="https://portal.csdi.gov.hk/" target="_blank" rel="noopener noreferrer">CSDI Portal</a> and DATA.GOV.HK. Analysis and presentation by GEOG7302 Group 13.')
     story.credits(heading='Credit', description=description)
+    # Acknowledgement is a footer, not a chapter/navigation target.
+    for child in credits.get('children', []):
+        node=story._properties['nodes'][child]
+        if node.get('data', {}).get('type')=='h4':
+            node['data'].update(type='paragraph',text='<strong>Credit</strong>')
+
+
+def chapter_title(cfg, index, section):
+    return (f'{index+1}. ' if cfg.get('numbered_chapters') else '') + section['title']
 
 
 def configure_map_views(story, cfg):
@@ -240,7 +253,7 @@ def configure_map_views(story, cfg):
         viewpoint={'rotation':0,'scale':scale,'targetGeometry':center}
         layer_state=[{'id':l['id'],'title':l['title'],'visible':l.get('visibility',True)} for l in data['operationalLayers']]
         if media.get('visible_layers'):
-            for layer in layer_state: layer['visible']=layer['id'] in media['visible_layers']
+            for layer in layer_state: layer['visible']=layer['id'] in media['visible_layers'] or layer['id'] in {'study_land','study_outline'}
         resource_id='r-'+uuid.uuid4().hex[:12]
         resource=copy.deepcopy(original)
         resource['data'].update(extent=extent,center=center,viewpoint=viewpoint,zoom=math.log2(591657527.59/scale),mapLayers=layer_state)
@@ -289,7 +302,7 @@ def publish_current(cfg, baseline, generated=None):
             if any(child not in nodes for child in node.get('children', [])):
                 raise RuntimeError('Staged graph has a missing child node')
         headings = [nodes[n]['data']['text'] for link in next(n for n in nodes.values() if n['type']=='navigation')['data']['links'] for n in [link['nodeId']]]
-        if headings != [html.escape(s['title']) for s in cfg['sections']]:
+        if headings != [html.escape(chapter_title(cfg,i,s)) for i,s in enumerate(cfg['sections'])]:
             raise RuntimeError('Staged graph navigation does not match configuration')
     configure_credits(story, cfg)
     configure_embeds(story)
@@ -412,7 +425,9 @@ def apply(cfg, baseline=None, cover_only=False):
             return Swipe(content=[Image(str(local_asset(p))) for p in media['images']])
         return Embed(embed_url(cfg, media['path']))
 
+    figure_number=0
     def add_block(block):
+        nonlocal figure_number
         kind = block['type']
         if kind == 'table':
             story.add(native_table(block['rows']))
@@ -420,13 +435,15 @@ def apply(cfg, baseline=None, cover_only=False):
             style = {'text': TextStyles.PARAGRAPH, 'quote': TextStyles.QUOTE, 'heading': TextStyles.SUBHEADING}[kind]
             story.add(Text(html.escape(block['text']), style=style))
         elif kind == 'references':
-            for source in cfg.get('sources', []):
+            for source in cfg.get('references', []):
                 url = html.escape(source['url'], quote=True)
-                label = html.escape(source['name'])
-                story.add(Text(f'{label}. <a href="{url}" target="_blank" rel="noopener noreferrer">Source and metadata</a>.'))
+                story.add(Text(f'{source["html"]} <a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>'))
         else:
             content = make_media(block)
-            story.add(content, caption=block.get('caption'), alt_text=block.get('alt', block.get('caption', '')))
+            figure_number+=1
+            title=html.escape(block.get('figure_title',''))
+            caption=f'<strong>Fig. {figure_number}. {title}</strong> '+html.escape(block.get('caption',''))
+            story.add(content, caption=caption, alt_text=block.get('alt', block.get('caption', '')))
             if isinstance(content, Embed):
                 content.display = 'inline'
                 story._properties['nodes'][content._node].setdefault('config', {})['size'] = 'full'
@@ -435,7 +452,10 @@ def apply(cfg, baseline=None, cover_only=False):
     for index, section in enumerate(cfg['sections']):
         if index:
             story.add(Separator())
-        heading = Text(html.escape(section['title']), style=TextStyles.HEADING)
+            # Native text spacing; no unsupported injected CSS or themed font overrides.
+            for _ in range(cfg.get('chapter_spacing_lines',0)):
+                story.add(Text('<br>',style=TextStyles.PARAGRAPH))
+        heading = Text(html.escape(chapter_title(cfg,index,section)), style=TextStyles.HEADING)
         story.add(heading)
         chapter_headings.append(heading)
         if section.get('intro'):

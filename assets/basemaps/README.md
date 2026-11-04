@@ -1,0 +1,5 @@
+# Minimal native vector basemap
+
+`minimal-vector.json` references Esri's official World Basemap v2 vector tile service. It uses neutral land and pale-blue water, with no place-label layers. The style is copied to the map asset folder on Pages and referenced by each native Web Map's `VectorTileLayer.styleUrl`. This is a native map with a JSON stylesheet, not another HTML embed. The renderer requires a URL: although the Web Map specification also documents an object value, Maps SDK 4.33 interpreted an inline object as the URL `[object Object]` in local testing.
+
+The vector source and source-layer names follow the service's [official default style](https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/styles/root.json). Inline styles are supported by the [Esri Web Map specification](https://developers.arcgis.com/web-map-specification/objects/vectorTileLayer/). Data attribution remains with the underlying Esri service. The study-area outline is a separate layer derived from the supplied 2021 district display geometries; a newer cartographic basemap may depict later reclamation or use different generalisation.

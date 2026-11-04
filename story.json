@@ -25,7 +25,7 @@
         {
           "title": "Start with where people live",
           "summary": "Population counts and age proportions answer different questions.",
-          "text": "The 2021 Census records 2,065,146 residents aged 60+ across 211 small tertiary planning unit groups (STPUGs). Our screening uses the number of older residents to represent the scale of potential demand, rather than treating a high elderly percentage as a large population.\n\nA centre just across a statistical boundary may still be nearby. Conversely, a centre inside a large area may be far from its housing. We therefore examine distances from residential land, not simply facility counts inside boundaries.",
+          "text": "The 2021 Census records 2,065,146 residents aged 60+ across 211 small tertiary planning unit groups (STPUGs). Our screening uses the number of older residents to represent the scale of potential demand, rather than treating a high elderly percentage as a large population.",
           "media": {
             "type": "map",
             "webmap": "M01_population"
@@ -42,6 +42,10 @@
         {
           "type": "text",
           "text": "This story combines population, residential land and facility locations in a transparent two-condition Binary screen. Its outcome is a shortlist for further community-support review, not proof of unmet demand and not a prescription for new-centre sites."
+        },
+        {
+          "type": "text",
+          "text": "A centre just across a statistical boundary may still be nearby. Conversely, a centre inside a large area may be far from its housing. We therefore examine distances from residential land, not simply facility counts inside boundaries."
         }
       ]
     },
@@ -49,13 +53,13 @@
       "id": "data",
       "title": "Data & Objective",
       "intro": "Link older-population counts to residential proximity, identify areas meeting explicit conditions, and examine how the shortlist changes when those conditions change.",
-      "layout": "slideshow",
+      "layout": "floating-panel",
       "panel_position": "end",
       "slides": [
         {
           "title": "Locations are not capacity",
           "summary": "215 unique NEC sites and 62 DECC sites support two facility scenarios.",
-          "text": "The SWD snapshot retrieved on 2 November 2026 contains 216 NEC records at 215 distinct coordinates. Only exactly coincident coordinates were deduplicated; premises and sub-bases remain represented. These are mapped locations, not 215 independent service units, and their number does not measure capacity or utilisation.\n\nDistrict Elderly Community Centres (DECCs) form a supplementary comparison. Their inclusion tests geographical complementarity; it does not make NEC and DECC services interchangeable.",
+          "text": "The SWD snapshot retrieved on 2 November 2026 contains 216 NEC records at 215 distinct coordinates. Only exactly coincident coordinates were deduplicated; premises and sub-bases remain represented. These are mapped locations, not 215 independent service units, and their number does not measure capacity or utilisation.",
           "media": {
             "type": "map",
             "webmap": "M11_residential_nec"
@@ -69,7 +73,8 @@
             "type": "map",
             "webmap": "M01_population",
             "visible_layers": [
-              "district_context",
+              "study_land",
+              "study_outline",
               "age_share",
               "nec_sites"
             ]
@@ -117,6 +122,10 @@
         {
           "type": "text",
           "text": "We assess 210 STPUGs with usable residential cells. Group 295 has no usable residential support and remains unassessed. Of 792,158 source residential cells, 792,049 were assigned to a group; 109 were not. The coverage denominator is 79.2049 km² of assigned residential land."
+        },
+        {
+          "type": "text",
+          "text": "District Elderly Community Centres (DECCs) form a supplementary comparison. Their inclusion tests geographical complementarity; it does not make NEC and DECC services interchangeable."
         }
       ]
     },
@@ -131,7 +140,8 @@
         {
           "type": "embed",
           "path": "embeds/workflow/index.html",
-          "caption": "Select a step to inspect its inputs, assumptions and outputs. Use the walkthrough, search and zoom controls."
+          "caption": "Select a step to inspect its inputs, assumptions and outputs. Use the walkthrough, search and zoom controls.",
+          "figure_title": "Analytical workflow."
         },
         {
           "type": "heading",
@@ -164,6 +174,10 @@
         {
           "type": "text",
           "text": "Cross population P60/P75/P90, distances of 500/800/1,000 m, and uncovered shares of 25/50/75% to produce 27 threshold scenarios. Repeat the main rule for ages 65+ and 75+ using their own P75 cutoffs. Compare NEC-only with NEC+DECC coverage and residential-cell distances with a centroid-distance alternative. These are sensitivity checks, not independent validation or additional weighted models."
+        },
+        {
+          "type": "text",
+          "text": "Accessibility has several dimensions; a geographical proximity screen captures only part of the wider concept (Geurs & van Wee, 2004). We therefore interpret this model as a transparent review shortlist, rather than an assessment of actual service use."
         }
       ],
       "after": []
@@ -293,7 +307,8 @@
               "bookmark": "833 "
             }
           ],
-          "caption": "Matched native Web Maps: NEC only on the left; NEC + DECC on the right. Tiu Keng Leng, group 833."
+          "caption": "Matched native Web Maps: NEC only on the left; NEC + DECC on the right. Tiu Keng Leng, group 833.",
+          "figure_title": "Facility scope in Tiu Keng Leng."
         },
         {
           "type": "heading",
@@ -302,7 +317,8 @@
         {
           "type": "embed",
           "path": "embeds/charts/index.html#housing",
-          "caption": "Explore residential-area coverage by housing class or district. Compare facility definitions, sort values, or download the source table."
+          "caption": "Explore residential-area coverage by housing class or district. Compare facility definitions, sort values, or download the source table.",
+          "figure_title": "Residential-area coverage by housing type and district."
         },
         {
           "type": "heading",
@@ -311,7 +327,8 @@
         {
           "type": "embed",
           "path": "embeds/charts/index.html#sensitivity",
-          "caption": "Inspect Binary decisions across distance and age definitions. Each age cohort uses its own P75 cutoff."
+          "caption": "(A) Distance-threshold decisions at 500, 800 and 1,000 m. (B) Age-definition decisions for the four main-scenario groups. Each age cohort uses its own P75 cutoff. 1 = selected; 0 = not selected.",
+          "figure_title": "Sensitivity to distance and age definitions."
         }
       ]
     },
@@ -361,7 +378,7 @@
     {
       "id": "references",
       "title": "References",
-      "intro": "Official datasets and sources used in this study. Population and residential land refer to 2021; facility premises were retrieved on 2 November 2026.",
+      "intro": "Scholarly literature and official datasets cited in this study. Entries follow APA style; undated datasets are identified as n.d. rather than assigned an unverified publication year.",
       "slides": [],
       "before": [
         {
@@ -405,5 +422,38 @@
       "name": "C&SD: 2021 district boundaries",
       "url": "https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-dcd"
     }
-  ]
+  ],
+  "numbered_chapters": true,
+  "chapter_spacing_lines": 2,
+  "references": [
+    {
+      "html": "Census and Statistics Department. (n.d.-a). <em>2021 Population Census (statistics and boundaries of District Council districts)</em> [Data set]. DATA.GOV.HK.",
+      "url": "https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-dcd"
+    },
+    {
+      "html": "Census and Statistics Department. (n.d.-b). <em>2021 Population Census (statistics and boundaries of small tertiary planning unit groups)</em> [Data set]. DATA.GOV.HK.",
+      "url": "https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-stpu"
+    },
+    {
+      "html": "Census and Statistics Department. (2022, October 28). <em>A503: Population by small tertiary planning unit group, sex, year and age</em> [Data set]. 2021 Population Census.",
+      "url": "https://www.census2021.gov.hk/en/main_tables.html"
+    },
+    {
+      "html": "Geurs, K. T., &amp; van Wee, B. (2004). Accessibility evaluation of land-use and transport strategies: Review and research directions. <em>Journal of Transport Geography, 12</em>(2), 127–140.",
+      "url": "https://doi.org/10.1016/j.jtrangeo.2003.10.005"
+    },
+    {
+      "html": "Planning Department. (n.d.). <em>Land utilization in Hong Kong 2021</em> [Data set]. Common Spatial Data Infrastructure Portal.",
+      "url": "https://portal.csdi.gov.hk/csdi-webpage/metadata/pland_rcd_1634024370851_27769/html"
+    },
+    {
+      "html": "Social Welfare Department. (n.d.-a). <em>District Elderly Community Centres</em> [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 2, 2026, from",
+      "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_34036"
+    },
+    {
+      "html": "Social Welfare Department. (n.d.-b). <em>Neighbourhood Elderly Centres</em> [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 2, 2026, from",
+      "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"
+    }
+  ],
+  "asset_revision": "20261105-review2"
 }

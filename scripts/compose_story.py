@@ -100,6 +100,8 @@ def compose():
         elif block.get('path','').endswith('12_age_distance_sensitivity_en.png'):
             cfg['sections'][3]['after'][i] = {'type': 'embed', 'path': 'embeds/charts/index.html#sensitivity', 'caption': 'Inspect Binary decisions across distance and age definitions. Each age cohort uses its own P75 cutoff.'}
     cfg['sections'].append({'id': 'references', 'title': 'References', 'intro': 'Official datasets and sources used in this study. Population and residential land refer to 2021; facility premises were retrieved on 2 November 2026.', 'slides': [], 'before': [{'type': 'references'}, {'type': 'text', 'text': 'Maps and the Binary screening reproduce the supplied Group 13 analysis. Interactive components use Leaflet 1.9.4 and project-specific SVG/HTML; workflow interaction direction was informed by dsh-archify. Selection frequency is a sensitivity measure, not probability.'}]})
+    from editorial_policy import apply_policy
+    cfg=apply_policy(cfg)
     (ROOT/'story.json').write_text(json.dumps(cfg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Composed six chapters from supplied evidence')
 
