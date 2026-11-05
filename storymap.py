@@ -270,6 +270,13 @@ def configure_map_views(story, cfg):
         layer_state=[{'id':l['id'],'title':l['title'],'visible':l.get('visibility',True)} for l in data['operationalLayers']]
         if media.get('visible_layers'):
             for layer in layer_state: layer['visible']=layer['id'] in media['visible_layers'] or layer['id'] in {'study_land','study_outline'}
+        state_by_id={layer['id']:layer for layer in layer_state}
+        if all(key in state_by_id for key in ['facilities','nec_sites','decc_sites']):
+            both=state_by_id['nec_sites']['visible'] and state_by_id['decc_sites']['visible']
+            state_by_id['facilities']['visible']=both
+            if both:
+                state_by_id['nec_sites']['visible']=False
+                state_by_id['decc_sites']['visible']=False
         resource_id='r-'+uuid.uuid4().hex[:12]
         resource=copy.deepcopy(original)
         resource['data'].update(extent=extent,center=center,viewpoint=viewpoint,zoom=math.log2(591657527.59/scale),mapLayers=layer_state)

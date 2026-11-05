@@ -307,27 +307,10 @@
           "text": "Drag the divider to compare NEC-only and NEC + DECC proximity in Tiu Keng Leng at the same geographical extent. The left and right legends describe their respective layers. These are geographical proximity definitions, not interchangeable services or measures of operating capacity."
         },
         {
-          "type": "swipe",
-          "maps": [
-            {
-              "type": "map",
-              "webmap": "M11_residential_nec",
-              "bookmark": "833 ",
-              "show_legend": false
-            },
-            {
-              "type": "map",
-              "webmap": "M12_residential_combined",
-              "bookmark": "833 ",
-              "show_legend": false
-            }
-          ],
+          "type": "embed",
+          "path": "embeds/coverage-comparison/index.html",
           "figure_title": "Facility scope in Tiu Keng Leng.",
-          "caption": "Matched native Web Maps. NEC only on the left; NEC + DECC on the right. The two legends below correspond to the respective map layers."
-        },
-        {
-          "type": "comparison_legend",
-          "path": "assets/legends/facility-comparison.png"
+          "caption": "NEC only on the left; NEC + DECC on the right. Both sides share one geographical view. In-map legends identify residential land within or beyond 800 m and the facility types."
         },
         {
           "type": "heading",
@@ -474,7 +457,7 @@
       "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"
     }
   ],
-  "asset_revision": "20261105-review7",
+  "asset_revision": "20261105-review8",
   "cover_media": {
     "type": "image",
     "path": "assets/cover/tuen-mun-aged-blind-garden.jpg"

@@ -14,7 +14,6 @@ def run():
    c=entry['symbol']['color'];d.rectangle((x,y+4,x+26,y+27),fill=tuple(c[:3]));d.text((x+42,y),entry['label'],font=font,fill='#33464f');y+=44
   for label,shape in [('NEC site','diamond')]+([('DECC site','triangle')] if i else []):
    pts=[(x+13,y+2),(x+25,y+14),(x+13,y+26),(x+1,y+14)] if shape=='diamond' else [(x+13,y+2),(x+25,y+26),(x+1,y+26)]
-   d.polygon(pts,fill='#145341');d.text((x+42,y),label,font=font,fill='#33464f');y+=44
- d.line((800,20,800,270),fill='#e1e5e8',width=2)
+   d.polygon(pts,fill='#145341' if shape=='diamond' else '#b75d22');d.text((x+42,y),label,font=font,fill='#33464f');y+=44
  target=ROOT/'assets/legends/facility-comparison.png';target.parent.mkdir(exist_ok=True);im.save(target)
 if __name__=='__main__':run()

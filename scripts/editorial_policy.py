@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def apply_policy(cfg):
     cfg['numbered_chapters']=True
-    cfg['asset_revision']='20261105-review7'
+    cfg['asset_revision']='20261105-review8'
     cfg['cover_media']={'type':'image','path':'assets/cover/tuen-mun-aged-blind-garden.jpg'}
     cfg['chapter_spacing_lines']=2
     cfg['references']=json.loads((ROOT/'assets/references.json').read_text(encoding='utf-8'))
@@ -23,9 +23,9 @@ def apply_policy(cfg):
                 section.setdefault('before',[]).append({'type':'text','text':text})
         for block in section.get('before',[])+section.get('after',[]):
             if block.get('type')=='swipe' or block.get('path')=='embeds/coverage-comparison/index.html':
-                block.clear();block.update(type='swipe',maps=[{'type':'map','webmap':'M11_residential_nec','bookmark':'833 ','show_legend':False},{'type':'map','webmap':'M12_residential_combined','bookmark':'833 ','show_legend':False}],figure_title='Facility scope in Tiu Keng Leng.',caption='Matched native Web Maps. NEC only on the left; NEC + DECC on the right. The two legends below correspond to the respective map layers.')
+                block.clear();block.update(type='embed',path='embeds/coverage-comparison/index.html',figure_title='Facility scope in Tiu Keng Leng.',caption='NEC only on the left; NEC + DECC on the right. Both sides share one geographical view. In-map legends identify residential land within or beyond 800 m and the facility types.')
             if block.get('text','').startswith(('Drag the native Swipe divider','Compare matched residential patches')):
-                block['text']='Drag the divider to compare NEC-only and NEC + DECC proximity in Tiu Keng Leng at the same geographical extent. The left and right legends describe their respective layers. These are geographical proximity definitions, not interchangeable services or measures of operating capacity.'
+                block['text']='Drag the divider to compare NEC-only and NEC + DECC proximity in Tiu Keng Leng at the same geographical extent. The fixed in-map legends describe their respective layers. These are geographical proximity definitions, not interchangeable services or measures of operating capacity.'
             if block.get('text')=='Tiu Keng Leng: change the facility scope':block['text']='Compare local facility scope'
             if block.get('path')=='embeds/workflow/index.html':block['figure_title']='Analytical workflow.'
             elif block.get('type')=='swipe':block['figure_title']='Facility scope in Tiu Keng Leng.'
@@ -38,10 +38,7 @@ def apply_policy(cfg):
                 group='coverage' if fragment=='housing' else 'sensitivity'
                 block['path']=f'embeds/charts/index.html?group={group}#{fragment}'
         for key in ['before','after']:
-            blocks=section.get(key,[])
-            if any(b.get('type')=='swipe' for b in blocks) and not any(b.get('type')=='comparison_legend' for b in blocks):
-                idx=next(i for i,b in enumerate(blocks) if b.get('type')=='swipe')
-                blocks.insert(idx+1,{'type':'comparison_legend','path':'assets/legends/facility-comparison.png'})
+            section[key]=[b for b in section.get(key,[]) if b.get('type')!='comparison_legend']
         for slide in section.get('slides',[]):
             if section.get('layout')=='floating-panel' and '\n\n' in slide.get('text',''):
                 first,remaining=slide['text'].split('\n\n',1)

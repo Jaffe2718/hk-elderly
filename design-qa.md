@@ -22,3 +22,6 @@ Ignored local build screenshots include map-desktop.png, map-mobile.png, compari
 - Browser test confirms Pause freezes CSS animation time and walkthrough selection; Resume advances again.
 - Fit clears selection, search, timer and transforms; mobile reset also verified.
 - SVG export UI and its download handler removed. No SVG export remains in embedded components.
+
+## In-map comparison revision
+Browser checks pass for an ArcGIS Maps SDK 4.33 Swipe, 315 features per scenario, stable in-map legend rectangles after pan/swipe, and non-overlapping mobile legend cards. Desktop and mobile screenshots are saved under build/native-swipe-*.png. The StoryMap-native layer legend separators remain unsupported for direct styling.

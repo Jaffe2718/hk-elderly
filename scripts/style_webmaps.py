@@ -28,12 +28,24 @@ def run():
     outline_layer=collection('study_outline','Hong Kong study area outline','esriGeometryPolyline',{'paths':line['coordinates'],'spatialReference':{'wkid':4326}},{'type':'esriSLS','style':'esriSLSSolid','color':[128,40,53,245],'width':1.2})
     for path in sorted((ROOT/'assets/webmaps').glob('M*.json')):
         data=json.loads(path.read_text(encoding='utf-8'))
-        layers=[l for l in data['operationalLayers'] if l['id'] not in {'study_land','study_outline'}]
+        layers=[l for l in data['operationalLayers'] if l['id'] not in {'study_land','study_outline','facilities'}]
         for layer in layers:
             key=layer['id']
             if key=='district_context':layer['visibility']=False
             for sub in layer.get('featureCollection',{}).get('layers',[]):
                 renderer=sub['layerDefinition'].get('drawingInfo',{}).get('renderer',{})
+                renderer.setdefault('legendOptions',{})['title']=''
+                field=renderer.get('field1',renderer.get('field'))
+                titles={'elderly_pct':'Residents aged 60+ (%)','elderly_n':'Residents aged 60+ (2021)',
+                        'nec_out800_pct':'Residential land beyond NEC 800 m (%)','any_out800_pct':'Residential land beyond NEC + DECC 800 m (%)',
+                        'sensitivity_hits27':'Selections across 27 scenarios','nec2plus_pct800':'Residential land within 800 m of 2+ NECs (%)',
+                        'centroid_disagree':'Residential vs centroid screening','nec_decc_gain_pp':'Coverage gain from adding DECC (pp)',
+                        'demand_coverage_class':'Older population and residential proximity'}
+                if field in titles: layer['title']=titles[field]
+                elif field and field.startswith('priority_'):
+                    suffix={'priority_main':'800 m','priority_500':'500 m','priority_1000':'1,000 m','priority_age65':'age 65+ · 800 m','priority_age75':'age 75+ · 800 m'}.get(field,'800 m')
+                    layer['title']='Priority screen · '+suffix
+                sub['layerDefinition']['name']=layer.get('title',sub['layerDefinition'].get('name',''))
                 if key!='district_context':
                     layer['showLegend']=True
                     layer.get('featureCollection',{})['showLegend']=True
@@ -62,7 +74,7 @@ def run():
                     else:
                         renderer['defaultLabel']='Other / missing value'
                 if key in {'nec_sites','decc_sites'}:
-                    renderer['symbol']={'type':'esriSMS','style':'esriSMSDiamond' if key=='nec_sites' else 'esriSMSTriangle','color':[20,83,65,245] if key=='nec_sites' else [20,83,65,245],'size':5.5 if key=='nec_sites' else 7,'outline':{'type':'esriSLS','style':'esriSLSSolid','color':[255,255,255,250],'width':.7}}
+                    renderer['symbol']={'type':'esriSMS','style':'esriSMSDiamond' if key=='nec_sites' else 'esriSMSTriangle','color':rgba(theme['facility']) if key=='nec_sites' else rgba(theme['decc']),'size':5.5 if key=='nec_sites' else 7,'outline':{'type':'esriSLS','style':'esriSLSSolid','color':[255,255,255,250],'width':.7}}
                 if key=='population60':
                     for info,size in zip(renderer['classBreakInfos'],[6,10,15,21,27]):
                         info['symbol'].update(color=rgba(theme['population'])[:3]+[185],size=size)
@@ -71,10 +83,47 @@ def run():
                     renderer['defaultSymbol']['color']=[165,173,176,255]
                 if key=='age_share':
                     for info,colour in zip(renderer['classBreakInfos'],[rgba(c) for c in theme['age_share']]):info['symbol']['color']=colour
+                if renderer.get('type')=='uniqueValue':
+                    for info in renderer.get('uniqueValueInfos',[]):
+                        value=str(info['value'])
+                        if field and field.startswith('priority_') and value in {'0','1'}:info['label']='Selected for review' if value=='1' else 'Not selected'
+                        if field=='centroid_disagree' and value in {'0','1'}:info['label']='Same result' if value=='0' else 'Different result'
+                if renderer.get('type')=='classBreaks':
+                    values=[f['attributes'].get(field) for f in sub['featureSet']['features']]
+                    lo=renderer.get('minValue',0);hi=renderer['classBreakInfos'][-1]['classMaxValue']
+                    if all(isinstance(v,(int,float)) and lo<=v<=hi for v in values):
+                        renderer['defaultSymbol']=None;renderer.pop('defaultLabel',None)
+                    else:
+                        renderer['defaultLabel']='Not assessed'
                 if key=='residential' and path.stem in {'M11_residential_nec','M12_residential_combined'}:
                     colours=(['#eee8f4','#af98c4'] if path.stem=='M11_residential_nec' else ['#f3eadf','#b79b7a'])
                     for info in renderer['uniqueValueInfos']:
                         info['symbol']['color']=rgba(colours[int(info['value'])])
+        by_id={l['id']:l for l in layers}
+        if {'nec_sites','decc_sites'} <= by_id.keys():
+            # One point layer gives the two facility classes one coherent legend,
+            # without a native layer separator between NEC and DECC.
+            combined=copy.deepcopy(by_id['nec_sites'])
+            combined.update(id='facilities',title='Elderly centre premises',visibility=False)
+            sub=combined['featureCollection']['layers'][0]
+            definition=sub['layerDefinition']
+            fields={f['name']:copy.deepcopy(f) for key in ['nec_sites','decc_sites'] for f in by_id[key]['featureCollection']['layers'][0]['layerDefinition']['fields']}
+            fields['facility_kind']={'name':'facility_kind','alias':'Facility type','type':'esriFieldTypeString','length':8}
+            definition.update(name='Elderly centre premises',fields=list(fields.values()))
+            features=[];infos=[]
+            for key,kind in [('nec_sites','NEC'),('decc_sites','DECC')]:
+                source=by_id[key]['featureCollection']['layers'][0]
+                infos.append({'value':kind,'label':kind+' premises','symbol':copy.deepcopy(source['layerDefinition']['drawingInfo']['renderer']['symbol'])})
+                for feature in source['featureSet']['features']:
+                    feature=copy.deepcopy(feature)
+                    feature['attributes']={name:feature['attributes'].get(name) for name in fields}
+                    feature['attributes'].update(facility_kind=kind)
+                    feature['attributes'][definition.get('objectIdField','OBJECTID')]=len(features)+1
+                    features.append(feature)
+            sub['featureSet']['features']=features
+            definition['drawingInfo']['renderer']={'type':'uniqueValue','field1':'facility_kind','uniqueValueInfos':infos,'defaultSymbol':None,'legendOptions':{'title':''}}
+            sub['popupInfo']={'title':'{facility_kind}: {name_en}','popupElements':[{'type':'fields','fieldInfos':[{'fieldName':'facility_kind','label':'Facility type'},{'fieldName':'name_en','label':'Name'},{'fieldName':'address_en','label':'Address'}]},{'type':'text','text':'Mapped premises indicate location, not service capacity.'}],'showAttachments':False}
+            layers.append(combined)
         data['operationalLayers']=[copy.deepcopy(land_layer)]+layers+[copy.deepcopy(outline_layer)]
         if path.stem=='M01_population':
             boundary=data['operationalLayers'][-1]['featureCollection']['layers'][0]['layerDefinition']['drawingInfo']['renderer']['symbol']

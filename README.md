@@ -143,7 +143,7 @@ The main rule is residents aged 60+ >= 14,695 AND over 50% of residential land b
 
 Snapshots, local QA screenshots and raw handoff materials remain ignored. Only public-safe English derivatives and generator sources are committed.
 
-Final figure policy: no PDF crops are used. Population composition uses a native Web Map with its age-share layer enabled. Housing/district coverage and age/distance decisions use interactive HTML charts generated from the supplied CSV tables. The Tiu Keng Leng comparison uses two native Web Maps with the same bookmark extent. `scripts/render_charts.py` remains an optional static fallback and is not inserted into the story. The original English handoff PNGs remain available as reference assets.
+Final figure policy: no PDF crops are used. Population composition uses a native Web Map with its age-share layer enabled. Housing/district coverage and age/distance decisions use interactive HTML charts generated from the supplied CSV tables. The Tiu Keng Leng comparison embeds an ArcGIS Maps SDK Swipe with one shared viewpoint and independent in-map legends. `scripts/render_charts.py` remains an optional static fallback and is not inserted into the story. The original English handoff PNGs remain available as reference assets.
 
 ### Preview revision
 
@@ -183,7 +183,7 @@ The outline exporter explicitly projects back to WGS84 using the same Hong Kong 
 
 - Docked narrative panels use the native small size; the explorer control column is 210 px on desktop.
 - Both Leaflet embeds use the Esri Light Gray Base label-free raster basemap with Esri/HERE/Garmin attribution and a subtle cool tint. Roads and neighbouring land provide context without non-English place labels. Analytical overlays remain from the supplied handoff.
-- The facility-scope comparison uses the native StoryMap Swipe at the same Tiu Keng Leng extent. A paired legend image immediately below it is generated from both source renderers by scripts/prepare_comparison_legend.py. The former HTML comparison remains an unused prototype.
+- The facility-scope comparison uses an embedded ArcGIS Maps SDK 4.33 Swipe (not the StoryMap Swipe block), preserving native map controls while allowing two fixed in-map legends. Both legend cards are compact, have no separators, and use trapezoid area swatches. The left map is lavender; the right is grey-apricot. NEC is a dark-green diamond; DECC is a deep-orange triangle. Native combined-facility views use a derived point layer with both categories in one legend group, while original source layers remain unchanged. The old paired PNG legend and its generator remain legacy assets and are not inserted.
 - Population counts use proportional pale-purple circles; age percentages use a muted lavender sequential ramp. Water stays pale blue. Sizes, percentage classes and analytical attributes are unchanged.
 - The native cover uses the selected Tuen Mun home garden entrance photograph. Source, photographer and CC BY-SA licence are recorded under assets/cover and reproduced in Credit.
 - References have bracketed numbers while retaining APA entry formatting; in-text cross-references remain deferred.
