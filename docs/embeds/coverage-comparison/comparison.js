@@ -11,7 +11,7 @@ require(['esri/Map','esri/views/MapView','esri/layers/GeoJSONLayer','esri/layers
   const outline=geo(data.outline,'Study area boundary',{type:'simple',symbol:{type:'simple-line',color:'#802835',width:1}});
   const map=new Map({basemap:new Basemap({baseLayers:[new VectorTileLayer({style:new URL('../elderly-map/native-basemap.json',location.href).href})]}),layers:[land,...panels,nec,decc,outline]});
   const view=new MapView({container:'map',map,center:[114.25,22.3],zoom:14,ui:{components:['attribution','zoom']}});await view.when();
-  view.ui.move('zoom','bottom-right');view.ui.add(new Home({view}),'bottom-right');view.ui.add(new Fullscreen({view}),'top-right');
+  view.ui.move('zoom','bottom-right');view.ui.add(new Home({view}),'bottom-right');view.ui.add(new Fullscreen({view,element:document.body}),'top-right');
   const swipe=new Swipe({view,leadingLayers:[panels[0]],trailingLayers:[panels[1],decc],position:50});view.ui.add(swipe);
   const selector=document.getElementById('case');data.cases.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;selector.append(o)});
   async function select(i){selector.value=String(i);const e=data.cases[i].extent;await view.goTo(new Extent({...e,spatialReference:{wkid:4326}}),{animate:false});}
