@@ -18,7 +18,7 @@ function start(D){
  function update(){
   const view=$('view').value,alternative=$('age').value!=='60'||$('combined').checked;if(alternative)radius=800;
   document.querySelectorAll('[data-distance]').forEach(b=>{b.disabled=alternative&&b.dataset.distance!=='800';b.setAttribute('aria-pressed',Number(b.dataset.distance)===radius)});$('age').disabled=$('combined').checked;
-  if(areas)map.removeLayer(areas);const pal=['#e1c9f5','#bb8ce5','#9452d0','#712ab5','#4e128c'];
+  if(areas)map.removeLayer(areas);const pal=['#e0ceee','#b99bd4','#9452d0','#712ab5','#4e128c'];
   function fill(p){if(!p.assessed)return '#a7afac';if(view==='priority')return decision(p)===1?'#b8414c':'#e5ece9';let v=view==='coverage'?100-($('combined').checked?p.any_out800_pct:p.nec_out800_pct):view==='choices'?p.nec2plus_pct800:p.sensitivity_hits27/27*100;return pal[Math.min(4,Math.floor(v/20))]}
   areas=L.geoJSON(D.groups,{style:f=>({color:decision(f.properties)===1&&view==='priority'?'#8c2934':'#b9c7c1',weight:decision(f.properties)===1&&view==='priority'?1.5:.5,fillColor:fill(f.properties),fillOpacity:1}),onEachFeature:(f,l)=>{groupLayers[f.properties.stpug_id]=l;l.bindPopup(()=>popup(f.properties));l.on('mouseover',()=>{l.setStyle({weight:2,color:'#00cbb0'});if(l.getElement())l.getElement().style.filter='drop-shadow(0 0 3px #00d4ae)'});l.on('mouseout',()=>{areas.resetStyle(l);if(l.getElement())l.getElement().style.filter='none'});}}).addTo(map);studyOutline.bringToFront();layers.nec.bringToFront();layers.decc.bringToFront();
   const count=D.groups.features.filter(f=>decision(f.properties)===1).length;$('count').textContent=count;

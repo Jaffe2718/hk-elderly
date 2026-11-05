@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def apply_policy(cfg):
     cfg['numbered_chapters']=True
-    cfg['asset_revision']='20261105-review4'
+    cfg['asset_revision']='20261105-review5'
     cfg['cover_media']={'type':'image','path':'assets/cover/tuen-mun-aged-blind-garden.jpg'}
     cfg['chapter_spacing_lines']=2
     cfg['references']=json.loads((ROOT/'assets/references.json').read_text(encoding='utf-8'))
