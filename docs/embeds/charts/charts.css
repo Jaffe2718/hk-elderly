@@ -3,3 +3,6 @@
 @media(max-height:550px){main{gap:4px;padding:8px 12px}nav{padding:6px 12px}button,select{padding:5px 8px}#description,.source,.panel-note{display:none}h1{font-size:17px}.matrix{gap:3px 6px}.matrix-panel{gap:4px}#detail,.note{font-size:11px}#chart{padding:2px 6px}.cell{min-height:14px}}
 
 .matrix-label{line-height:1.15}.matrix-panel.age .matrix{max-height:175px}.matrices.paired .panel-note{display:none}
+
+/* Low-saturation surfaces; dark text preserves readable binary values. */
+button[aria-pressed=true]{background:#e4deef;color:#504561;border-color:#b9afd0}.yes-key{background:#d1c6e3}.no-key{background:#edf0f4}.cell.yes{background:#d1c6e3;color:#493d60;border-color:#b5a5cc}.cell.no{background:#edf0f4;color:#566170;border-color:#d2d9e1}.cell:hover,.cell:focus,.cell.picked{border-color:#a995ce;filter:drop-shadow(0 0 3px #bda7e9aa)}

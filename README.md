@@ -161,7 +161,8 @@ Final figure policy: no PDF crops are used. Population composition uses a native
 - Use Floating Sidecars for Introduction and Data & Objective and a Docked Sidecar for Spatial Analysis. Slideshow is no longer used.
 - Use native figure captions in reading order outside Sidecars: **Fig. N. Short title.** followed by the explanation. Native caption typography distinguishes them from body paragraphs; Sidecar media is not numbered.
 - `assets/references.json` holds APA-formatted scholarly and dataset references. The A503 release date is verified against the Census main-table register. Unknown release dates remain `n.d.`; retrieval dates identify the changing facility datasets. The discussion cites Geurs and van Wee (2004) for the distinction between a proximity measure and the wider concept of accessibility.
-- Both distance and age matrices appear together in the sensitivity embed. The component sizes itself to the iframe height. District bars use six-row pages; the table view and CSV export still include all rows. Teal/blue colours and coloured outer glows replace purple bars and dark hover borders. Selection remains encoded by explicit 1/0 values.
+- Both distance and age matrices appear together in the sensitivity embed. The component sizes itself to the iframe height. District bars use six-row pages; the table view and CSV export still include all rows. Muted lavender/blue fills and coloured outer glows replace dark fills and black hover borders. Selection remains encoded by explicit 1/0 values.
+- Chart embeds have separate scopes: `?group=coverage#housing` exposes Housing/Districts and facility/sort controls; `?group=sensitivity#sensitivity` exposes Both matrices/Distance/Age definition. Hash navigation is restricted to the selected scope. Table and CSV actions follow that scope.
 - The 18 supplied district polygons are dissolved locally with ArcPy. The outline retains island exteriors and removes internal district lines and hole boundaries. Geometry repair and independent-union checks are recorded in `assets/boundaries/provenance.json`.
 - Native maps use pale-purple population circles, dark-green NEC diamonds and DECC triangles, a label-free native vector basemap with pale-blue water, and the dark-red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
 
@@ -177,3 +178,11 @@ python scripts/prepare_chart_data.py
 `story.json` is used for normal draft rebuilds. `scripts/compose_story.py` is an optional narrative bootstrap and reapplies `scripts/editorial_policy.py`; running it intentionally replaces configured narrative sections.
 
 The outline exporter explicitly projects back to WGS84 using the same Hong Kong 1980 datum transformation before serializing GeoJSON. A round-trip check must remain below 2 cm; the corrected asset measures approximately 0.25 mm in the sampled check. This prevents the approximately 305 m shift found when relying on automatic GeoJSON projection.
+
+### Embedded map layout and cover
+
+- Docked narrative panels use the native small size; the explorer control column is 210 px on desktop.
+- Both Leaflet embeds use the Esri Light Gray Base label-free raster basemap with Esri/HERE/Garmin attribution and a subtle cool tint. Roads and neighbouring land provide context without non-English place labels. Analytical overlays remain from the supplied handoff.
+- The linked facility-scope comparison has four case bookmarks, synchronized views and fixed legends in opposite corners. It compares distinct NEC-only and NEC + DECC attributes.
+- The native cover uses the selected Tuen Mun home garden entrance photograph. Source, photographer and CC BY-SA licence are recorded under assets/cover and reproduced in Credit.
+- References have bracketed numbers while retaining APA entry formatting; in-text cross-references remain deferred.

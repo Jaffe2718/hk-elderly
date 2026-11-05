@@ -1,6 +1,11 @@
 'use strict';
-const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg',COLORS=['#087f82','#397fc4'];
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg',COLORS=['#b9afd0','#adc9d6'];
 let data,view='housing',table=false,page=0;
+// Each embed owns one task. Hash changes may switch tabs within that task only.
+const initialHash=location.hash.slice(1),requestedGroup=new URLSearchParams(location.search).get('group');
+const group=requestedGroup==='sensitivity'||(!requestedGroup&&['sensitivity','distance','age'].includes(initialHash))?'sensitivity':'coverage';
+const allowedViews=group==='coverage'?['housing','districts']:['sensitivity','distance','age'];
+document.querySelectorAll('[data-view]').forEach(button=>{button.hidden=!allowedViews.includes(button.dataset.view)});
 const titles={housing:'Coverage by residential type',districts:'Coverage by district',distance:'Distance sensitivity',age:'Age-definition sensitivity',sensitivity:'Sensitivity to distance and age'};
 function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);parent.append(e);return e}
 function label(parent,x,y,s,attrs={}){const e=el('text',{x,y,...attrs},parent);e.textContent=s;return e}
@@ -46,7 +51,7 @@ function draw(){
  $('pager').hidden=view!=='districts'||table;$('page-label').textContent=`${page*6+1}–${Math.min(page*6+6,rows.length)} of ${rows.length}`;$('page-back').disabled=page===0;$('page-next').disabled=page*6+6>=rows.length;
  window.__charts={view,rows,draw};
 }
-function route(){const hash=location.hash.slice(1);view=hash==='sensitivity'?'sensitivity':data[hash]?hash:'housing';page=0;draw()}
+function route(){const hash=location.hash.slice(1);view=allowedViews.includes(hash)?hash:allowedViews[0];page=0;draw()}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{location.hash=b.dataset.view});$('scope').onchange=draw;$('sort').onchange=()=>{page=0;draw()};$('table-toggle').onclick=()=>{table=!table;draw()};
 $('page-back').onclick=()=>{page--;draw()};$('page-next').onclick=()=>{page++;draw()};
 $('download').onclick=()=>{let ds=data[view];if(view==='sensitivity')ds={columns:['Definition','STPUG','Scenario','Selected'],rows:['distance','age'].flatMap(kind=>data[kind].rows.flatMap(r=>[1,2,3].map(i=>[kind,r[0],data[kind].columns[i],r[i]])))};const escape=v=>'"'+String(v).replaceAll('"','""')+'"',csv=[ds.columns,...ds.rows].map(r=>r.map(escape).join(',')).join('\r\n'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=view+'-evidence.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};

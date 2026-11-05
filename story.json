@@ -47,7 +47,8 @@
           "type": "text",
           "text": "A centre just across a statistical boundary may still be nearby. Conversely, a centre inside a large area may be far from its housing. We therefore examine distances from residential land, not simply facility counts inside boundaries."
         }
-      ]
+      ],
+      "panel_size": "small"
     },
     {
       "id": "data",
@@ -127,7 +128,8 @@
           "type": "text",
           "text": "District Elderly Community Centres (DECCs) form a supplementary comparison. Their inclusion tests geographical complementarity; it does not make NEC and DECC services interchangeable."
         }
-      ]
+      ],
+      "panel_size": "small"
     },
     {
       "id": "methodology",
@@ -180,7 +182,8 @@
           "text": "Accessibility has several dimensions; a geographical proximity screen captures only part of the wider concept (Geurs & van Wee, 2004). We therefore interpret this model as a transparent review shortlist, rather than an assessment of actual service use."
         }
       ],
-      "after": []
+      "after": [],
+      "panel_size": "small"
     },
     {
       "id": "analysis",
@@ -287,28 +290,17 @@
         },
         {
           "type": "heading",
-          "text": "Tiu Keng Leng: change the facility scope"
+          "text": "Compare local facility scope"
         },
         {
           "type": "text",
-          "text": "Drag the native Swipe divider between matched NEC-only and NEC+DECC views. The residential footprint and map extent are held constant. The comparison concerns spatial proximity, not interchangeable services or operating capacity."
+          "text": "Compare matched residential patches in the linked maps. The left panel uses NEC only; the right includes DECC. Choose a local case, pan or zoom either panel, or play the case tour. Both views remain aligned. These are geographical proximity definitions, not interchangeable services or measures of operating capacity."
         },
         {
-          "type": "swipe",
-          "maps": [
-            {
-              "type": "map",
-              "webmap": "M11_residential_nec",
-              "bookmark": "833 "
-            },
-            {
-              "type": "map",
-              "webmap": "M12_residential_combined",
-              "bookmark": "833 "
-            }
-          ],
-          "caption": "Matched native Web Maps: NEC only on the left; NEC + DECC on the right. Tiu Keng Leng, group 833.",
-          "figure_title": "Facility scope in Tiu Keng Leng."
+          "type": "embed",
+          "path": "embeds/coverage-comparison/index.html",
+          "figure_title": "Matched facility-scope comparison.",
+          "caption": "NEC only on the left; NEC + DECC on the right. Select one of four cases or pan either map. Both views share the same centre and scale; legends stay fixed in their respective corners."
         },
         {
           "type": "heading",
@@ -316,7 +308,7 @@
         },
         {
           "type": "embed",
-          "path": "embeds/charts/index.html#housing",
+          "path": "embeds/charts/index.html?group=coverage#housing",
           "caption": "Explore residential-area coverage by housing class or district. Compare facility definitions, sort values, or download the source table.",
           "figure_title": "Residential-area coverage by housing type and district."
         },
@@ -326,11 +318,12 @@
         },
         {
           "type": "embed",
-          "path": "embeds/charts/index.html#sensitivity",
+          "path": "embeds/charts/index.html?group=sensitivity#sensitivity",
           "caption": "(A) Distance-threshold decisions at 500, 800 and 1,000 m. (B) Age-definition decisions for the four main-scenario groups. Each age cohort uses its own P75 cutoff. 1 = selected; 0 = not selected.",
           "figure_title": "Sensitivity to distance and age definitions."
         }
-      ]
+      ],
+      "panel_size": "small"
     },
     {
       "id": "conclusions",
@@ -373,7 +366,8 @@
           "text": "The supplied results were produced through Python/GDAL pre-analysis and local checks. ArcGIS Web Maps reproduce the supplied geometry and attributes; importing them does not establish that the core geoprocessing was independently rerun in ArcGIS Pro. Final review should verify the analytical workflow in Pro, confirm local access conditions and service functions, and test the published story with group-member accounts."
         }
       ],
-      "after": []
+      "after": [],
+      "panel_size": "small"
     },
     {
       "id": "references",
@@ -388,7 +382,8 @@
           "type": "text",
           "text": "Maps and the Binary screening reproduce the supplied Group 13 analysis. Interactive components use Leaflet 1.9.4 and project-specific SVG/HTML; workflow interaction direction was informed by dsh-archify. Selection frequency is a sensitivity measure, not probability."
         }
-      ]
+      ],
+      "panel_size": "small"
     }
   ],
   "theme": "summit",
@@ -455,5 +450,9 @@
       "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"
     }
   ],
-  "asset_revision": "20261105-review2"
+  "asset_revision": "20261105-review4",
+  "cover_media": {
+    "type": "image",
+    "path": "assets/cover/tuen-mun-aged-blind-garden.jpg"
+  }
 }

@@ -32,6 +32,15 @@ def run():
             if key=='district_context':layer['visibility']=False
             for sub in layer.get('featureCollection',{}).get('layers',[]):
                 renderer=sub['layerDefinition'].get('drawingInfo',{}).get('renderer',{})
+                if key!='district_context':
+                    layer['showLegend']=True
+                    layer.get('featureCollection',{})['showLegend']=True
+                    sub['showLegend']=True
+                entries=renderer.get('classBreakInfos',renderer.get('uniqueValueInfos',[]))
+                pastel=[[242,238,247,240],[227,218,238,240],[209,195,226,240],[186,165,209,240],[162,137,190,240]]
+                for i,info in enumerate(entries):
+                    if info.get('symbol',{}).get('type')=='esriSFS':
+                        info['symbol']['color']=pastel[round(i*4/max(1,len(entries)-1))]
                 if key in {'nec_sites','decc_sites'}:
                     renderer['symbol']={'type':'esriSMS','style':'esriSMSDiamond' if key=='nec_sites' else 'esriSMSTriangle','color':[20,83,65,245] if key=='nec_sites' else [20,83,65,245],'size':5.5 if key=='nec_sites' else 7,'outline':{'type':'esriSLS','style':'esriSLSSolid','color':[255,255,255,250],'width':.7}}
                 if key=='population60':

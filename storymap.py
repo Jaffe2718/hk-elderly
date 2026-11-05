@@ -109,6 +109,8 @@ def check_baseline(story, cfg, baseline):
 
 def load_config():
     cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8'))
+    if cfg.get('cover_media'):
+        local_asset(cfg['cover_media']['path'])
     if cfg.get('theme', 'summit') not in {'summit', 'tidal', 'mesa', 'ridgeline', 'slate', 'obsidian'}:
         raise ValueError('Unsupported built-in theme')
     if len(cfg['item_id']) != 32 or not all(c in '0123456789abcdef' for c in cfg['item_id']):
@@ -177,6 +179,9 @@ def configure_cover(story, cfg):
         cover.vertical_position = cfg.get('cover_vertical_position', 'top')
         cover.horizontal_position = cfg.get('cover_horizontal_position', 'start')
         cover.size = cfg.get('cover_size', 'large')
+    if cfg.get('cover_media'):
+        from arcgis.apps.storymap.story_content import Image
+        cover.media=Image(str(local_asset(cfg['cover_media']['path'])))
     return cover
 
 
@@ -197,6 +202,9 @@ def configure_credits(story, cfg):
                    '<a href="https://www.swd.gov.hk/" target="_blank" rel="noopener noreferrer">Social Welfare Department</a> for elderly-centre premises data, and the '
                    '<a href="https://www.pland.gov.hk/" target="_blank" rel="noopener noreferrer">Planning Department</a> for 2021 land-use data, accessed through the '
                    '<a href="https://portal.csdi.gov.hk/" target="_blank" rel="noopener noreferrer">CSDI Portal</a> and DATA.GOV.HK. Analysis and presentation by GEOG7302 Group 13.')
+    if cfg.get('cover_media'):
+        attribution=json.loads(local_asset('assets/cover/attribution.json').read_text(encoding='utf-8'))
+        description+=' Cover photograph: '+attribution['title']+'. Photograph by '+attribution['photographer']+'. <a href="'+html.escape(attribution['source'],quote=True)+'">Image source</a>; <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Responsive cover framing may crop the original photograph. The image illustrates an elderly-care environment, not an NEC study location.'
     story.credits(heading='Credit', description=description)
     # Acknowledgement is a footer, not a chapter/navigation target.
     for child in credits.get('children', []):
@@ -258,7 +266,7 @@ def configure_map_views(story, cfg):
         resource=copy.deepcopy(original)
         resource['data'].update(extent=extent,center=center,viewpoint=viewpoint,zoom=math.log2(591657527.59/scale),mapLayers=layer_state)
         resources[resource_id]=resource
-        node['data'].update(map=resource_id,extent=extent,center=center,viewpoint=viewpoint,mapLayers=layer_state)
+        node['data'].update(map=resource_id,extent=extent,center=center,viewpoint=viewpoint,mapLayers=layer_state,isShowingLegend=True,legendPinned=True)
 
 
 def configure_embeds(story):
@@ -435,9 +443,9 @@ def apply(cfg, baseline=None, cover_only=False):
             style = {'text': TextStyles.PARAGRAPH, 'quote': TextStyles.QUOTE, 'heading': TextStyles.SUBHEADING}[kind]
             story.add(Text(html.escape(block['text']), style=style))
         elif kind == 'references':
-            for source in cfg.get('references', []):
+            for reference_number,source in enumerate(cfg.get('references', []),1):
                 url = html.escape(source['url'], quote=True)
-                story.add(Text(f'{source["html"]} <a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>'))
+                story.add(Text(f'[{reference_number}] {source["html"]} <a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>'))
         else:
             content = make_media(block)
             figure_number+=1
@@ -478,6 +486,7 @@ def apply(cfg, baseline=None, cover_only=False):
             # SDK has no public switch-panel-placement setter in 2.4.3.
             position = section.get('panel_position', 'start')
             story._properties['nodes'][sidecar._node]['data']['narrativePanelPosition'] = position
+            story._properties['nodes'][sidecar._node]['data']['narrativePanelSize'] = section.get('panel_size', 'small')
             for slide in slides:
                 if isinstance(slide.media, Embed):
                     slide.media.display = 'inline'
