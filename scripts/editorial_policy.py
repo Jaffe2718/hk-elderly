@@ -34,9 +34,10 @@ def apply_policy(cfg):
                 block['figure_title']='Sensitivity to distance and age definitions.'
                 block['caption']='(A) Distance-threshold decisions at 500, 800 and 1,000 m. (B) Age-definition decisions for the four main-scenario groups. Each age cohort uses its own P75 cutoff. 1 = selected; 0 = not selected.'
             if block.get('path','').startswith('embeds/charts/index.html'):
+                block['caption']=block.get('caption','').replace('sort values, or download the source table','sort values or inspect the table')
                 fragment=block['path'].split('#')[-1]
                 group='coverage' if fragment=='housing' else 'sensitivity'
-                block['path']=f'embeds/charts/index.html?group={group}#{fragment}'
+                block['path']=f'embeds/charts/index.html?group={group}&ui=20261105-no-csv#{fragment}'
         for key in ['before','after']:
             section[key]=[b for b in section.get(key,[]) if b.get('type')!='comparison_legend']
         for slide in section.get('slides',[]):

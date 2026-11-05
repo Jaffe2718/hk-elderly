@@ -318,8 +318,8 @@
         },
         {
           "type": "embed",
-          "path": "embeds/charts/index.html?group=coverage#housing",
-          "caption": "Explore residential-area coverage by housing class or district. Compare facility definitions, sort values, or download the source table.",
+          "path": "embeds/charts/index.html?group=coverage&ui=20261105-no-csv#housing",
+          "caption": "Explore residential-area coverage by housing class or district. Compare facility definitions, sort values or inspect the table.",
           "figure_title": "Residential-area coverage by housing type and district."
         },
         {
@@ -328,7 +328,7 @@
         },
         {
           "type": "embed",
-          "path": "embeds/charts/index.html?group=sensitivity#sensitivity",
+          "path": "embeds/charts/index.html?group=sensitivity&ui=20261105-no-csv#sensitivity",
           "caption": "(A) Distance-threshold decisions at 500, 800 and 1,000 m. (B) Age-definition decisions for the four main-scenario groups. Each age cohort uses its own P75 cutoff. 1 = selected; 0 = not selected.",
           "figure_title": "Sensitivity to distance and age definitions."
         }
