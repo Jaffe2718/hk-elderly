@@ -4,3 +4,7 @@
 button[aria-pressed=true]{background:#ded5eb;color:#28333d;border-color:#baa8ce}
 
 .context-tiles{filter:sepia(.65) hue-rotate(155deg) saturate(.7) brightness(1.03)}
+
+.map-key{background:#fff;border:0;border-radius:0;box-shadow:0 2px 5px #0002;padding:18px 20px;font:13px/1.6 Arial,sans-serif;color:#444;max-width:255px}.map-key b{font-size:14px;font-weight:600;margin-bottom:12px}.map-key .swatch{width:20px;height:14px;vertical-align:middle;margin-right:9px}.map-key>div{padding:3px 0}@media(max-width:620px){.map-key{font-size:10px;padding:10px;max-width:185px}.map-key b{font-size:11px;margin-bottom:5px}}
+
+.facility-marker{background:none;border:0}.legend-facility{border-top:1px solid #eee;margin-top:6px;padding-top:8px!important}.legend-nec,.legend-decc{display:inline-block;width:10px;height:10px;background:#145341;margin:0 14px 0 5px}.legend-nec{transform:rotate(45deg);width:8px;height:8px}.legend-decc{clip-path:polygon(50% 0,100% 100%,0 100%)}

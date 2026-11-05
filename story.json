@@ -198,7 +198,8 @@
           "text": "Within 800 m of an NEC, coverage is 91.5% for public residential land, 53.4% for private residential land and 17.9% for rural settlements. Ground area does not imply equal population density: these percentages cannot be read as the share of older people served.\n\nThe district comparison is summarised from residential-cell locations. It does not assign the entire population of a cross-district STPUG to a single district.",
           "media": {
             "type": "map",
-            "webmap": "M02_coverage"
+            "webmap": "M02_coverage",
+            "view_shift_right": 0.06
           }
         },
         {
@@ -207,7 +208,8 @@
           "text": "The four selected groups contain 78,526 residents aged 60+. This is their total older population, not a count of unserved residents. The remaining 206 assessed groups do not meet both criteria; one further group is unassessed.\n\nThe population–coverage classification distinguishes 4 higher-population/weaker-coverage groups, 49 higher-population/stronger-coverage groups, 72 lower-population/weaker-coverage groups and 85 lower-population/stronger-coverage groups. All labels use this study’s relative thresholds.",
           "media": {
             "type": "map",
-            "webmap": "M03_binary800"
+            "webmap": "M03_binary800",
+            "view_shift_right": 0.06
           }
         },
         {
@@ -234,7 +236,8 @@
           "text": "Centroid-distance screening selects six groups and disagrees with the residential-distribution method in eight group classifications. Southern Fanling is selected by residential support but not by the centroid alternative.\n\nThis comparison explains why the analysis follows residential land rather than a single geometric centre. It is a methodological diagnostic, not evidence that one distance captures real pedestrian access.",
           "media": {
             "type": "map",
-            "webmap": "M09_centroid_comparison"
+            "webmap": "M09_centroid_comparison",
+            "view_shift_right": 0.06
           }
         },
         {
@@ -243,7 +246,8 @@
           "text": "When DECC sites are included, none of the four main-scenario groups continues to meet the same uncovered-residential-share condition. In Tiu Keng Leng, the share beyond 800 m drops from 98.9% with NEC only to 8.5% with NEC+DECC.\n\nThis suggests a need to review how nearby services connect. It does not show that a DECC provides the same service, has spare capacity, or removes unmet demand.",
           "media": {
             "type": "map",
-            "webmap": "M10_facility_definition"
+            "webmap": "M10_facility_definition",
+            "view_shift_right": 0.06
           }
         }
       ],
@@ -294,13 +298,28 @@
         },
         {
           "type": "text",
-          "text": "Compare matched residential patches in the linked maps. The left panel uses NEC only; the right includes DECC. Choose a local case, pan or zoom either panel, or play the case tour. Both views remain aligned. These are geographical proximity definitions, not interchangeable services or measures of operating capacity."
+          "text": "Drag the divider to compare NEC-only and NEC + DECC proximity in Tiu Keng Leng at the same geographical extent. The left and right legends describe their respective layers. These are geographical proximity definitions, not interchangeable services or measures of operating capacity."
         },
         {
-          "type": "embed",
-          "path": "embeds/coverage-comparison/index.html",
-          "figure_title": "Matched facility-scope comparison.",
-          "caption": "NEC only on the left; NEC + DECC on the right. Select one of four cases or pan either map. Both views share the same centre and scale; legends stay fixed in their respective corners."
+          "type": "swipe",
+          "maps": [
+            {
+              "type": "map",
+              "webmap": "M11_residential_nec",
+              "bookmark": "833 "
+            },
+            {
+              "type": "map",
+              "webmap": "M12_residential_combined",
+              "bookmark": "833 "
+            }
+          ],
+          "figure_title": "Facility scope in Tiu Keng Leng.",
+          "caption": "Matched native Web Maps. NEC only on the left; NEC + DECC on the right. The two legends below correspond to the respective map layers."
+        },
+        {
+          "type": "comparison_legend",
+          "path": "assets/legends/facility-comparison.png"
         },
         {
           "type": "heading",
@@ -372,18 +391,15 @@
     {
       "id": "references",
       "title": "References",
-      "intro": "Scholarly literature and official datasets cited in this study. Entries follow APA style; undated datasets are identified as n.d. rather than assigned an unverified publication year.",
+      "intro": "",
       "slides": [],
       "before": [
         {
           "type": "references"
-        },
-        {
-          "type": "text",
-          "text": "Maps and the Binary screening reproduce the supplied Group 13 analysis. Interactive components use Leaflet 1.9.4 and project-specific SVG/HTML; workflow interaction direction was informed by dsh-archify. Selection frequency is a sensitivity measure, not probability."
         }
       ],
-      "panel_size": "small"
+      "panel_size": "small",
+      "after": []
     }
   ],
   "theme": "summit",
@@ -450,7 +466,7 @@
       "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"
     }
   ],
-  "asset_revision": "20261105-review5",
+  "asset_revision": "20261105-review6",
   "cover_media": {
     "type": "image",
     "path": "assets/cover/tuen-mun-aged-blind-garden.jpg"

@@ -251,6 +251,14 @@ def configure_map_views(story, cfg):
         if media.get('bookmark'):
             extent = next(b['extent'] for b in data['bookmarks'] if b['name'].startswith(media['bookmark']))
         extent = copy.deepcopy(extent)
+        # Shift the camera west to move the study area right on screen.
+        # This changes only framing; analytical geometries and scale stay intact.
+        shift = media.get('view_shift_right', 0)
+        if not isinstance(shift, (int, float)) or not 0 <= shift <= .15:
+            raise ValueError('view_shift_right must be a fraction between 0 and 0.15')
+        dx = (extent['xmax'] - extent['xmin']) * shift
+        extent['xmin'] -= dx
+        extent['xmax'] -= dx
         if extent['spatialReference']['wkid'] != 4326: raise RuntimeError('Review projected extent before applying view fix')
         x=(extent['xmin']+extent['xmax'])/2; y=(extent['ymin']+extent['ymax'])/2
         if not (113 < x < 115 and 21 < y < 24): raise RuntimeError('Map extent is outside Hong Kong')
@@ -437,7 +445,9 @@ def apply(cfg, baseline=None, cover_only=False):
     def add_block(block):
         nonlocal figure_number
         kind = block['type']
-        if kind == 'table':
+        if kind == 'comparison_legend':
+            story.add(Image(str(local_asset(block['path']))), alt_text='Left: NEC-only map legend. Right: NEC and DECC map legend.')
+        elif kind == 'table':
             story.add(native_table(block['rows']))
         elif kind in {'text', 'quote', 'heading'}:
             style = {'text': TextStyles.PARAGRAPH, 'quote': TextStyles.QUOTE, 'heading': TextStyles.SUBHEADING}[kind]
