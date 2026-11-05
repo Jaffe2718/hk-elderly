@@ -16,3 +16,9 @@ Local embedded components and generated StoryMap configuration. Authenticated St
 
 ## Evidence
 Ignored local build screenshots include map-desktop.png, map-mobile.png, comparison-desktop.png, comparison-mobile.png, workflow-desktop.png and cover-framing-desktop.png. Browser checks report no script errors. The cover framing image explicitly identifies itself as an approximation.
+
+## Workflow controls follow-up
+- Initial state has no active node.
+- Browser test confirms Pause freezes CSS animation time and walkthrough selection; Resume advances again.
+- Fit clears selection, search, timer and transforms; mobile reset also verified.
+- SVG export UI and its download handler removed. No SVG export remains in embedded components.

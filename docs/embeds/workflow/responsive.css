@@ -15,3 +15,5 @@ body{font-size:16px}nav{padding:12px 16px;gap:8px}button,input{font-size:14px;pa
 
 /* Remove the instruction overlay from the diagram surface. */
 .hint{display:none}
+
+.flow-paused .edge-flow.active{animation-play-state:paused!important}
