@@ -22,8 +22,8 @@ def apply_policy(cfg):
             if not any(b.get('text')==text for b in section.get('before',[])):
                 section.setdefault('before',[]).append({'type':'text','text':text})
         for block in section.get('before',[])+section.get('after',[]):
-            if block.get('type')=='swipe' or block.get('path')=='embeds/coverage-comparison/index.html':
-                block.clear();block.update(type='embed',path='embeds/coverage-comparison/index.html',figure_title='Facility scope in Tiu Keng Leng.',caption='NEC only on the left; NEC + DECC on the right. Both sides share one geographical view. In-map legends identify residential land within or beyond 800 m and the facility types.')
+            if block.get('type')=='swipe' or block.get('path','').split('?')[0]=='embeds/coverage-comparison/index.html':
+                block.clear();block.update(type='embed',path='embeds/coverage-comparison/index.html?ui=20261105-layoutfix',figure_title='Facility scope in Tiu Keng Leng.',caption='NEC only on the left; NEC + DECC on the right. Both sides share one geographical view. In-map legends identify residential land within or beyond 800 m and the facility types.')
             if block.get('text','').startswith(('Drag the native Swipe divider','Compare matched residential patches')):
                 block['text']='Drag the divider to compare NEC-only and NEC + DECC proximity in Tiu Keng Leng at the same geographical extent. The fixed in-map legends describe their respective layers. These are geographical proximity definitions, not interchangeable services or measures of operating capacity.'
             if block.get('text')=='Tiu Keng Leng: change the facility scope':block['text']='Compare local facility scope'
@@ -37,7 +37,7 @@ def apply_policy(cfg):
                 block['caption']=block.get('caption','').replace('sort values, or download the source table','sort values or inspect the table')
                 fragment=block['path'].split('#')[-1]
                 group='coverage' if fragment=='housing' else 'sensitivity'
-                block['path']=f'embeds/charts/index.html?group={group}&ui=20261105-no-csv#{fragment}'
+                block['path']=f'embeds/charts/index.html?group={group}&ui=20261105-layoutfix#{fragment}'
         for key in ['before','after']:
             section[key]=[b for b in section.get(key,[]) if b.get('type')!='comparison_legend']
         for slide in section.get('slides',[]):

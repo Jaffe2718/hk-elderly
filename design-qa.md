@@ -25,3 +25,7 @@ Ignored local build screenshots include map-desktop.png, map-mobile.png, compari
 
 ## In-map comparison revision
 Browser checks pass for an ArcGIS Maps SDK 4.33 Swipe, 315 features per scenario, stable in-map legend rectangles after pan/swipe, and non-overlapping mobile legend cards. Desktop and mobile screenshots are saved under build/native-swipe-*.png. The StoryMap-native layer legend separators remain unsupported for direct styling.
+
+## Home control and chart roundtrip sizing
+- ArcGIS Home moved to the top-right control group, clear of both in-map legends; browser bounding-box checks and a click pass. Its viewpoint follows the selected case.
+- Charts restore visible layout before measuring SVG width, and observe container width changes. Three table/chart roundtrips for Housing and Districts pass at desktop/mobile widths; resize also passes with consistent viewBox dimensions.

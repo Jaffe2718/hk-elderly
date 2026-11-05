@@ -44,6 +44,8 @@ function draw(){
  if(isMatrix){$('legend').innerHTML='<span><i class="key yes-key"></i>Selected (1)</span><span><i class="key no-key"></i>Not selected (0)</span>'}
  else for(const i of [1,2].filter(i=>scope==='both'||i===(scope==='nec'?1:2))){const key=document.createElement('span'),swatch=document.createElement('i');swatch.className='key';swatch.style.background=COLORS[i-1];key.append(swatch,document.createTextNode(i===1?'NEC only':'NEC + DECC'));$('legend').append(key)}
  $('chart').className=isMatrix?'matrices'+(view==='sensitivity'?' paired':''):'bars';
+ // Restore layout before measuring: a hidden chart reports zero width.
+ $('chart').hidden=table;$('table').hidden=!table;
  if(isMatrix)for(const kind of view==='sensitivity'?['distance','age']:[view])matrix(kind,$('chart'));else bars(rows,$('chart'));
  const sets=view==='sensitivity'?['distance','age']:[view];
  for(const kind of sets){const source=data[kind],t=document.createElement('table'),head=t.createTHead().insertRow();source.columns.forEach(c=>{const th=document.createElement('th');th.textContent=c;head.append(th)});const body=t.createTBody();(kind===view?rows:source.rows).forEach(r=>{const tr=body.insertRow();r.forEach(v=>tr.insertCell().textContent=v)});$('table').append(t)}
@@ -55,3 +57,5 @@ function route(){const hash=location.hash.slice(1);view=allowedViews.includes(ha
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{location.hash=b.dataset.view});$('scope').onchange=draw;$('sort').onchange=()=>{page=0;draw()};$('table-toggle').onclick=()=>{table=!table;draw()};
 $('page-back').onclick=()=>{page--;draw()};$('page-next').onclick=()=>{page++;draw()};
 fetch('data.json').then(r=>{if(!r.ok)throw Error('Chart data unavailable');return r.json()}).then(d=>{data=d;route();window.addEventListener('hashchange',route)}).catch(e=>{$('detail').textContent=e.message});
+let measuredWidth=0;
+new ResizeObserver(()=>{const width=$('chart').clientWidth;if(!data||table||width<=0||Math.abs(width-measuredWidth)<1)return;measuredWidth=width;draw()}).observe($('chart'));
