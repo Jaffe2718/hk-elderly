@@ -164,7 +164,7 @@ Final figure policy: no PDF crops are used. Population composition uses a native
 - Both distance and age matrices appear together in the sensitivity embed. The component sizes itself to the iframe height. District bars use six-row pages; the table view and CSV export still include all rows. Muted lavender/blue fills and coloured outer glows replace dark fills and black hover borders. Selection remains encoded by explicit 1/0 values.
 - Chart embeds have separate scopes: `?group=coverage#housing` exposes Housing/Districts and facility/sort controls; `?group=sensitivity#sensitivity` exposes Both matrices/Distance/Age definition. Hash navigation is restricted to the selected scope. Table and CSV actions follow that scope.
 - The 18 supplied district polygons are dissolved locally with ArcPy. The outline retains island exteriors and removes internal district lines and hole boundaries. Geometry repair and independent-union checks are recorded in `assets/boundaries/provenance.json`.
-- Native maps use warm sand-gold population circles, dark-green NEC diamonds and DECC triangles, a label-free native vector basemap with pale-blue water, and the dark-red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
+- Native maps use pale-purple population circles, dark-green NEC diamonds and DECC triangles, a label-free native vector basemap with pale-blue water, and the dark-red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
 
 To regenerate the map presentation after importing the original handoff:
 
@@ -184,6 +184,6 @@ The outline exporter explicitly projects back to WGS84 using the same Hong Kong 
 - Docked narrative panels use the native small size; the explorer control column is 210 px on desktop.
 - Both Leaflet embeds use the Esri Light Gray Base label-free raster basemap with Esri/HERE/Garmin attribution and a subtle cool tint. Roads and neighbouring land provide context without non-English place labels. Analytical overlays remain from the supplied handoff.
 - The facility-scope comparison uses the native StoryMap Swipe at the same Tiu Keng Leng extent. A paired legend image immediately below it is generated from both source renderers by scripts/prepare_comparison_legend.py. The former HTML comparison remains an unused prototype.
-- Population counts use proportional sand-gold circles; age percentages use a cream-to-ochre sequential ramp. Water stays pale blue. Sizes, percentage classes and analytical attributes are unchanged.
+- Population counts use proportional pale-purple circles; age percentages use a muted lavender sequential ramp. Water stays pale blue. Sizes, percentage classes and analytical attributes are unchanged.
 - The native cover uses the selected Tuen Mun home garden entrance photograph. Source, photographer and CC BY-SA licence are recorded under assets/cover and reproduced in Credit.
 - References have bracketed numbers while retaining APA entry formatting; in-text cross-references remain deferred.

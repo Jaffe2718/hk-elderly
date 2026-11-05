@@ -71,6 +71,10 @@ def run():
                     renderer['defaultSymbol']['color']=[165,173,176,255]
                 if key=='age_share':
                     for info,colour in zip(renderer['classBreakInfos'],[rgba(c) for c in theme['age_share']]):info['symbol']['color']=colour
+                if key=='residential' and path.stem in {'M11_residential_nec','M12_residential_combined'}:
+                    colours=(['#eee8f4','#af98c4'] if path.stem=='M11_residential_nec' else ['#f3eadf','#b79b7a'])
+                    for info in renderer['uniqueValueInfos']:
+                        info['symbol']['color']=rgba(colours[int(info['value'])])
         data['operationalLayers']=[copy.deepcopy(land_layer)]+layers+[copy.deepcopy(outline_layer)]
         if path.stem=='M01_population':
             boundary=data['operationalLayers'][-1]['featureCollection']['layers'][0]['layerDefinition']['drawingInfo']['renderer']['symbol']
@@ -81,6 +85,6 @@ def run():
     (ROOT/'docs/embeds/elderly-map/theme.json').write_text(json.dumps(theme)+'\n',encoding='utf-8')
     (ROOT/'docs/embeds/elderly-map/study-outline.geojson').write_bytes((ROOT/'assets/boundaries/hk-study-area-outline.geojson').read_bytes())
     (ROOT/'docs/embeds/elderly-map/native-basemap.json').write_bytes((ROOT/'assets/basemaps/minimal-vector.json').read_bytes())
-    print('Styled 12 native Web Maps using shared thematic colours, warm population symbols and a warm age-share ramp.')
+    print('Styled 12 native Web Maps using the shared muted-lavender theme.')
 
 if __name__=='__main__':run()

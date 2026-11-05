@@ -274,7 +274,8 @@ def configure_map_views(story, cfg):
         resource=copy.deepcopy(original)
         resource['data'].update(extent=extent,center=center,viewpoint=viewpoint,zoom=math.log2(591657527.59/scale),mapLayers=layer_state)
         resources[resource_id]=resource
-        node['data'].update(map=resource_id,extent=extent,center=center,viewpoint=viewpoint,mapLayers=layer_state,isShowingLegend=True,legendPinned=True)
+        show_legend=media.get('show_legend',True)
+        node['data'].update(map=resource_id,extent=extent,center=center,viewpoint=viewpoint,mapLayers=layer_state,isShowingLegend=show_legend,legendPinned=show_legend)
 
 
 def configure_embeds(story):

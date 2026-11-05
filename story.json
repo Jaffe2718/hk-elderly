@@ -63,7 +63,13 @@
           "text": "The SWD snapshot retrieved on 2 November 2026 contains 216 NEC records at 215 distinct coordinates. Only exactly coincident coordinates were deduplicated; premises and sub-bases remain represented. These are mapped locations, not 215 independent service units, and their number does not measure capacity or utilisation.",
           "media": {
             "type": "map",
-            "webmap": "M11_residential_nec"
+            "webmap": "M10_facility_definition",
+            "visible_layers": [
+              "study_land",
+              "study_outline",
+              "nec_sites",
+              "decc_sites"
+            ]
           }
         },
         {
@@ -306,12 +312,14 @@
             {
               "type": "map",
               "webmap": "M11_residential_nec",
-              "bookmark": "833 "
+              "bookmark": "833 ",
+              "show_legend": false
             },
             {
               "type": "map",
               "webmap": "M12_residential_combined",
-              "bookmark": "833 "
+              "bookmark": "833 ",
+              "show_legend": false
             }
           ],
           "figure_title": "Facility scope in Tiu Keng Leng.",
@@ -466,7 +474,7 @@
       "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216"
     }
   ],
-  "asset_revision": "20261105-review6",
+  "asset_revision": "20261105-review7",
   "cover_media": {
     "type": "image",
     "path": "assets/cover/tuen-mun-aged-blind-garden.jpg"

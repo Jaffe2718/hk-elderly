@@ -43,3 +43,8 @@
 ## Pending native layout limitation
 - Native Floating legend horizontal placement has not been verified. The introductory text/legend overlap is still pending; no unsupported positioning property was added.
 - Other flagged map views receive a 6% westward camera shift (rightward subject framing), without changing scale or geometry.
+
+## Subsequent review corrections
+- Facilities overview now uses only NEC and DECC locations, with no residential-patch layer or residential legend. Source patch counts are 113 within / 202 beyond for NEC only, and 241 within / 74 beyond for the combined scope; these local-case geometries are retained in the Swipe comparison.
+- Population symbols and age-share fills use muted lavender after the warm-palette review.
+- Comparison uses distinct muted lavender and grey-apricot colours; native internal Swipe legends are disabled to prevent the two overlays colliding. A compact paired key sits immediately below the native Swipe.
