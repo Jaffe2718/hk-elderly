@@ -1,0 +1,167 @@
+[
+  [
+    "census",
+    30,
+    30,
+    "Census evidence",
+    "2021 \u00b7 211 STPUGs",
+    "INPUT",
+    "Join Census A503 age counts and population totals to the 211 STPUG boundaries. Retain counts and denominators alongside shares.",
+    "65+ / all residents",
+    [
+      "The main indicator is the share aged 65+.",
+      "Compare 60+ and 75+ as sensitivity checks.",
+      "Keep STPUG identifiers as strings."
+    ]
+  ],
+  [
+    "sites",
+    390,
+    30,
+    "Facilities and venues",
+    "NEC \u00b7 DECC \u00b7 community venues",
+    "INPUT",
+    "Use the SWD premises snapshot from 2 November 2026 and the HAD community-venue directory checked on 5 November. Coincident NEC coordinates are deduplicated.",
+    "215 NEC / 62 DECC",
+    [
+      "216 NEC records occupy 215 distinct coordinates.",
+      "115 community halls and centres provide addresses for review.",
+      "Premises locations do not measure capacity or availability."
+    ]
+  ],
+  [
+    "land",
+    750,
+    30,
+    "Residential land",
+    "2021 \u00b7 10 m cells",
+    "INPUT",
+    "Private housing, public housing and rural settlements define the residential ground area used in the proximity calculation.",
+    "100 m\u00b2 per cell",
+    [
+      "Use cell centres for distance and group assignment.",
+      "Retain residential cell counts as denominators.",
+      "Non-residential land is excluded."
+    ]
+  ],
+  [
+    "prepare",
+    30,
+    205,
+    "Join and validate",
+    "Codes \u00b7 denominators \u00b7 CRS",
+    "PROCESS",
+    "Align the evidence in Hong Kong 1980 Grid and validate census joins, geometry and residential-cell assignment.",
+    "210 assessed groups",
+    [
+      "EPSG:2326 distances are in metres.",
+      "Group 295 has no assigned residential cells.",
+      "Map simplification is for display, not recalculating areas."
+    ]
+  ],
+  [
+    "distance",
+    390,
+    205,
+    "Measure proximity",
+    "NEC baseline \u00b7 three radii",
+    "PROCESS",
+    "Measure straight-line distance from each residential-cell centre to the nearest NEC anywhere in Hong Kong. Include centres across group boundaries.",
+    "500 / 800 / 1,000 m",
+    [
+      "Exactly 800 m counts as covered.",
+      "Compare dissolved buffers with cell-centre distances.",
+      "Residential-area coverage is not people served."
+    ]
+  ],
+  [
+    "population",
+    30,
+    380,
+    "Ageing condition",
+    "65+ share \u00b7 equal group weights",
+    "CONDITION",
+    "Calculate P60 of the age-65+ population share across the 210 assessed groups. Apply the unrounded cutoff and include ties.",
+    "\u2265 19.913%",
+    [
+      "Exact cutoff: 19.913163372872837%.",
+      "84 groups meet the ageing condition.",
+      "Each assessed STPUG receives equal weight."
+    ]
+  ],
+  [
+    "coverage",
+    390,
+    380,
+    "Residential-gap condition",
+    "Land beyond NEC 800 m",
+    "CONDITION",
+    "Calculate P60 of the residential-area share outside 800 m. Preserve endpoint ties when interpreting the distribution.",
+    "\u2265 30.758%",
+    [
+      "Exact cutoff: 30.75788624778998%.",
+      "84 groups meet the gap condition.",
+      "80 groups have 0% outside; 42 have 100% outside."
+    ]
+  ],
+  [
+    "binary",
+    390,
+    555,
+    "Apply both conditions",
+    "Ageing AND residential gap",
+    "MODEL",
+    "Select only groups meeting both P60 conditions independently. A high value on one indicator cannot compensate for a low value on the other.",
+    "13 selected areas",
+    [
+      "Use continuous indicators as well as binary decisions.",
+      "The fixed 20% / 30% comparison selects 14 groups.",
+      "Unassessed is distinct from not selected."
+    ]
+  ],
+  [
+    "checks",
+    750,
+    555,
+    "Test assumptions",
+    "Percentiles \u00b7 radii \u00b7 cohorts",
+    "SENSITIVITY",
+    "Cross P50/P60/P70 for each indicator with 500/800/1,000 m: 27 recalibrated scenarios. Separately vary distance with the main cutoffs fixed.",
+    "27 recalibrated scenarios",
+    [
+      "Fixed-cutoff distance counts: 32 / 13 / 10.",
+      "Each alternative age cohort uses its own P60 cutoff.",
+      "Adding DECC changes facility scope. Frequency is not probability."
+    ]
+  ],
+  [
+    "cases",
+    30,
+    730,
+    "Compare local locations",
+    "Model A \u00b7 venue \u00b7 second point",
+    "PROCESS",
+    "Within shortlisted groups, take one residential reference from each occupied 200 m grid square. Compare model A with documented venues and marginal second-point gains.",
+    "131 / 620S / 920",
+    [
+      "B is an independent alternative at least 400 m from A.",
+      "C is re-optimised on the housing still uncovered after A.",
+      "A reference cell is not proof of available premises."
+    ]
+  ],
+  [
+    "review",
+    390,
+    730,
+    "Inform field review",
+    "Evidence \u00b7 feasibility \u00b7 limits",
+    "OUTPUT",
+    "Use the screen and local comparisons to organise further review, not prescribe a new centre or claim unmet demand.",
+    "Review, not prescription",
+    [
+      "Check walking routes, slopes and accessible entrances.",
+      "Confirm venue schedules, operator capacity and permission.",
+      "Population and housing: 2021; premises: 2026."
+    ]
+  ]
+]

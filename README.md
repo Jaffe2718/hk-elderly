@@ -1,189 +1,68 @@
 # Group 13 StoryMap
 
-## Editing rules
+The draft title is **Ageing and NEC Access**. `story.json` controls the narrative, chapter order, layouts and asset references. `storymap.py` is the single editing entry point. All public text and derived assets are English.
 
-- Use English for all repository documentation, story text, interface labels, map popups, figures and tables. Original bilingual handoff files remain only in ignored local preparation folders.
-- `story.json` is the source of truth for chapter order, text, layouts, and asset references. `storymap.py` is the single entry point for rebuilding the online draft.
-- Every apply run replaces all draft content while retaining the item ID and URL. Before applying, export the current online state, reconcile manual edits, and obtain explicit user approval to update the generator. Never silently discard collaborators' manual changes.
-- Keep the current chapter order until a new outline is agreed. Titles and the subtitle remain editable placeholders, not research conclusions.
-- Use the built-in Summit theme, a full cover with a top-left themed title panel, a title, subtitle, and member names without student IDs.
-- Use owned or appropriately licensed assets. Never commit credentials, tokens, login profiles, sensitive source data, or local backups.
-- Sign into ArcGIS Pro as the StoryMap owner. Close the StoryMap editor tab before applying changes to prevent stale browser autosaves; reopen it afterward to preview.
-- Apply runs save unpublished drafts and preserve sharing settings. Review the result in the StoryMaps builder before publishing.
-- `backups/` stores the previous draft JSON, configuration, and generated JSON. It is ignored by Git and is not a complete offline media backup. The script does not proactively delete old item resources.
+## Current analysis
 
-## Layout
+The November 6 model follows the updated proposal: select groups with both a 65+ population share at or above P60 and a residential-area share beyond NEC 800 m at or above P60. Each of the 210 assessed STPUGs has equal weight, and ties are included. The exact cutoffs are 19.913163372872837% and 30.75788624778998%. There are 13 selected areas; group 295 has no assigned residential cells and remains unassessed.
 
-| Chapter | Native composition |
-| --- | --- |
-| Introduction | Opening question, Floating Sidecar and population Web Map |
-| Data & Objective | Native evidence table, Floating Sidecar, premises Web Map and age-share Web Map |
-| Methodology | Interactive workflow embed, native headings, quotation and explanatory text |
-| Spatial Analysis | Docked Sidecar, analytical Web Maps, coverage-explorer embed, case table, native Web Map Swipe and interactive CSV-backed charts |
-| Conclusions | Native headings, evidence-based synthesis, limitations and next steps |
-| References | Native official-source links, followed by a native Credit acknowledgement |
+The supplied fixed 20% / 30% rule selects 14 areas. It is a labelled comparison, not the main result. Group 149 belongs only to that comparison. The 27 sensitivity scenarios combine three radii with P50/P60/P70 for each indicator, recalculating gap percentiles at each radius. Separate fixed-cutoff distance tests produce 32, 13 and 10 selections. Alternative age definitions use their own cohort P60 cutoffs.
 
-The visible top navigation always links to these six chapter headings. The white Summit theme, top-left cover, course code and English member names are retained. Only the workflow, coverage explorer and interactive charts use GitHub Pages. All other content uses native StoryMap components. The HTML map's analytical attributes come from the supplied Web Map definitions; inherited geometry and the illustrative residential overlay come from the original collaborator demo.
+Local reviews cover Wan Chai (131), Ta Kwu Ling (620S) and Cheung Chau (920). Model A maximises additional residential ground area; independent B and complementary C answer different questions. Existing community venues provide addresses for review, not evidence of spare capacity. Global portfolio totals from the supplied 14-area model are excluded from the 13-area narrative.
 
-## Run
+Population and residential land describe 2021. SWD premises were retrieved on November 2, 2026; HAD venues were checked on November 5. Classification is independently recalculated from the supplied proximity outputs. This is not an independent rerun of the complete proximity geoprocessing. Residential area is not people served, capacity or walking accessibility. See `assets/analysis/provenance.json` for source hashes and validation scope.
 
-Validate locally without network access or an ArcGIS license:
+## Editing and deployment
 
-```powershell
-python storymap.py
-```
+1. Keep original handoffs in ignored `build/handoff-20261106/`. The extracted package contains `redo7302/` and `HK_Elderly_Analysis_Tables.xlsx`.
+2. Prepare the approved model and narrative locally:
 
-Replace the online draft using the signed-in ArcGIS Pro account:
+   ```powershell
+   & 'D:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe' -X utf8 storymap.py --prepare
+   ```
 
-```powershell
-& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' -u storymap.py --apply --based-on snapshots/REVIEWED_SNAPSHOT
-```
+3. Validate the configuration with the same interpreter and `storymap.py` without arguments. `--apply` uses the committed derivatives and does not require the original handoff.
+4. Export the online story with `storymap.py --inspect`. Review the snapshot report and reconcile collaborators' manual changes into the generator before a full rebuild. A full apply replaces all draft content. Obtain user approval for that reconciliation; never silently discard manual edits.
+5. Commit and push only when authorised, then check that GitHub Pages serves the new embed files. No credentials, original bilingual handoffs or snapshots belong in Git.
+6. Sign into ArcGIS Pro as the owner, close StoryMap editor tabs to avoid stale autosaves, and apply the approved update:
 
-In Codex, the apply command requires execution outside the sandbox to access the Pro license. ArcGIS API for Python is pinned to **2.4.3**. After saving, the script reads back the draft and verifies chapter and slide counts, layouts, panel placements, cover text, embed settings, chapter navigation, and the theme reference.
+   ```powershell
+   & 'D:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe' -X utf8 storymap.py --apply --based-on snapshots/REVIEWED_SNAPSHOT
+   ```
 
-## Theme and SDK compatibility
+Apply saves an **unpublished draft**. Publication always needs separate user authorisation. Preserve the existing group-only audience, `GEOG-7302 Group 13`, and duplication setting. ArcGIS API for Python is pinned to 2.4.3; revalidate the template adapter before upgrading it.
 
-The `theme` configuration selects a built-in theme, currently `summit`. The script passes a `Themes` enum to the API. SDK 2.4.3 interprets the string `"summit"` as a custom theme item ID, creating an invalid `themeItemId` reference that causes the **Theme not found** warning. The script removes custom theme references and verifies the saved built-in `themeId`.
+## Publication isolation
 
-`reference_id` records the original visual reference only. Rebuilding does not depend on that story being accessible and does not copy its content.
+The new draft uses `docs/embeds/20261106/`. Existing unversioned embed files remain unchanged so the published story retains its previous results until publication is approved. When `model_version` changes, the map importer creates separately versioned Web Map items rather than updating maps used by the published story. The ledger retains the previous item ID. Do not reuse or overwrite a published model's version identifier for another model.
 
-The version-pinned adapter in `apply()` uses Esri's internal blank template and draft preparation methods. It also supports empty Sidecar media, sets panel placement fields directly, and avoids reapplying `access` during draft metadata updates because SDK 2.4.3 calls a missing `SharingGroupManager.update` method for group-shared items. These adapters do not modify the installed SDK. Revalidate them before upgrading ArcGIS.
+The four embed components are the workflow, coverage explorer, linked location comparison and charts. They are hosted by GitHub Pages. The cover, text, tables, headings, Sidecars, analytical maps, references and Credit use native StoryMap components. The comparison uses the ArcGIS Maps SDK Swipe widget to keep its two legends fixed inside opposite map corners.
 
-## Add assets
+## Design and interpretation rules
 
-Place local images in `assets/`, then add optional `text` and `media` fields to a slide:
+- Keep the white Summit theme, top-left cover panel, short main title, GEOG7302 and English member names without student numbers. The approved cover photograph's source and licence are in `assets/cover/attribution.json` and Credit.
+- Keep six numbered navigation chapters: Introduction; Data & Objective; Methodology; Spatial Analysis; Conclusions; References. Credit is an unnumbered footer outside navigation.
+- Use Floating and Docked Sidecars with small narrative panels. Do not use Slideshow layouts. Allow space between chapters.
+- Use the shared muted-lavender map theme, pale-blue water, dark-red study boundary, deep-green NEC diamonds and deep-orange DECC triangles. The dissolved outline preserves islands and uses an explicit Hong Kong 1980 to WGS84 transformation.
+- Legend labels must match actual classes, including zero, missing values and threshold endpoints. Hide unused fallback legend classes. Where both facility types are visible, use the combined categorical point layer to avoid a separator between them.
+- Put both comparison legends inside the map, left and right, clear of Home and zoom controls. Keep matched geography and distinguish the two coverage palettes.
+- Number standalone figures as `Fig. N.` with smaller captions. Sidecar maps do not receive separate figure numbers. References contain only numbered APA-style entries; do not append explanatory paragraphs.
+- Keep coverage and sensitivity chart tabs separate. Support table view and responsive pagination. Do not add CSV or SVG export controls.
+- The workflow starts neutral. Fit resets selection, search, zoom and playback. Pause freezes traversal and flowing edges. Animate outgoing edges from the active node only. Preserve a static centre line and readable inactive nodes.
 
-```json
-{"title":"Population Distribution", "text":"Your narrative", "media":{"type":"image", "path":"assets/population.png"}}
-```
+## Snapshots and recovery
 
-For an ArcGIS WebMap or WebScene:
+`--inspect` exports the current draft, published data, item metadata, all item resources, node/resource JSON and a readable report under ignored `snapshots/TIMESTAMP/`. The report lists every node and asset reference, including style, geometry, unknown fields and orphaned nodes. Referenced remote maps or embeds are not complete offline media copies.
 
-```json
-{"type":"map", "item_id":"ARCGIS_ITEM_ID"}
-```
+Apply requires a complete, stable snapshot and checks its draft fingerprint before building and immediately before saving. This detects drift; it is not an atomic server lock. Backups retain the prior draft, configuration and generated JSON in ignored `backups/`. Old item resources are not proactively deleted. Unsaved browser changes cannot be inspected.
 
-For an embedded page, place the file at `docs/embeds/chart/index.html` and reference it relative to the Pages root:
+`--update-cover --based-on SNAPSHOT` is a targeted alternative for an approved cover-only change. It verifies that non-cover nodes remain unchanged. Full rebuilds still require reconciliation into the generator.
 
-```json
-{"type":"embed", "path":"embeds/chart/index.html"}
-```
+## Source files
 
-Embeds display inline. Apply runs preserve all configured asset references.
-
-## GitHub Pages
-
-- Repository: <https://github.com/Jaffe2718/hk-elderly>
-- Publishing source: `docs/` on `main`.
-- Base URL: <https://jaffe2718.github.io/hk-elderly/>
-- Demo: <https://jaffe2718.github.io/hk-elderly/embeds/elderly-map/index.html>
-
-Use relative URLs inside hosted pages to support the repository URL prefix. Pages hosts public static HTML/CSS/JS and appropriately sized public datasets; it does not run a Python backend. Images can also be uploaded directly to ArcGIS.
-
-The collaborator's demo is stored unchanged at `docs/embeds/elderly-map/index.html`. Leaflet, styles, and data are embedded in the file, with no additional linked assets or fetch requests. It appears in chapter 04, **Service Distribution**. Treat it as an interactive preview rather than validated final research findings.
-
-Push new embed assets and wait for Pages deployment to succeed before applying the StoryMap configuration. Pages deployment and StoryMap updates are separate operations; StoryMap updates currently use local ArcGIS Pro authentication.
-
-## Visual structure
-
-The current reference is recorded in `reference_id`. Keep the white Summit theme and a top-left title/subtitle/member block while no cover image is available. Chapter headings are followed by short editorial introductions, separators between chapters, and mixed Sidecar layouts. Slide summaries describe the intended reading task without inventing findings; media remains empty where no asset is configured.
-
-The visible top chapter navigation is mandatory. Each apply run binds it to the configured chapter headings using builder-compatible `nodeId` link objects, and verifies the saved links and visibility. The SDK 2.4.3 navigation setter writes a different schema, so the adapter sets these link objects directly. Preserve this navigation when changing chapter order.
-
-## Inspect manual edits before rebuilding
-
-Export the current online StoryMap without changing it or adopting changes into the local generator:
-
-```powershell
-& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' -u storymap.py --inspect
-```
-
-Each ignored `snapshots/TIMESTAMP/` directory contains:
-
-- `REPORT.md`: reading order, complete per-node data/configuration, disconnected nodes, complete top-level styles/resources/actions, and review instructions.
-- `draft.json`: the complete current draft graph, without filtering unknown node types or fields.
-- `item.json` and `item-data.json`: item metadata and item data, including published content where stored there.
-- `resource-list.json` and `resources/`: every resource listed by ArcGIS, including draft/published JSON and media files.
-- `manifest.json`: the item ID, draft fingerprint, download hashes, errors, and an export stability check.
-- `local-config.json`: the local configuration at inspection time for comparison.
-
-Agent workflow: read the report and original JSON, compare against the generator, list differences, and propose how to preserve each manual change. Request explicit user approval before adopting the online state into `story.json` or `storymap.py`. Unsupported components must be represented or preserved before a rebuild; never ignore them just because the local schema is narrower.
-
-After approval, update the generator/configuration, validate locally, and apply using `--based-on` with the reviewed snapshot directory. An apply without a baseline is blocked. The script checks that the online draft still matches the reviewed fingerprint both before building and immediately before saving; if collaborators changed it again, inspect and review again. This is a drift check, not an atomic server lock. Close editor tabs during the final apply.
-
-Snapshots are local and ignored by Git because manually added content may not be intended for public sharing. Remote web maps, layers, custom themes, and embeds remain references, not complete offline copies. The report explicitly records this scope; inspect those referenced items and browser rendering when necessary. Unsaved browser edits cannot be exported. An incomplete or unstable snapshot cannot be used as a rebuild baseline.
-
-## Cover-only updates
-
-`course` adds the course code to the byline. The current cover uses Full with a themed title panel at the top left. `cover_vertical_position`, `cover_horizontal_position`, `cover_style`, and `cover_size` control its placement and appearance. Missing cover imagery remains empty.
-
-After inspection and approval of a cover change, use `--update-cover --based-on snapshots/REVIEWED_SNAPSHOT` instead of `--apply` to preserve manually edited content outside the cover. The command verifies that every non-cover node remains unchanged. This targeted operation does not reconcile other manual edits into the full-rebuild configuration; those still require a separate approved reconciliation before a full rebuild.
-
-## Rebuild and publication
-
-The source handoff was reviewed before composition. It contains 12 embedded-feature Web Map definitions, 22 distinct English PNG/SVG figure pairs, chart tables and a private-import helper. The delivered ZIP is an asset subset, not the complete raw-data/geodatabase package described in the handoff PDF. Original inputs and full ArcGIS Pro reproduction are not claimed here.
-
-- `scripts/prepare_assets.py`: creates English-only derivatives from the ignored local handoff and archived original HTML. It does not modify source materials.
-- `scripts/compose_story.py`: optional bootstrap for the supplied narrative. It overwrites `story.json`; do not run it after manual content reconciliation without review.
-- `scripts/arcgis_maps.py`: called by the main generator to import and verify referenced Web Maps. `assets/map_items.json` records item IDs and their exact sharing groups; it contains no credentials.
-- `storymap.py --apply --based-on SNAPSHOT`: imports native map dependencies and writes a verified draft. Snapshot and drift requirements still apply.
-- `storymap.py --publish --based-on SNAPSHOT`: publishes the reviewed current draft, refreshes native Credits, preserves its exact group-only audience, and enables duplication. Run only with explicit user authorization to publish. It refuses unexpected sharing scopes or a missing original group.
-
-Before publication, deploy the workflow, map and chart embeds, check the live endpoints, review the current draft and take a fresh snapshot. Publication verifies the stored content, status, copyability and sharing. API publication bypasses the StoryMaps builder issue checker, so browser review and dependency-sharing checks remain important.
-
-### Evidence and interpretation
-
-The main rule is residents aged 60+ >= 14,695 AND over 50% of residential land beyond 800 m of the nearest NEC. It selects 524, 628, 833 and 950S among 210 assessed groups; group 295 remains unassessed. Source and interpretation notes appear in native Credits. All distances are planar; coverage describes residential ground area, not people served, centre capacity or walking accessibility. The published analysis reproduces supplied Python/GDAL results; it does not claim an independent ArcGIS Pro geoprocessing rerun.
-
-### Interactive assets
-
-- `docs/embeds/workflow/`: original SVG/HTML implementation with node detail panels, linked-path highlighting, search, walkthrough, pan, zoom and SVG export. Interaction direction is inspired by dsh-archify; no Archify source code is incorporated.
-- `docs/embeds/elderly-map/`: English-only Leaflet explorer with distance/age/facility scenarios, area popups and case navigation. Main-scenario counts and alternatives are checked against the handoff data.
-- `docs/vendor/`: Leaflet 1.9.4 and its BSD 2-Clause license.
-
-Snapshots, local QA screenshots and raw handoff materials remain ignored. Only public-safe English derivatives and generator sources are committed.
-
-Final figure policy: no PDF crops are used. Population composition uses a native Web Map with its age-share layer enabled. Housing/district coverage and age/distance decisions use interactive HTML charts generated from the supplied CSV tables. The Tiu Keng Leng comparison embeds an ArcGIS Maps SDK Swipe with one shared viewpoint and independent in-map legends. `scripts/render_charts.py` remains an optional static fallback and is not inserted into the story. The original English handoff PNGs remain available as reference assets.
-
-### Preview revision
-
-- Six navigation chapters end with References, followed by a native Credit acknowledgement.
-- Native Web Map nodes each receive an isolated resource and an explicit Hong Kong centre, extent and positive scale, including matched case-study Swipe views.
-- HTML embeds declare supported inline rendering rather than link cards and hide the StoryMaps open-in-new-window button.
-- The workflow uses five architecture layers, category colours, line icons and an English colour legend with step counts. All connections retain static centre lines. Only the selected step's outgoing connections carry glowing green packets; the packets fade at the ports and wrap seamlessly at a constant path speed. Reduced-motion settings disable animation. Inactive labels remain fully readable. SVG exports include the legend.
-- The workflow omits the duplicate heading, sizes its SVG viewport to the actual iframe container and focuses the current step on narrow frames. Search, Previous/Next, Fit and pan/zoom remain available.
-- Interactive housing/district coverage and distance/age decision charts are generated from the supplied CSVs with `scripts/prepare_chart_data.py`. They support exact-value inspection, table view; coverage bars also support facility-scope filtering and sorting.
-- Draft updates and publishing are separate. The current review authorises pushing assets and replacing the draft only; it does not authorise a new publication.
-
-### Cartographic and editorial revision
-
-- Number the six chapter headings and navigation entries. Credit is an unnumbered footer paragraph and is excluded from navigation. Native separator blocks plus two blank paragraph lines provide extra space between chapters.
-- Use Floating Sidecars for Introduction and Data & Objective and a Docked Sidecar for Spatial Analysis. Slideshow is no longer used.
-- Use native figure captions in reading order outside Sidecars: **Fig. N. Short title.** followed by the explanation. Native caption typography distinguishes them from body paragraphs; Sidecar media is not numbered.
-- `assets/references.json` holds APA-formatted scholarly and dataset references. The A503 release date is verified against the Census main-table register. Unknown release dates remain `n.d.`; retrieval dates identify the changing facility datasets. The discussion cites Geurs and van Wee (2004) for the distinction between a proximity measure and the wider concept of accessibility.
-- Both distance and age matrices appear together in the sensitivity embed. The component sizes itself to the iframe height. District bars use six-row pages; the table view still includes all rows. Muted lavender/blue fills and coloured outer glows replace dark fills and black hover borders. Selection remains encoded by explicit 1/0 values.
-- Chart embeds have separate scopes: `?group=coverage#housing` exposes Housing/Districts and facility/sort controls; `?group=sensitivity#sensitivity` exposes Both matrices/Distance/Age definition. Hash navigation is restricted to the selected scope. Table view follows that scope. CSV download is not exposed in embeds.
-- The 18 supplied district polygons are dissolved locally with ArcPy. The outline retains island exteriors and removes internal district lines and hole boundaries. Geometry repair and independent-union checks are recorded in `assets/boundaries/provenance.json`.
-- Native maps use pale-purple population circles, dark-green NEC diamonds and DECC triangles, a label-free native vector basemap with pale-blue water, and the dark-red ArcPy-derived exterior outline. Source analytical attributes and decision thresholds are unchanged.
-
-To regenerate the map presentation after importing the original handoff:
-
-```powershell
-& 'D:\Program Files\ArcGIS\Pro\bin\Python\Scripts\propy.bat' scripts/prepare_study_area.py
-python scripts/style_webmaps.py
-python scripts/editorial_policy.py
-python scripts/prepare_chart_data.py
-```
-
-`story.json` is used for normal draft rebuilds. `scripts/compose_story.py` is an optional narrative bootstrap and reapplies `scripts/editorial_policy.py`; running it intentionally replaces configured narrative sections.
-
-The outline exporter explicitly projects back to WGS84 using the same Hong Kong 1980 datum transformation before serializing GeoJSON. A round-trip check must remain below 2 cm; the corrected asset measures approximately 0.25 mm in the sampled check. This prevents the approximately 305 m shift found when relying on automatic GeoJSON projection.
-
-### Embedded map layout and cover
-
-- Docked narrative panels use the native small size; the explorer control column is 210 px on desktop.
-- Both Leaflet embeds use the Esri Light Gray Base label-free raster basemap with Esri/HERE/Garmin attribution and a subtle cool tint. Roads and neighbouring land provide context without non-English place labels. Analytical overlays remain from the supplied handoff.
-- The facility-scope comparison uses an embedded ArcGIS Maps SDK 4.33 Swipe (not the StoryMap Swipe block), preserving native map controls while allowing two fixed in-map legends. Both legend cards are compact, have no separators, and use trapezoid area swatches. The left map is lavender; the right is grey-apricot. NEC is a dark-green diamond; DECC is a deep-orange triangle. Native combined-facility views use a derived point layer with both categories in one legend group, while original source layers remain unchanged. The old paired PNG legend and its generator remain legacy assets and are not inserted.
-- Population counts use proportional pale-purple circles; age percentages use a muted lavender sequential ramp. Water stays pale blue. Sizes, percentage classes and analytical attributes are unchanged.
-- The native cover uses the selected Tuen Mun home garden entrance photograph. Source, photographer and CC BY-SA licence are recorded under assets/cover and reproduced in Credit.
-- References have bracketed numbers while retaining APA entry formatting; in-text cross-references remain deferred.
+- `scripts/update_handoff_20261106.py`: prepare current English datasets, model classifications, site comparisons and native maps.
+- `scripts/compose_current_story.py`: compose the approved six-chapter narrative. `scripts/compose_story.py` is a compatibility entry point.
+- `scripts/style_webmaps.py`: style active maps and matching embed basemap assets.
+- `scripts/arcgis_maps.py`: import versioned maps, preserve group access and verify saved data.
+- `scripts/editorial_policy.py`: chapter, figure, bibliography and layout rules.
+- Older preparation scripts and unversioned derived assets are retained for the earlier published model. Do not run them to prepare the current model; use `storymap.py --prepare`.

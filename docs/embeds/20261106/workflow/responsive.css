@@ -1,0 +1,19 @@
+/* Size for the StoryMap frame, with no duplicate chapter title. */
+body{font-size:16px}nav{padding:12px 16px;gap:8px}button,input{font-size:14px;padding:10px 12px;border-color:#a9b9b2}main{grid-template-columns:minmax(0,1fr) 290px;min-height:740px;height:auto}#canvas{height:max(700px,calc(100dvh - 65px))}aside h2{font-size:25px}aside p,aside li{font-size:15px;color:#344e42}aside .metric{font-size:29px}.note{font-size:13px;color:#435b51}.tag{font-size:12px}.node .title{font-size:18px}.node .subtitle{font-size:13px;fill:#344e42}.node .stage-label{font-size:11px}.hint{font-size:12px;color:#435b51;max-width:95%}.edge{stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.edge.active{stroke:#00856b;stroke-width:2.4}.edge-flow{fill:none;stroke:#009e80;stroke-width:4;stroke-dasharray:.2 .8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 1px #00e5a8) drop-shadow(0 0 4px #00d99b99);opacity:0;pointer-events:none}.edge-flow.active{opacity:1;animation:flow-packet var(--flow-duration,2s) linear infinite;animation-delay:var(--flow-phase,0s)}@keyframes flow-packet{from{stroke-dashoffset:0}to{stroke-dashoffset:-1}}
+@media(max-width:1099px){main{grid-template-columns:1fr;min-height:0}#canvas{height:clamp(620px,79vw,900px)}aside{border-left:0;border-top:1px solid #dce4df;padding:22px 28px}aside ul{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}aside .metric{margin:12px 0}}
+@media(max-width:759px){nav{padding:10px;flex-wrap:wrap;gap:7px}input{width:145px}.spacer,#export{display:none}#canvas{height:420px}aside{padding:20px}aside ul{display:block}aside h2{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.edge-flow.active{animation:none;display:none}.edge.active{stroke:#00856b}}
+
+@media(min-width:1100px){main{height:calc(100dvh - var(--chrome-height,140px));min-height:0}#canvas{height:100%;min-height:0}aside{height:100%}}
+#legend{display:flex;align-items:center;gap:18px;padding:14px 20px;border-top:1px solid #dce4df;background:#fff;color:#304b3e}
+#legend h2{margin:0;font-size:14px;font-weight:600;line-height:1.5}
+#legend ul{display:flex;align-items:center;flex-wrap:wrap;gap:12px 22px;list-style:none;margin:0;padding:0}
+#legend li{display:flex;align-items:center;gap:7px;font-size:14px;line-height:1.5;white-space:nowrap}
+.legend-swatch{width:18px;height:12px;border:1.8px solid var(--legend-colour);background:color-mix(in srgb,var(--legend-colour) 8%,white);border-radius:3px;flex:none}
+.legend-count{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;border:1px solid #c7d3cd;border-radius:50%;font-size:12px;color:#40594c;font-variant-numeric:tabular-nums}
+@media(max-width:759px){#legend{align-items:flex-start;flex-direction:column;gap:10px;padding:16px 20px}#legend ul{gap:12px 18px}#legend li{font-size:14px}}
+
+/* Remove the instruction overlay from the diagram surface. */
+.hint{display:none}
+
+.flow-paused .edge-flow.active{animation-play-state:paused!important}

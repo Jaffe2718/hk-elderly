@@ -6,7 +6,8 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def apply_policy(cfg):
     cfg['numbered_chapters']=True
-    cfg['asset_revision']='20261105-review8'
+    cfg['asset_revision']=cfg.get('asset_revision','20261106-p60')
+    current=cfg.get('model_version')=='20261106-p60'
     cfg['cover_media']={'type':'image','path':'assets/cover/tuen-mun-aged-blind-garden.jpg'}
     cfg['chapter_spacing_lines']=2
     cfg['references']=json.loads((ROOT/'assets/references.json').read_text(encoding='utf-8'))
@@ -23,7 +24,10 @@ def apply_policy(cfg):
                 section.setdefault('before',[]).append({'type':'text','text':text})
         for block in section.get('before',[])+section.get('after',[]):
             if block.get('type')=='swipe' or block.get('path','').split('?')[0]=='embeds/coverage-comparison/index.html':
-                block.clear();block.update(type='embed',path='embeds/coverage-comparison/index.html?ui=20261105-layoutfix',figure_title='Facility scope in Tiu Keng Leng.',caption='NEC only on the left; NEC + DECC on the right. Both sides share one geographical view. In-map legends identify residential land within or beyond 800 m and the facility types.')
+                if current:
+                    block.update(type='embed',path='embeds/coverage-comparison/index.html?ui=20261106-p60',figure_title='Local location alternatives.',caption='Model reference A on the left; an existing community venue on the right. Both use the same NEC baseline and 800 m radius. Legends float inside the map.')
+                else:
+                    block.clear();block.update(type='embed',path='embeds/coverage-comparison/index.html?ui=20261105-layoutfix',figure_title='Facility scope in Tiu Keng Leng.',caption='NEC only on the left; NEC + DECC on the right. Both sides share one geographical view. In-map legends identify residential land within or beyond 800 m and the facility types.')
             if block.get('text','').startswith(('Drag the native Swipe divider','Compare matched residential patches')):
                 block['text']='Drag the divider to compare NEC-only and NEC + DECC proximity in Tiu Keng Leng at the same geographical extent. The fixed in-map legends describe their respective layers. These are geographical proximity definitions, not interchangeable services or measures of operating capacity.'
             if block.get('text')=='Tiu Keng Leng: change the facility scope':block['text']='Compare local facility scope'
@@ -33,11 +37,14 @@ def apply_policy(cfg):
             elif block.get('path','').startswith('embeds/charts/index.html') and block['path'].endswith('#sensitivity'):
                 block['figure_title']='Sensitivity to distance and age definitions.'
                 block['caption']='(A) Distance-threshold decisions at 500, 800 and 1,000 m. (B) Age-definition decisions for the four main-scenario groups. Each age cohort uses its own P75 cutoff. 1 = selected; 0 = not selected.'
+            if current and block.get('path','').endswith('#sensitivity'):
+                block['figure_title']='Screening sensitivity.'
+                block['caption']='Compare fixed-cutoff distance tests, cohort-specific P60 age definitions and 27 recalibrated percentile scenarios. These are screening decisions, not probabilities.'
             if block.get('path','').startswith('embeds/charts/index.html'):
                 block['caption']=block.get('caption','').replace('sort values, or download the source table','sort values or inspect the table')
                 fragment=block['path'].split('#')[-1]
                 group='coverage' if fragment=='housing' else 'sensitivity'
-                block['path']=f'embeds/charts/index.html?group={group}&ui=20261105-layoutfix#{fragment}'
+                block['path']=f"embeds/charts/index.html?group={group}&ui={cfg['asset_revision']}#{fragment}"
         for key in ['before','after']:
             section[key]=[b for b in section.get(key,[]) if b.get('type')!='comparison_legend']
         for slide in section.get('slides',[]):

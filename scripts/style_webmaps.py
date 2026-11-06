@@ -26,7 +26,10 @@ def run():
     study_extent={'xmin':xmin-dx,'xmax':xmax+dx,'ymin':ymin-dy,'ymax':ymax+dy,'spatialReference':{'wkid':4326}}
     land_layer=collection('study_land','Study area land','esriGeometryPolygon',{'rings':rings,'spatialReference':{'wkid':4326}}, {'type':'esriSFS','style':'esriSFSSolid','color':[249,251,250,225],'outline':{'type':'esriSLS','style':'esriSLSNull'}})
     outline_layer=collection('study_outline','Hong Kong study area outline','esriGeometryPolyline',{'paths':line['coordinates'],'spatialReference':{'wkid':4326}},{'type':'esriSLS','style':'esriSLSSolid','color':[128,40,53,245],'width':1.2})
+    current=(ROOT/'assets/analysis/current_model.json').exists()
+    embed_root=ROOT/('docs/embeds/20261106/elderly-map' if current else 'docs/embeds/elderly-map')
     for path in sorted((ROOT/'assets/webmaps').glob('M*.json')):
+        if current and path.stem not in {'M01_population','M02_coverage','M03_binary800','M06_sensitivity27','M10_facility_definition','M13_case131','M14_case620S','M15_case920'}:continue
         data=json.loads(path.read_text(encoding='utf-8'))
         layers=[l for l in data['operationalLayers'] if l['id'] not in {'study_land','study_outline','facilities'}]
         for layer in layers:
@@ -36,7 +39,7 @@ def run():
                 renderer=sub['layerDefinition'].get('drawingInfo',{}).get('renderer',{})
                 renderer.setdefault('legendOptions',{})['title']=''
                 field=renderer.get('field1',renderer.get('field'))
-                titles={'elderly_pct':'Residents aged 60+ (%)','elderly_n':'Residents aged 60+ (2021)',
+                titles={'elderly_pct':'Residents aged 60+ (%)','elderly_n':'Residents aged 65+ (2021)','pct65':'Residents aged 65+ (%)','age65_assessed':'Residents aged 65+ (%)',
                         'nec_out800_pct':'Residential land beyond NEC 800 m (%)','any_out800_pct':'Residential land beyond NEC + DECC 800 m (%)',
                         'sensitivity_hits27':'Selections across 27 scenarios','nec2plus_pct800':'Residential land within 800 m of 2+ NECs (%)',
                         'centroid_disagree':'Residential vs centroid screening','nec_decc_gain_pp':'Coverage gain from adding DECC (pp)',
@@ -53,7 +56,7 @@ def run():
                 entries=renderer.get('classBreakInfos',renderer.get('uniqueValueInfos',[]))
                 pastel=[rgba(c) for c in theme['sequential']]
                 for i,info in enumerate(entries):
-                    if info.get('symbol',{}).get('type')=='esriSFS':
+                    if info.get('symbol',{}).get('type')=='esriSFS' and field not in {'A_status','venue_status'}:
                         info['symbol']['color']=pastel[round(i*4/max(1,len(entries)-1))]
                 # Categorical semantics must not inherit the sequential ramp order.
                 if renderer.get('type')=='uniqueValue':
@@ -128,12 +131,13 @@ def run():
         if path.stem=='M01_population':
             boundary=data['operationalLayers'][-1]['featureCollection']['layers'][0]['layerDefinition']['drawingInfo']['renderer']['symbol']
             boundary.update(color=[128,40,53,190],width=.8)
-        data['baseMap']={'title':'Minimal pale-blue vector basemap','baseMapLayers':[{'id':'pale_blue_water_context','layerType':'VectorTileLayer','title':'Esri World Basemap v2 (minimal, no labels)','styleUrl':'https://jaffe2718.github.io/hk-elderly/embeds/elderly-map/native-basemap.json','visibility':True,'opacity':1}]}
-        data.setdefault('initialState',{}).setdefault('viewpoint',{})['targetGeometry']=copy.deepcopy(study_extent)
+        data['baseMap']={'title':'Minimal pale-blue vector basemap','baseMapLayers':[{'id':'pale_blue_water_context','layerType':'VectorTileLayer','title':'Esri World Basemap v2 (minimal, no labels)','styleUrl':'https://jaffe2718.github.io/hk-elderly/embeds/20261106/elderly-map/native-basemap.json','visibility':True,'opacity':1}]}
+        if not path.stem.startswith(('M13_','M14_','M15_')):
+            data.setdefault('initialState',{}).setdefault('viewpoint',{})['targetGeometry']=copy.deepcopy(study_extent)
         path.write_text(json.dumps(data,ensure_ascii=False)+'\n',encoding='utf-8')
-    (ROOT/'docs/embeds/elderly-map/theme.json').write_text(json.dumps(theme)+'\n',encoding='utf-8')
-    (ROOT/'docs/embeds/elderly-map/study-outline.geojson').write_bytes((ROOT/'assets/boundaries/hk-study-area-outline.geojson').read_bytes())
-    (ROOT/'docs/embeds/elderly-map/native-basemap.json').write_bytes((ROOT/'assets/basemaps/minimal-vector.json').read_bytes())
-    print('Styled 12 native Web Maps using the shared muted-lavender theme.')
+    (embed_root/'theme.json').write_text(json.dumps(theme)+'\n',encoding='utf-8')
+    (embed_root/'study-outline.geojson').write_bytes((ROOT/'assets/boundaries/hk-study-area-outline.geojson').read_bytes())
+    (embed_root/'native-basemap.json').write_bytes((ROOT/'assets/basemaps/minimal-vector.json').read_bytes())
+    print('Styled active native Web Maps using the shared muted-lavender theme.')
 
 if __name__=='__main__':run()

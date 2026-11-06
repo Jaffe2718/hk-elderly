@@ -202,6 +202,8 @@ def configure_credits(story, cfg):
                    '<a href="https://www.swd.gov.hk/" target="_blank" rel="noopener noreferrer">Social Welfare Department</a> for elderly-centre premises data, and the '
                    '<a href="https://www.pland.gov.hk/" target="_blank" rel="noopener noreferrer">Planning Department</a> for 2021 land-use data, accessed through the '
                    '<a href="https://portal.csdi.gov.hk/" target="_blank" rel="noopener noreferrer">CSDI Portal</a> and DATA.GOV.HK. Analysis and presentation by GEOG7302 Group 13.')
+    if cfg.get('model_version'):
+        description+=' We also acknowledge the Home Affairs Department for community-hall and community-centre locations checked on 5 November 2026.'
     if cfg.get('cover_media'):
         attribution=json.loads(local_asset('assets/cover/attribution.json').read_text(encoding='utf-8'))
         description+=' Cover photograph: '+attribution['title']+'. Photograph by '+attribution['photographer']+'. <a href="'+html.escape(attribution['source'],quote=True)+'">Image source</a>; <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Responsive cover framing may crop the original photograph. The image illustrates an elderly-care environment, not an NEC study location.'
@@ -420,7 +422,7 @@ def apply(cfg, baseline=None, cover_only=False):
     all_media += [b for section in cfg['sections'] for b in section.get('before', [])+section.get('after', [])]
     all_media += [m for b in list(all_media) for m in b.get('maps', [])]
     map_keys = [m['webmap'] for m in all_media if m.get('type') == 'map' and m.get('webmap')]
-    ledger = ensure_maps(gis, item, map_keys)
+    ledger = ensure_maps(gis, item, map_keys, version=cfg.get('model_version'))
 
     def native_table(rows):
         import pandas as pd
@@ -576,11 +578,20 @@ def main():
     actions = parser.add_mutually_exclusive_group()
     actions.add_argument('--apply', action='store_true', help='Overwrite draft after inspection and user-approved reconciliation')
     actions.add_argument('--inspect', action='store_true', help='Read-only export of the current story and all item resources')
+    actions.add_argument('--prepare', action='store_true', help='Prepare the approved handoff data and current narrative locally; no online writes')
     actions.add_argument('--update-cover', action='store_true', help='Update only the cover, preserving manual edits elsewhere')
     actions.add_argument('--publish', action='store_true', help='Publish reviewed draft, preserving exact group sharing and allowing duplication')
     parser.add_argument('--based-on', help='Reviewed snapshot folder required by --apply')
     parser.add_argument('--generated', help='Optional reviewed generated.json from a matching local backup, for publication')
     args = parser.parse_args()
+    if args.prepare:
+        from scripts.update_handoff_20261106 import run
+        from scripts.style_webmaps import run as style
+        import sys
+        sys.path.insert(0,str(ROOT/'scripts'))
+        from scripts.compose_current_story import compose
+        run();style();compose()
+        return
     cfg = json.loads((ROOT / 'story.json').read_text(encoding='utf-8')) if args.inspect else load_config()
     if args.inspect:
         inspect_story(cfg)
