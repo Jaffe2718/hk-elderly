@@ -63,7 +63,7 @@ def compose():
  section('references','References','',before=[{'type':'references'}])]
  cfg=apply_policy(cfg)
  # The approved proposal supersedes legacy automatic four-area narrative policies.
- cfg['title']='Ageing and NEC Access';cfg['asset_revision']='20261106-p60'
+ cfg['title']='Ageing and NEC Access';cfg['asset_revision']='20261106-green'
  for s in cfg['sections']:
   if s['id']=='spatial':
    for b in s['after']:

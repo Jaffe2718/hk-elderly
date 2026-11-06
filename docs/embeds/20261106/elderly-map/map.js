@@ -1,7 +1,7 @@
 'use strict';
 const $=id=>document.getElementById(id),nf=new Intl.NumberFormat('en-GB'),pct=v=>v==null?'Not assessed':Number(v).toFixed(2)+'%';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-Promise.all(['data.json','study-outline.geojson','theme.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw Error('Data unavailable');return r.json()}))).then(([data,outline,theme])=>start({...data,outline,theme})).catch(e=>{$('loading').textContent='Unable to load map. Please refresh.';console.error(e)});
+Promise.all(['data.json','study-outline.geojson','theme.json'].map(path=>fetch(path+'?v=20261106-green').then(r=>{if(!r.ok)throw Error('Data unavailable');return r.json()}))).then(([data,outline,theme])=>start({...data,outline,theme})).catch(e=>{$('loading').textContent='Unable to load map. Please refresh.';console.error(e)});
 function start(D){
  $('loading').remove();let radius=800,areas;const map=L.map('map',{zoomControl:false,minZoom:8,maxZoom:18});L.control.zoom({position:'topright'}).addTo(map);L.control.scale({imperial:false}).addTo(map);
  const basemap=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,maxNativeZoom:16,className:'context-tiles',attribution:'Tiles &copy; Esri, HERE, Garmin',crossOrigin:true}).addTo(map);
