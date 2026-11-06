@@ -66,3 +66,5 @@ Apply requires a complete, stable snapshot and checks its draft fingerprint befo
 - `scripts/arcgis_maps.py`: import versioned maps, preserve group access and verify saved data.
 - `scripts/editorial_policy.py`: chapter, figure, bibliography and layout rules.
 - Older preparation scripts and unversioned derived assets are retained for the earlier published model. Do not run them to prepare the current model; use `storymap.py --prepare`.
+
+Publication uploads `published_data.json` as a file. The REST text-upload parameter can sanitize HTML inside JSON and remove reference hyperlinks. The publication adapter verifies both the published item data and the published resource against the intended graph.

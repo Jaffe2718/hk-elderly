@@ -337,10 +337,19 @@ def publish_current(cfg, baseline, generated=None):
     # Keep publication metadata consistent while avoiding the SDK access='shared' bug.
     props = _utils.prepare_story_for_save(story, True, True, False, cfg['title'], None, _utils.get_version(story))
     props.pop('access', None)
-    for resource in item.resources.list():
-        if resource['resource'] == 'published_data.json':
-            _utils.remove_resource(story, file='published_data.json')
-    _utils.add_resource(story, resource_name='published_data.json', text=json.dumps(story._properties))
+    # The REST text parameter sanitizes HTML inside JSON, stripping reference
+    # href attributes. A JSON file upload preserves the complete story graph.
+    import tempfile
+    import time
+    with tempfile.TemporaryDirectory(prefix='storymap-publish-') as temp_dir:
+        published_file = Path(temp_dir) / 'published_data.json'
+        published_file.write_text(json.dumps(story._properties, ensure_ascii=False), encoding='utf-8')
+        if any(r['resource'] == 'published_data.json' for r in item.resources.list()):
+            result = item.resources.update(file=str(published_file), file_name='published_data.json')
+        else:
+            result = item.resources.add(file=str(published_file), file_name='published_data.json', access='inherit')
+        if not result or (isinstance(result, dict) and not result.get('success')):
+            raise RuntimeError('Published resource file upload failed')
     props.update(text=json.dumps(story._properties), url=f'https://storymaps.arcgis.com/stories/{item.id}')
     if not item.update(item_properties=props):
         raise RuntimeError('Publication update failed')
@@ -351,6 +360,12 @@ def publish_current(cfg, baseline, generated=None):
         raise RuntimeError('Publication or duplication flag is missing')
     if fingerprint(actual.get_data()) != fingerprint(story._properties):
         raise RuntimeError('Published content readback failed')
+    published = gis._con.get(
+        gis._portal.resturl + 'content/items/' + item.id + '/resources/published_data.json',
+        {'f': 'json', '_ts': str(time.time_ns())},
+    )
+    if fingerprint(published) != fingerprint(story._properties):
+        raise RuntimeError('Published resource differs from the story, including HTML links')
     print('Published and verified. Group-only audience preserved:', groups, flush=True)
     print(f'https://storymaps.arcgis.com/stories/{item.id}')
 
