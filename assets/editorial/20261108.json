@@ -1,0 +1,167 @@
+{
+  "entries": {
+    "01": "Here Are the Service Gaps Close to Home!",
+    "02": "Elderly Centre Accessibility and Community Site Selection in Hong Kong",
+    "03": "GEOG7302 Group 13 | Wu Jihui · Li Changzhe · Hu Jiaming · She Xiaolai · Zhao Yuexiang · Hu Yang",
+    "04": "Published 3 November 2026. Updated 8 November 2026.",
+    "05": "1 Introduction",
+    "06": "Where do areas with a high share of older residents also have residential land far from Neighbourhood Elderly Centres (NECs)?",
+    "07": "The screening identifies priority areas for community service review.",
+    "08": "Older resident numbers and population shares",
+    "09": "The map shows the number of residents aged 65 or above; the screening uses their share of each area’s total population.",
+    "10": "A large older population and a high older-resident share describe different aspects of a community. We use the share for screening and retain headcounts and total population to interpret the results. Map symbols summarise entire statistical areas; they do not locate individual residents.",
+    "11": "2 Data and Objectives",
+    "12": "We combine census statistics, residential land and elderly-centre locations to identify areas for review, then compare how model locations and existing venues could extend residential accessibility coverage.",
+    "13": "Elderly centre locations",
+    "14": "The baseline contains 215 distinct NEC locations. An alternative scenario also includes 62 District Elderly Community Centre (DECC) locations.",
+    "15": "The Social Welfare Department (SWD) records were retrieved on 2 November 2026. The 216 NEC premises records occupy 215 distinct coordinates, so coincident records are merged for distance calculations.",
+    "16": "Population and residential denominators",
+    "17": "The older-resident share is the number of residents aged 65 or above divided by the total population of the same small tertiary planning unit group (STPUG).",
+    "18": "The analysis uses 211 STPUGs from the 2021 Census geography. Residential proximity can be assessed for 210 groups. Group 295 has no assigned residential cells and is excluded from the joint screen. Interpret a high older-resident share alongside the older-resident count, total population and residential area.",
+    "19": "3 Methodology",
+    "20": "We apply separate cutoffs to population age structure and residential accessibility, then examine how the shortlist changes under alternative assumptions.",
+    "21": "Fig. 1. Analytical workflow. Census statistics, residential cells and facility locations are combined to calculate two indicators, apply the joint screening rule, test alternative assumptions and compare local reference locations.",
+    "22": "A transparent two-condition rule",
+    "23": "This study uses the 60th percentile (P60) as its screening standard for two indicators across the 210 assessed STPUGs: the share of residents aged 65 or above and the share of residential land more than 800 m from the nearest NEC. Every group has equal weight. The thresholds are approximately 20% and 31%, respectively. Groups meeting or exceeding both P60 thresholds enter the shortlist. Each condition is met by 84 groups, and 13 meet both.",
+    "24": "Measure residential proximity",
+    "25": "Distances are calculated in Hong Kong 1980 Grid (EPSG:2326). Each 10 m residential-cell centre is assigned to an STPUG, and its straight-line distance to the nearest NEC anywhere in Hong Kong is calculated, including centres outside that group. This study sets 800 m as its baseline coverage standard. Cells at or within 800 m count as covered. The outside-area share equals the number of residential cells beyond 800 m divided by all assigned residential cells in that group. Each cell represents 100 m² of residential ground area.",
+    "26": "Separate two sensitivity questions",
+    "27": "The 27 scenarios combine three age-share percentiles (P50, P60 and P70), three outside-area percentiles and three radii (500, 800 and 1,000 m). The outside-area distribution is recalculated for each radius. A separate test holds the two baseline numerical cutoffs fixed and changes only the radius. Age-cohort tests use cohort-specific P60 age-share cutoffs. The NEC plus DECC scenario tests a broader facility network.",
+    "28": "Review locations within shortlisted groups",
+    "29": "Within each shortlisted group, one residential cell nearest the centre of each occupied 200 m grid square is used as a candidate location. A provides the greatest additional residential-area coverage among these candidates. B provides the greatest stand-alone gain among candidates at least 400 m from A. C maximises the remaining gain after A has been added. Model locations are compared with registered community venues and DECC premises.",
+    "30": "Geographical proximity is one dimension of accessibility (Geurs & van Wee, 2004). This study uses residential coverage to compare access to elderly centres and identify priority areas for service review.",
+    "31": "4 Spatial Analysis",
+    "32": "We first examine the distributions of age share and residential accessibility, then identify the joint shortlist and compare possible additions in three local cases.",
+    "33": "Residential outside-area shares cluster at zero and 100 percent",
+    "34": "At 800 m, 80 of the 210 assessed groups have no residential land beyond the NEC radius, while 42 have all residential land beyond it. The remaining 88 groups lie between these extremes.",
+    "35": "The concentration of values at 0% and 100% affects percentile cutoffs and map classes. Area-wide shading identifies the statistical group. Residential land serves as a spatial proxy for potential service demand, and the outside-area share highlights where this demand is distant from existing NECs.",
+    "36": "Thirteen areas meet both criteria",
+    "37": "The main screen requires both the older-resident share and the residential outside-area share to meet their respective P60 cutoffs.",
+    "38": "The 13 shortlisted groups are 131, 140, 155, 162, 175S, 525, 545, 620S, 758, 821, 825, 920 and 944. For comparison, the fixed 20% age-share and 30% outside-area rule selects 14 groups, including group 149. Group 295 remains unassessed because it has no assigned residential cells.",
+    "39": "Explore assumptions",
+    "40": "Use the explorer to compare the P60 rule with fixed cutoffs, alternative age cohorts and the NEC plus DECC network.",
+    "41": "The explorer displays population and residential-area denominators for each group. A larger outside-area share indicates a larger accessibility gap under the selected settings. Selection frequencies show how consistently groups enter the shortlist across scenarios.",
+    "42": "Sensitivity remains visible",
+    "43": "The scenario maps show how often individual groups are selected; the 27-cell comparison chart shows how many groups are selected under each combination of assumptions.",
+    "44": "Use the distance and age matrices to inspect the baseline shortlist under alternative settings. In the 27-scenario chart, rows indicate age-share percentiles and columns indicate outside-area percentiles. Compare changes in membership as well as changes in the number selected. Similar totals do not guarantee similar shortlists.",
+    "45": "Wan Chai group 131",
+    "46": "Most residential land in this group lies beyond the NEC radius, although the total residential area is only 12.00 ha.",
+    "47": "Group 131 has 5,290 residents aged 65 or above (20.20%) and 12.00 ha of residential land. Of that land, 11.69 ha lies beyond the existing NEC 800 m radius. Model A and the community-venue alternative each bring all 11.69 ha within the modelled radius. Nearby DECC locations provide an additional comparison for local service planning.",
+    "48": "Ta Kwu Ling group 620S",
+    "49": "Assess a second location by the residential area it adds after the first location is in place.",
+    "50": "All 110.36 ha of residential land in group 620S lies beyond the existing NEC 800 m radius. Model A adds 31.01 ha. B covers 28.63 ha on its own but adds only 3.05 ha after A. Choosing C for the remaining gap adds 25.09 ha after A, giving 56.10 ha in total. In a separate arrangement, Ta Kwu Ling Community Hall adds 19.62 ha on its own. These results compare the A-plus-C arrangement with the stand-alone community-hall option.",
+    "51": "Cheung Chau group 920",
+    "52": "Cheung Chau Community Hall provides a documented venue to compare with the model reference location.",
+    "53": "Group 920 has 4,450 residents aged 65 or above (22.51%) and 56.54 ha of residential land. Model A adds 28.93 ha of coverage, compared with 26.71 ha for Cheung Chau Community Hall, approximately 92.3% of A’s gain. B adds no further area after A. In the separate hall-first arrangement, H2 denotes a complementary second model location that adds 4.01 ha after the hall.",
+    "54": "Compare model and existing locations",
+    "55": "Select a case and drag the divider to compare the same area. The left map shows coverage after adding model location A; the right shows coverage after adding an existing community venue. Grey residential cells were already within the NEC radius. Purple cells on the left and brown cells on the right are newly covered; pale cells remain outside. Both maps use the same NEC baseline and an 800 m radius.",
+    "56": "Fig. 2. Local alternatives under an 800 m radius. Left: model location A. Right: an existing community venue. Colours distinguish previously covered, newly covered and remaining outside residential land relative to the same NEC baseline.",
+    "57": "Coverage by residential type and district",
+    "58": "Fig. 3. Residential ground-area coverage by housing type and district. In the housing view, NEC-only coverage is 91.5% for public residential land, 53.4% for private residential land and 17.9% for rural settlements. Including DECC locations increases these figures to 97.1%, 58.9% and 20.7%, respectively. Coverage is expressed as a share of residential ground area.",
+    "59": "How the shortlist changes",
+    "60": "Fig. 4. Sensitivity of the shortlist to analytical settings. The distance and age matrices show selection status for the baseline shortlisted groups. In the 27-scenario view, each cell gives the total number selected from the 210 assessed groups; totals range from 4 to 31. The 800 m P60/P60 combination selects 13 groups.",
+    "61": "5 Conclusions",
+    "62": "The joint screen identifies 13 statistical groups as priorities for local service planning.",
+    "63": "What the analysis supports",
+    "64": "The analysis identifies where a relatively high older-resident share coincides with residential land distant from NEC premises. This provides a reproducible starting point for local service planning using the P60 screening rule and the 800 m coverage standard.",
+    "65": "What local comparisons add",
+    "66": "Existing venues provide concrete options for community service provision, while model locations indicate where additional residential-area coverage could be concentrated. Second locations are compared by their marginal gain after the first location is added. A Hong Kong-wide plan can build on these local comparisons by incorporating resource constraints and accounting for overlapping coverage across areas.",
+    "67": "Limits and next steps",
+    "68": "The analysis combines 2021 population and land-use data with facility records from 2026. It measures accessibility through residential ground area and straight-line distance. Future work can incorporate building-level population, walking routes and service capacity to refine local planning.",
+    "69": "6 References",
+    "70": "[1] Census and Statistics Department. (n.d.-a). 2021 Population Census (statistics and boundaries of District Council districts) [Data set]. DATA.GOV.HK. https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-dcd",
+    "71": "[2] Census and Statistics Department. (n.d.-b). 2021 Population Census (statistics and boundaries of small tertiary planning unit groups) [Data set]. DATA.GOV.HK. https://data.gov.hk/en-data/dataset/hk-censtatd-census_geo-2021-population-census-by-stpu",
+    "72": "[3] Census and Statistics Department. (2022, October 28). A503: Population by small tertiary planning unit group, sex, year and age [Data set]. 2021 Population Census. https://www.census2021.gov.hk/en/main_tables.html",
+    "73": "[4] Geurs, K. T., & van Wee, B. (2004). Accessibility evaluation of land-use and transport strategies: Review and research directions. Journal of Transport Geography, 12(2), 127–140. https://doi.org/10.1016/j.jtrangeo.2003.10.005",
+    "74": "[5] Planning Department. (n.d.). Land utilization in Hong Kong 2021 [Data set]. Common Spatial Data Infrastructure Portal. https://portal.csdi.gov.hk/csdi-webpage/metadata/pland_rcd_1634024370851_27769/html",
+    "75": "[6] Social Welfare Department. (n.d.-a). District Elderly Community Centres [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 2, 2026, from https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_1216",
+    "76": "[7] Social Welfare Department. (n.d.-b). Neighbourhood Elderly Centres [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 2, 2026, from https://portal.csdi.gov.hk/csdi-webpage/dataset/swd_rcd_1629267205235_34036",
+    "77": "[8] Home Affairs Department. (n.d.). Community halls and community centres [Data set]. Common Spatial Data Infrastructure Portal. Retrieved November 5, 2026, from https://portal.csdi.gov.hk/csdi-webpage/dataset/had_rcd_1634531497753_36049",
+    "78": "Credits",
+    "79": "Analysis and presentation by GEOG7302 Group 13. We acknowledge the Census and Statistics Department for 2021 population statistics and boundaries, the Planning Department for 2021 land-use data, the Social Welfare Department for elderly-centre premises records, and the Home Affairs Department for community-venue records checked on 5 November 2026. Data were accessed through the 2021 Census website, DATA.GOV.HK and the CSDI Portal. Cover photograph: garden entrance to the Jockey Club Tuen Mun Home for the Aged Blind, Hong Kong, by TSunbenmongos, licensed under CC BY-SA 4.0. The photograph may be cropped for display and illustrates an elderly-care setting rather than an NEC study site."
+  },
+  "tables": [
+    [
+      [
+        "Evidence",
+        "Reference date and scope",
+        "Analytical use"
+      ],
+      [
+        "2021 Census A503 and STPUG boundaries",
+        "2021; 211 groups",
+        "Older-resident shares, counts and total population"
+      ],
+      [
+        "Residential land-use grid",
+        "2021 · 10 m cells",
+        "Private/public housing and rural settlements"
+      ],
+      [
+        "NEC and DECC premises",
+        "Retrieved 2 November 2026",
+        "NEC baseline; NEC plus DECC comparison"
+      ],
+      [
+        "Community halls and centres",
+        "115 venues · checked 5 November 2026",
+        "Existing addresses for outreach-site review"
+      ],
+      [
+        "District boundaries",
+        "2021 · 18 districts",
+        "Geographical context; no population redistribution"
+      ],
+      [
+        "Case",
+        "Added residential area with A",
+        "Added residential area with community venue",
+        "Additional gain from a second location"
+      ],
+      [
+        "Wan Chai 131",
+        "11.69 ha",
+        "11.69 ha",
+        "No modelled residential gap remains within group 131 after A"
+      ],
+      [
+        "Ta Kwu Ling 620S",
+        "31.01 ha",
+        "19.62 ha",
+        "C adds 25.09 ha after A; B adds 3.05 ha"
+      ],
+      [
+        "Cheung Chau 920",
+        "28.93 ha",
+        "26.71 ha",
+        "H2 adds 4.01 ha after the hall"
+      ]
+    ],
+    [
+      [
+        "Case",
+        "Added residential area with A",
+        "Added residential area with community venue",
+        "Additional gain from a second location"
+      ],
+      [
+        "Wan Chai 131",
+        "11.69 ha",
+        "11.69 ha",
+        "No modelled residential gap remains within group 131 after A"
+      ],
+      [
+        "Ta Kwu Ling 620S",
+        "31.01 ha",
+        "19.62 ha",
+        "C adds 25.09 ha after A; B adds 3.05 ha"
+      ],
+      [
+        "Cheung Chau 920",
+        "28.93 ha",
+        "26.71 ha",
+        "H2 adds 4.01 ha after the hall"
+      ]
+    ]
+  ]
+}

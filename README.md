@@ -1,6 +1,6 @@
 # Group 13 StoryMap
 
-The draft title is **Ageing and NEC Access**. `story.json` controls the narrative, chapter order, layouts and asset references. `storymap.py` is the single editing entry point. All public text and derived assets are English.
+The current title is **Here Are the Service Gaps Close to Home!**. `story.json` controls the narrative, chapter order, layouts and asset references. `storymap.py` is the single editing entry point. All public text and derived assets are English.
 
 ## Current analysis
 
@@ -68,3 +68,5 @@ Apply requires a complete, stable snapshot and checks its draft fingerprint befo
 - Older preparation scripts and unversioned derived assets are retained for the earlier published model. Do not run them to prepare the current model; use `storymap.py --prepare`.
 
 Publication uploads `published_data.json` as a file. The REST text-upload parameter can sanitize HTML inside JSON and remove reference hyperlinks. The publication adapter verifies both the published item data and the published resource against the intended graph.
+
+The November 8 editorial update follows the final handoff wording in `assets/editorial/20261108.json`, applied by `scripts/editorial_20261108.py` after the base composer. It changes narrative, captions, tables, the date note and Credits only. Analytical thresholds, geography, component styles and embed interfaces remain unchanged. Public prose rounds the main cutoffs to approximately 20% and 31%; calculations retain the exact P60 values.

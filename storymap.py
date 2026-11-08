@@ -207,16 +207,17 @@ def configure_credits(story, cfg):
     if cfg.get('cover_media'):
         attribution=json.loads(local_asset('assets/cover/attribution.json').read_text(encoding='utf-8'))
         description+=' Cover photograph: '+attribution['title']+'. Photograph by '+attribution['photographer']+'. <a href="'+html.escape(attribution['source'],quote=True)+'">Image source</a>; <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Responsive cover framing may crop the original photograph. The image illustrates an elderly-care environment, not an NEC study location.'
-    story.credits(heading='Credit', description=description)
+    description = cfg.get('credit_html', description)
+    story.credits(heading=cfg.get('credit_heading', 'Credit'), description=description)
     # Acknowledgement is a footer, not a chapter/navigation target.
     for child in credits.get('children', []):
         node=story._properties['nodes'][child]
         if node.get('data', {}).get('type')=='h4':
-            node['data'].update(type='paragraph',text='<strong>Credit</strong>')
+            node['data'].update(type='paragraph',text='<strong>'+html.escape(cfg.get('credit_heading', 'Credit'))+'</strong>')
 
 
 def chapter_title(cfg, index, section):
-    return (f'{index+1}. ' if cfg.get('numbered_chapters') else '') + section['title']
+    return (f"{index+1}{cfg.get('chapter_number_separator', '. ')}" if cfg.get('numbered_chapters') else '') + section['title']
 
 
 def configure_map_views(story, cfg):
@@ -492,6 +493,8 @@ def apply(cfg, baseline=None, cover_only=False):
                 story._properties['nodes'][content._node].setdefault('config', {})['size'] = 'full'
 
     chapter_headings = []
+    if cfg.get('cover_note'):
+        story.add(Text(html.escape(cfg['cover_note']), style=TextStyles.PARAGRAPH))
     for index, section in enumerate(cfg['sections']):
         if index:
             story.add(Separator())
