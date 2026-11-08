@@ -5,11 +5,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def ensure_maps(gis, story_item, keys, version=None):
+def ensure_maps(gis, story_item, keys, version=None, allow_public=False):
     path = ROOT / 'assets/map_items.json'
     ledger = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     groups = story_item.sharing.groups.list()
-    if story_item.access not in {'private', 'shared'}:
+    if story_item.access not in ({'private','shared','public'} if allow_public else {'private','shared'}):
         raise RuntimeError('Expected a private/group-shared story; review audience before importing maps')
     for key in sorted(set(keys)):
         data = json.loads((ROOT / 'assets/webmaps' / (key + '.json')).read_text(encoding='utf-8'))

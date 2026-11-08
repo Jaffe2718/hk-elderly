@@ -313,8 +313,9 @@ def publish_current(cfg, baseline, generated=None):
     item = gis.content.get(cfg['item_id'])
     story = StoryMap(item, gis=gis)
     check_baseline(story, cfg, baseline)
+    public = cfg.get('publish_audience') == 'public'
     groups = {g.id: g.title for g in item.sharing.groups.list()}
-    if item.owner != gis.users.me.username or item.access not in {'private', 'shared'} or not groups:
+    if item.owner != gis.users.me.username or item.access not in ({'private','shared','public'} if public else {'private','shared'}) or not groups:
         raise RuntimeError('Expected owner account and existing group-only sharing')
     if '16d0debba6b24c88afffca891f37958a' not in groups:
         raise RuntimeError('The original GEOG-7302 Group 13 is not in the sharing list')
@@ -354,8 +355,14 @@ def publish_current(cfg, baseline, generated=None):
     props.update(text=json.dumps(story._properties), url=f'https://storymaps.arcgis.com/stories/{item.id}', isViewerCopiable=True)
     if not item.update(item_properties=props):
         raise RuntimeError('Publication update failed')
+    if public:
+        from arcgis.gis import SharingLevel
+        dependencies={story._properties['resources'][n['data']['map']]['data']['itemId'] for n in story._properties['nodes'].values() if n['type']=='webmap'}
+        for dependency in dependencies:
+            gis.content.get(dependency).sharing.sharing_level=SharingLevel.EVERYONE
+        item.sharing.sharing_level=SharingLevel.EVERYONE
     actual = gis.content.get(item.id)
-    if actual.access not in {'private', 'shared'} or {g.id for g in actual.sharing.groups.list()} != set(groups):
+    if actual.access not in ({'public'} if public else {'private','shared'}) or {g.id for g in actual.sharing.groups.list()} != set(groups):
         raise RuntimeError('Publication audience changed unexpectedly')
     if 'Viewer Copyable' not in actual.typeKeywords or 'smstatuspublished' not in actual.typeKeywords:
         raise RuntimeError('Publication or duplication flag is missing')
@@ -367,7 +374,7 @@ def publish_current(cfg, baseline, generated=None):
     )
     if fingerprint(published) != fingerprint(story._properties):
         raise RuntimeError('Published resource differs from the story, including HTML links')
-    print('Published and verified. Group-only audience preserved:', groups, flush=True)
+    print('Published and verified. Audience:', actual.access, 'Groups:', groups, flush=True)
     print(f'https://storymaps.arcgis.com/stories/{item.id}')
 
 
@@ -377,7 +384,7 @@ def apply(cfg, baseline=None, cover_only=False):
     from arcgis.gis import GIS
     from arcgis.apps.storymap import StoryMap, Themes
     from arcgis.apps.storymap.story_content import (
-        Cover, Navigation, Separator, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed, Swipe, Table,
+        Cover, Navigation, Separator, Text, TextStyles, Sidecar, SidecarSlide, Image, Map, Embed, Swipe, Table, Infographic, Timeline, TimelineEvent,
     )
     if arcgis.__version__ != '2.4.3':
         raise RuntimeError('Revalidate template adapter before changing arcgis 2.4.3')
@@ -438,7 +445,7 @@ def apply(cfg, baseline=None, cover_only=False):
     all_media += [b for section in cfg['sections'] for b in section.get('before', [])+section.get('after', [])]
     all_media += [m for b in list(all_media) for m in b.get('maps', [])]
     map_keys = [m['webmap'] for m in all_media if m.get('type') == 'map' and m.get('webmap')]
-    ledger = ensure_maps(gis, item, map_keys, version=cfg.get('model_version'))
+    ledger = ensure_maps(gis, item, map_keys, version=cfg.get('model_version'), allow_public=cfg.get('publish_audience')=='public')
 
     def native_table(rows):
         import pandas as pd
@@ -473,6 +480,11 @@ def apply(cfg, baseline=None, cover_only=False):
         kind = block['type']
         if kind == 'comparison_legend':
             story.add(Image(str(local_asset(block['path']))), alt_text='Left: NEC-only map legend. Right: NEC and DECC map legend.')
+        elif kind == 'infographic':
+            story.add(Infographic(title=block['title'], description=block['description'], icon=block.get('icon','')))
+        elif kind == 'timeline':
+            events=[TimelineEvent(contents=[Text(html.escape(e['title']),style=TextStyles.SUBHEADING),Text(html.escape(e['text']))]) for e in block['events']]
+            story.add(Timeline(events=events,style='timeline'))
         elif kind == 'table':
             story.add(native_table(block['rows']))
         elif kind in {'text', 'quote', 'heading'}:
@@ -514,6 +526,8 @@ def apply(cfg, baseline=None, cover_only=False):
             slides = []
             for slide in section['slides']:
                 texts = [Text(html.escape(slide['title']), style=TextStyles.SUBHEADING)]
+                for metric in slide.get('infographics',[]):
+                    texts.append(Infographic(title=metric['title'],description=metric['description'],icon=metric.get('icon','')))
                 if slide.get('summary'):
                     texts.append(Text(html.escape(slide['summary'])))
                 if slide.get('text'):

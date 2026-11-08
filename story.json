@@ -34,6 +34,12 @@
         {
           "type": "quote",
           "text": "The screening identifies priority areas for community service review."
+        },
+        {
+          "type": "infographic",
+          "title": "13",
+          "description": "Priority areas for community service review. Screened from 210 assessed STPUGs using two P60 conditions and an 800 m NEC radius.",
+          "icon": "pin"
         }
       ],
       "after": [],
@@ -114,7 +120,25 @@
           ]
         }
       ],
-      "after": [],
+      "after": [
+        {
+          "type": "timeline",
+          "events": [
+            {
+              "title": "2021 · Population and housing",
+              "text": "Census A503 and STPUG boundaries describe 211 groups. Residential land is represented by 10 m cells."
+            },
+            {
+              "title": "2 November 2026 · Elderly centres",
+              "text": "SWD premises records supply 215 distinct NEC locations and 62 DECC locations for the network comparison."
+            },
+            {
+              "title": "5 November 2026 · Community venues",
+              "text": "115 community halls and centres provide existing addresses for outreach-site comparison."
+            }
+          ]
+        }
+      ],
       "layout": "floating-panel",
       "panel_position": "end",
       "panel_size": "small"
@@ -225,7 +249,15 @@
             "type": "map",
             "webmap": "M13_case131",
             "view_shift_right": 0.06
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "11.69 ha",
+              "description": "Newly covered residential land with either model A or the community venue. Wan Chai 131.",
+              "icon": "home"
+            }
+          ]
         },
         {
           "title": "Ta Kwu Ling group 620S",
@@ -235,7 +267,15 @@
             "type": "map",
             "webmap": "M14_case620S",
             "view_shift_right": 0.06
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "56.10 ha",
+              "description": "Total additional residential coverage with A + C: 31.01 ha from A, then 25.09 ha from C. Ta Kwu Ling 620S.",
+              "icon": "analysis"
+            }
+          ]
         },
         {
           "title": "Cheung Chau group 920",
@@ -245,7 +285,15 @@
             "type": "map",
             "webmap": "M15_case920",
             "view_shift_right": 0.06
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "92.3%",
+              "description": "Community Hall gain relative to model A: 26.71 ha compared with 28.93 ha. Cheung Chau 920.",
+              "icon": "home"
+            }
+          ]
         }
       ],
       "before": [],
@@ -448,5 +496,6 @@
   "chapter_number_separator": " ",
   "editorial_version": "20261108",
   "credit_heading": "Credits",
-  "credit_html": "Analysis and presentation by GEOG7302 Group 13. We acknowledge the <a href=\"https://www.census2021.gov.hk/en/main_tables.html\">Census and Statistics Department</a> for 2021 population statistics and boundaries, the <a href=\"https://www.pland.gov.hk/\">Planning Department</a> for 2021 land-use data, the <a href=\"https://www.swd.gov.hk/\">Social Welfare Department</a> for elderly-centre premises records, and the <a href=\"https://www.had.gov.hk/\">Home Affairs Department</a> for community-venue records checked on 5 November 2026. Data were accessed through the 2021 Census website, <a href=\"https://data.gov.hk/\">DATA.GOV.HK</a> and the <a href=\"https://portal.csdi.gov.hk/\">CSDI Portal</a>. Cover photograph: <a href=\"https://commons.wikimedia.org/wiki/File:HK_%E5%B1%AF%E9%96%80_Tuen_Mun_%E9%9C%87%E5%AF%B0%E8%B7%AF_Tsun_Wen_Road_Aged_Blind_People_Home_ahead_sign_July_2016_DSC.jpg\">garden entrance to the Jockey Club Tuen Mun Home for the Aged Blind, Hong Kong</a>, by <a href=\"https://commons.wikimedia.org/wiki/User:TSunbenmongos\">TSunbenmongos</a>, licensed under <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a>. The photograph may be cropped for display and illustrates an elderly-care setting rather than an NEC study site."
+  "credit_html": "Analysis and presentation by GEOG7302 Group 13. We acknowledge the <a href=\"https://www.census2021.gov.hk/en/main_tables.html\">Census and Statistics Department</a> for 2021 population statistics and boundaries, the <a href=\"https://www.pland.gov.hk/\">Planning Department</a> for 2021 land-use data, the <a href=\"https://www.swd.gov.hk/\">Social Welfare Department</a> for elderly-centre premises records, and the <a href=\"https://www.had.gov.hk/\">Home Affairs Department</a> for community-venue records checked on 5 November 2026. Data were accessed through the 2021 Census website, <a href=\"https://data.gov.hk/\">DATA.GOV.HK</a> and the <a href=\"https://portal.csdi.gov.hk/\">CSDI Portal</a>. Cover photograph: <a href=\"https://commons.wikimedia.org/wiki/File:HK_%E5%B1%AF%E9%96%80_Tuen_Mun_%E9%9C%87%E5%AF%B0%E8%B7%AF_Tsun_Wen_Road_Aged_Blind_People_Home_ahead_sign_July_2016_DSC.jpg\">garden entrance to the Jockey Club Tuen Mun Home for the Aged Blind, Hong Kong</a>, by <a href=\"https://commons.wikimedia.org/wiki/User:TSunbenmongos\">TSunbenmongos</a>, licensed under <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a>. The photograph may be cropped for display and illustrates an elderly-care setting rather than an NEC study site.",
+  "publish_audience": "public"
 }

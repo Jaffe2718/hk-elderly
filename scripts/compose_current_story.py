@@ -76,6 +76,8 @@ def compose():
     block['path']=block['path'].replace('embeds/','embeds/20261106/',1)
  from scripts.editorial_20261108 import apply_copy
  cfg=apply_copy(cfg)
+ from scripts.visual_20261108 import apply_visuals
+ cfg=apply_visuals(cfg)
  (ROOT/'story.json').write_text(json.dumps(cfg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  print('Composed six chapters with a short cover title and the approved 13-area model.')
 if __name__=='__main__':compose()

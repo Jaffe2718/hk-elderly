@@ -30,7 +30,7 @@ Population and residential land describe 2021. SWD premises were retrieved on No
    & 'D:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe' -X utf8 storymap.py --apply --based-on snapshots/REVIEWED_SNAPSHOT
    ```
 
-Apply saves an **unpublished draft**. On November 6, 2026, the project owner granted standing authorisation to publish subsequent approved project updates. After validation, commit, push, rebuild the draft and publish unless the user gives a later instruction to stop at local changes or draft preview. This authorisation preserves the existing group-only audience; it does not authorise public sharing. Preserve the existing group-only audience, `GEOG-7302 Group 13`, and duplication setting. ArcGIS API for Python is pinned to 2.4.3; revalidate the template adapter before upgrading it.
+Apply saves an **unpublished draft**. On November 6, 2026, the project owner granted standing authorisation to publish subsequent approved project updates. After validation, commit, push, rebuild the draft and publish unless the user gives a later instruction to stop at local changes or draft preview. On November 8, 2026, the owner additionally authorised public publication: everyone may view and duplicate the story. Retain the `GEOG-7302 Group 13` sharing group and make current map dependencies public along with the story. ArcGIS API for Python is pinned to 2.4.3; revalidate the template adapter before upgrading it.
 
 ## Publication isolation
 
@@ -70,3 +70,5 @@ Apply requires a complete, stable snapshot and checks its draft fingerprint befo
 Publication uploads `published_data.json` as a file. The REST text-upload parameter can sanitize HTML inside JSON and remove reference hyperlinks. The publication adapter verifies both the published item data and the published resource against the intended graph.
 
 The November 8 editorial update follows the final handoff wording in `assets/editorial/20261108.json`, applied by `scripts/editorial_20261108.py` after the base composer. It changes narrative, captions, tables, the date note and Credits only. Analytical thresholds, geography, component styles and embed interfaces remain unchanged. Public prose rounds the main cutoffs to approximately 20% and 31%; calculations retain the exact P60 values.
+
+Native visual enrichment is applied by `scripts/visual_20261108.py`: an introductory large-number infographic before the first Sidecar; one metric per local case in its narrative panel; and a three-event data-provenance timeline. These inherit the Summit theme and do not replace the handoff text, analytical layers or interactive embeds. `publish_audience` controls public publication; map dependencies follow that audience.
