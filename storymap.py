@@ -351,7 +351,7 @@ def publish_current(cfg, baseline, generated=None):
             result = item.resources.add(file=str(published_file), file_name='published_data.json', access='inherit')
         if not result or (isinstance(result, dict) and not result.get('success')):
             raise RuntimeError('Published resource file upload failed')
-    props.update(text=json.dumps(story._properties), url=f'https://storymaps.arcgis.com/stories/{item.id}')
+    props.update(text=json.dumps(story._properties), url=f'https://storymaps.arcgis.com/stories/{item.id}', isViewerCopiable=True)
     if not item.update(item_properties=props):
         raise RuntimeError('Publication update failed')
     actual = gis.content.get(item.id)
