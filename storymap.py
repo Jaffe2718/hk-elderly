@@ -484,7 +484,7 @@ def apply(cfg, baseline=None, cover_only=False):
             story.add(Infographic(title=block['title'], description=block['description'], icon=block.get('icon','')))
         elif kind == 'timeline':
             events=[TimelineEvent(contents=[Text(html.escape(e['title']),style=TextStyles.SUBHEADING),Text(html.escape(e['text']))]) for e in block['events']]
-            story.add(Timeline(events=events,style='timeline'))
+            story.add(Timeline(events=events,style=block.get('style','single-side')))
         elif kind == 'table':
             story.add(native_table(block['rows']))
         elif kind in {'text', 'quote', 'heading'}:
@@ -526,12 +526,12 @@ def apply(cfg, baseline=None, cover_only=False):
             slides = []
             for slide in section['slides']:
                 texts = [Text(html.escape(slide['title']), style=TextStyles.SUBHEADING)]
-                for metric in slide.get('infographics',[]):
-                    texts.append(Infographic(title=metric['title'],description=metric['description'],icon=metric.get('icon','')))
                 if slide.get('summary'):
                     texts.append(Text(html.escape(slide['summary'])))
                 if slide.get('text'):
                     texts.append(Text(html.escape(slide['text']).replace('\n', '<br>')))
+                for metric in slide.get('infographics',[]):
+                    texts.append(Infographic(title=metric['title'],description=metric['description'],icon=metric.get('icon','')))
                 content = make_media(slide.get('media'))
                 slides.append(TemplateSlide(content=texts, media=content))
             sidecar.slides = slides

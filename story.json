@@ -27,7 +27,15 @@
           "media": {
             "type": "map",
             "webmap": "M01_population"
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "65+",
+              "description": "The map shows older-resident counts; the joint screen uses their share of total population.",
+              "icon": "group"
+            }
+          ]
         }
       ],
       "before": [
@@ -65,7 +73,15 @@
               "nec_sites",
               "decc_sites"
             ]
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "215 + 62",
+              "description": "215 distinct NEC locations in the baseline; 62 DECC locations in the alternative network.",
+              "icon": "pin"
+            }
+          ]
         },
         {
           "title": "Population and residential denominators",
@@ -80,7 +96,15 @@
               "age_share",
               "nec_sites"
             ]
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "210 / 211",
+              "description": "STPUGs with assessable residential coverage. Group 295 has no assigned residential cells.",
+              "icon": "analysis"
+            }
+          ]
         }
       ],
       "before": [
@@ -123,6 +147,7 @@
       "after": [
         {
           "type": "timeline",
+          "style": "single-side",
           "events": [
             {
               "title": "2021 · Population and housing",
@@ -210,7 +235,15 @@
             "type": "map",
             "webmap": "M02_coverage",
             "view_shift_right": 0.06
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "80 + 42",
+              "description": "80 groups have a 0% outside-area share; 42 have a 100% share. Another 88 fall between these endpoints.",
+              "icon": "analysis"
+            }
+          ]
         },
         {
           "title": "Thirteen areas meet both criteria",
@@ -220,7 +253,15 @@
             "type": "map",
             "webmap": "M03_binary800",
             "view_shift_right": 0.06
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "13",
+              "description": "Groups meeting both P60 conditions: older-resident share and residential land beyond NEC 800 m.",
+              "icon": "pin"
+            }
+          ]
         },
         {
           "title": "Explore assumptions",
@@ -229,7 +270,15 @@
           "media": {
             "type": "embed",
             "path": "embeds/20261106/elderly-map/index.html"
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "800 m",
+              "description": "Baseline NEC coverage radius. Compare distance, age cohort and facility-network assumptions in the explorer.",
+              "icon": "walking"
+            }
+          ]
         },
         {
           "title": "Sensitivity remains visible",
@@ -239,7 +288,15 @@
             "type": "map",
             "webmap": "M06_sensitivity27",
             "view_shift_right": 0.06
-          }
+          },
+          "infographics": [
+            {
+              "type": "infographic",
+              "title": "27",
+              "description": "Scenario combinations: 3 radii × 3 age-share percentiles × 3 outside-area percentiles.",
+              "icon": "analysis"
+            }
+          ]
         },
         {
           "title": "Wan Chai group 131",
