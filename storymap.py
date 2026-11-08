@@ -475,16 +475,25 @@ def apply(cfg, baseline=None, cover_only=False):
         return Embed(embed_url(cfg, media['path']))
 
     figure_number=0
+    def infographic_figure(block, default_title):
+        nonlocal figure_number
+        figure_number += 1
+        label = block.get('figure_title', default_title).rstrip('.')
+        description = f'Fig. {figure_number}. {label}. ' + block['description']
+        return Infographic(title=block['title'], description=description, icon=block.get('icon',''))
+
     def add_block(block):
         nonlocal figure_number
         kind = block['type']
         if kind == 'comparison_legend':
             story.add(Image(str(local_asset(block['path']))), alt_text='Left: NEC-only map legend. Right: NEC and DECC map legend.')
         elif kind == 'infographic':
-            story.add(Infographic(title=block['title'], description=block['description'], icon=block.get('icon','')))
+            story.add(infographic_figure(block, 'Joint P60 screening'))
         elif kind == 'timeline':
             events=[TimelineEvent(contents=[Text(html.escape(e['title']),style=TextStyles.SUBHEADING),Text(html.escape(e['text']))]) for e in block['events']]
             story.add(Timeline(events=events,style=block.get('style','single-side')))
+            figure_number += 1
+            story.add(Text(f'<em>Fig. {figure_number}. Evidence reference dates.</em>',style=TextStyles.PARAGRAPH))
         elif kind == 'table':
             story.add(native_table(block['rows']))
         elif kind in {'text', 'quote', 'heading'}:
@@ -531,7 +540,7 @@ def apply(cfg, baseline=None, cover_only=False):
                 if slide.get('text'):
                     texts.append(Text(html.escape(slide['text']).replace('\n', '<br>')))
                 for metric in slide.get('infographics',[]):
-                    texts.append(Infographic(title=metric['title'],description=metric['description'],icon=metric.get('icon','')))
+                    texts.append(infographic_figure(metric, slide['title']))
                 content = make_media(slide.get('media'))
                 slides.append(TemplateSlide(content=texts, media=content))
             sidecar.slides = slides
