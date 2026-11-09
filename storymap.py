@@ -324,17 +324,32 @@ def normalize_figure_captions(story):
     for parent in list(nodes.values()):
         children=parent.get('children')
         if not children:continue
+        existing_captions={nodes[k].get('data',{}).get('text','') for k in children
+                           if nodes[k].get('type')=='text'}
+        seen_captions=set()
         result=[]
         for child in children:
-            result.append(child)
             node=nodes[child]
+            text=node.get('data',{}).get('text','')
+            if node.get('type')=='text' and text.startswith('<strong>Fig.'):
+                if text in seen_captions:continue
+                seen_captions.add(text)
+            result.append(child)
             if node.get('type') not in {'grid','embed'}:continue
-            caption=node.get('data',{}).get('caption','')
+            data=node.get('data',{})
+            caption=data.get('caption') or data.get('description','')
             if not caption.startswith('<strong>Fig.'):continue
-            node['data'].pop('caption',None)
+            # Empty both SDK caption aliases: configure_embeds must not restore
+            # the old description as another visible caption on the next save.
+            data['caption']=''
+            if data.get('description','').startswith('<strong>Fig.'):
+                data['description']=''
+            if caption in existing_captions:continue
             key='n-'+uuid.uuid4().hex[:10]
             nodes[key]={'type':'text','data':{'type':'paragraph','text':caption,'textSize':'small'}}
             result.append(key)
+            existing_captions.add(caption)
+            seen_captions.add(caption)
         parent['children']=result
     for node in nodes.values():
         if node.get('type')=='text' and node.get('data',{}).get('text','').startswith('<strong>Fig.'):
