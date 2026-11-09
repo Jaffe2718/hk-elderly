@@ -326,9 +326,12 @@ def normalize_figure_captions(story):
             if not caption.startswith('<strong>Fig.'):continue
             node['data'].pop('caption',None)
             key='n-'+uuid.uuid4().hex[:10]
-            nodes[key]={'type':'text','data':{'type':'paragraph','text':caption,'textSize':'medium'}}
+            nodes[key]={'type':'text','data':{'type':'paragraph','text':caption,'textSize':'small'}}
             result.append(key)
         parent['children']=result
+    for node in nodes.values():
+        if node.get('type')=='text' and node.get('data',{}).get('text','').startswith('<strong>Fig.'):
+            node['data']['textSize']='small'
 
 
 def publish_current(cfg, baseline, generated=None):
@@ -515,8 +518,8 @@ def apply(cfg, baseline=None, cover_only=False):
             settings = {
                 'basic': dict(alignment='center', descriptionPosition='bottom'),
                 'stacked': dict(alignment='center', iconPosition='top', descriptionPosition='bottom'),
-                'compact': dict(alignment='start', iconPosition='start', descriptionPosition='bottom'),
-                'titled': dict(alignment='start', iconPosition='start', descriptionPosition='top'),
+                'compact': dict(alignment='start', iconPosition='top', descriptionPosition='bottom'),
+                'titled': dict(alignment='start', iconPosition='top', descriptionPosition='top'),
             }[layout]
             children=[]
             for value in values:
@@ -538,6 +541,9 @@ def apply(cfg, baseline=None, cover_only=False):
     def infographic_figure(block, default_title):
         return InfographicGroup(block, figure_caption(block.get('figure_title',default_title)))
 
+    def cited_text(value, sources=()):
+        return html.escape(value) + (''.join(f' [{n}]' for n in sources) if sources else '')
+
     def add_block(block):
         nonlocal figure_number
         kind = block['type']
@@ -546,14 +552,14 @@ def apply(cfg, baseline=None, cover_only=False):
         elif kind == 'infographic':
             story.add(infographic_figure(block, 'Joint P60 screening'))
         elif kind == 'timeline':
-            events=[TimelineEvent(contents=[Text(html.escape(e['title']),style=TextStyles.SUBHEADING),Text(html.escape(e['text']))]) for e in block['events']]
+            events=[TimelineEvent(contents=[Text(html.escape(e['title']),style=TextStyles.SUBHEADING),Text(cited_text(e['text'],e.get('citations',())))]) for e in block['events']]
             story.add(Timeline(events=events,style=block.get('style','single-side')))
             story.add(Text(figure_caption('Evidence reference dates'),style=TextStyles.PARAGRAPH))
         elif kind == 'table':
             story.add(native_table(block['rows']))
         elif kind in {'text', 'quote', 'heading'}:
             style = {'text': TextStyles.PARAGRAPH, 'quote': TextStyles.QUOTE, 'heading': TextStyles.SUBHEADING}[kind]
-            story.add(Text(html.escape(block['text']), style=style))
+            story.add(Text(cited_text(block['text'],block.get('citations',())), style=style))
         elif kind == 'references':
             for reference_number,source in enumerate(cfg.get('references', []),1):
                 url = html.escape(source['url'], quote=True)
@@ -563,7 +569,7 @@ def apply(cfg, baseline=None, cover_only=False):
             caption=figure_caption(block.get('figure_title','Figure'))
             story.add(content, caption=caption, alt_text=block.get('alt',block.get('caption','')))
             if block.get('caption'):
-                story.add(Text(html.escape(block['caption'])))
+                story.add(Text(cited_text(block['caption'],block.get('citations',()))))
             if isinstance(content, Embed):
                 content.display = 'inline'
                 story._properties['nodes'][content._node].setdefault('config', {})['size'] = 'full'
@@ -581,7 +587,7 @@ def apply(cfg, baseline=None, cover_only=False):
         story.add(heading)
         chapter_headings.append(heading)
         if section.get('intro'):
-            story.add(Text(html.escape(section['intro'])))
+            story.add(Text(cited_text(section['intro'],section.get('intro_citations',()))))
         for block in section.get('before', []):
             add_block(block)
         if section['slides']:
@@ -591,9 +597,9 @@ def apply(cfg, baseline=None, cover_only=False):
             for slide in section['slides']:
                 texts = [Text(html.escape(slide['title']), style=TextStyles.SUBHEADING)]
                 if slide.get('summary'):
-                    texts.append(Text(html.escape(slide['summary'])))
+                    texts.append(Text(cited_text(slide['summary'],slide.get('summary_citations',()))))
                 if slide.get('text'):
-                    texts.append(Text(html.escape(slide['text']).replace('\n', '<br>')))
+                    texts.append(Text(cited_text(slide['text'],slide.get('text_citations',())).replace('\n', '<br>')))
                 for metric in slide.get('infographics',[]):
                     texts.append(infographic_figure(metric, slide['title']))
                 content = make_media(slide.get('media'))

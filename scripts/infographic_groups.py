@@ -7,4 +7,14 @@ def apply_infographic_groups(cfg):
  slides=[s for sec in cfg['sections'] for s in sec['slides']]
  assert len(slides)==len(groups)==10
  for slide,g in zip(slides,groups):slide['infographics']=[g]
+ # Keep unit-bearing values compact; put the unit in its own descriptive label.
+ for section in cfg['sections']:
+  blocks=section.get('before',[])+section.get('after',[])
+  for slide in section.get('slides',[]):blocks+=slide.get('infographics',[])
+  for block in blocks:
+   if block.get('type')!='infographic':continue
+   for value in block.get('values',[]):
+    if value['title'].endswith(' m'):
+     value['title']=value['title'][:-2]
+     value['description']='m · '+value['description']
  return cfg

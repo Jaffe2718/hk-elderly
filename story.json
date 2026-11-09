@@ -46,6 +46,10 @@
                 }
               ]
             }
+          ],
+          "text_citations": [
+            2,
+            3
           ]
         }
       ],
@@ -70,8 +74,8 @@
               "icon": "pin"
             },
             {
-              "title": "800 m",
-              "description": "Baseline radius",
+              "title": "800",
+              "description": "m · Baseline radius",
               "icon": "walking"
             },
             {
@@ -124,6 +128,10 @@
                 }
               ]
             }
+          ],
+          "text_citations": [
+            6,
+            7
           ]
         },
         {
@@ -163,6 +171,11 @@
                 }
               ]
             }
+          ],
+          "text_citations": [
+            2,
+            3,
+            5
           ]
         }
       ],
@@ -210,22 +223,42 @@
           "events": [
             {
               "title": "2021 · Population and housing",
-              "text": "Census A503 and STPUG boundaries describe 211 groups. Residential land is represented by 10 m cells."
+              "text": "Census A503 and STPUG boundaries describe 211 groups. Residential land is represented by 10 m cells.",
+              "citations": [
+                2,
+                3,
+                5
+              ]
             },
             {
               "title": "2 November 2026 · Elderly centres",
-              "text": "SWD premises records supply 215 distinct NEC locations and 62 DECC locations for the network comparison."
+              "text": "SWD premises records supply 215 distinct NEC locations and 62 DECC locations for the network comparison.",
+              "citations": [
+                6,
+                7
+              ]
             },
             {
               "title": "5 November 2026 · Community venues",
-              "text": "115 community halls and centres provide existing addresses for outreach-site comparison."
+              "text": "115 community halls and centres provide existing addresses for outreach-site comparison.",
+              "citations": [
+                8
+              ]
             }
           ]
         }
       ],
       "layout": "floating-panel",
       "panel_position": "end",
-      "panel_size": "small"
+      "panel_size": "small",
+      "intro_citations": [
+        2,
+        3,
+        5,
+        6,
+        7,
+        8
+      ]
     },
     {
       "id": "methodology",
@@ -253,7 +286,12 @@
         },
         {
           "type": "text",
-          "text": "Distances are calculated in Hong Kong 1980 Grid (EPSG:2326). Each 10 m residential-cell centre is assigned to an STPUG, and its straight-line distance to the nearest NEC anywhere in Hong Kong is calculated, including centres outside that group. This study sets 800 m as its baseline coverage standard. Cells at or within 800 m count as covered. The outside-area share equals the number of residential cells beyond 800 m divided by all assigned residential cells in that group. Each cell represents 100 m² of residential ground area."
+          "text": "Distances are calculated in Hong Kong 1980 Grid (EPSG:2326). Each 10 m residential-cell centre is assigned to an STPUG, and its straight-line distance to the nearest NEC anywhere in Hong Kong is calculated, including centres outside that group. This study sets 800 m as its baseline coverage standard. Cells at or within 800 m count as covered. The outside-area share equals the number of residential cells beyond 800 m divided by all assigned residential cells in that group. Each cell represents 100 m² of residential ground area.",
+          "citations": [
+            2,
+            5,
+            7
+          ]
         },
         {
           "type": "heading",
@@ -269,11 +307,18 @@
         },
         {
           "type": "text",
-          "text": "Within each shortlisted group, one residential cell nearest the centre of each occupied 200 m grid square is used as a candidate location. A provides the greatest additional residential-area coverage among these candidates. B provides the greatest stand-alone gain among candidates at least 400 m from A. C maximises the remaining gain after A has been added. Model locations are compared with registered community venues and DECC premises."
+          "text": "Within each shortlisted group, one residential cell nearest the centre of each occupied 200 m grid square is used as a candidate location. A provides the greatest additional residential-area coverage among these candidates. B provides the greatest stand-alone gain among candidates at least 400 m from A. C maximises the remaining gain after A has been added. Model locations are compared with registered community venues and DECC premises.",
+          "citations": [
+            6,
+            8
+          ]
         },
         {
           "type": "text",
-          "text": "Geographical proximity is one dimension of accessibility (Geurs & van Wee, 2004). This study uses residential coverage to compare access to elderly centres and identify priority areas for service review."
+          "text": "Geographical proximity is one dimension of accessibility (Geurs & van Wee, 2004). This study uses residential coverage to compare access to elderly centres and identify priority areas for service review.",
+          "citations": [
+            4
+          ]
         }
       ],
       "after": [],
@@ -369,18 +414,18 @@
               "layout": "compact",
               "values": [
                 {
-                  "title": "500 m",
-                  "description": "Shorter-radius comparison",
+                  "title": "500",
+                  "description": "m · Shorter-radius comparison",
                   "icon": "walking"
                 },
                 {
-                  "title": "800 m",
-                  "description": "Baseline coverage radius",
+                  "title": "800",
+                  "description": "m · Baseline coverage radius",
                   "icon": "pin"
                 },
                 {
-                  "title": "1,000 m",
-                  "description": "Longer-radius comparison",
+                  "title": "1,000",
+                  "description": "m · Longer-radius comparison",
                   "icon": "walking"
                 }
               ]
@@ -463,6 +508,14 @@
                 }
               ]
             }
+          ],
+          "text_citations": [
+            2,
+            3,
+            5,
+            6,
+            7,
+            8
           ]
         },
         {
@@ -502,6 +555,14 @@
                 }
               ]
             }
+          ],
+          "text_citations": [
+            2,
+            3,
+            5,
+            6,
+            7,
+            8
           ]
         },
         {
@@ -541,6 +602,14 @@
                 }
               ]
             }
+          ],
+          "text_citations": [
+            2,
+            3,
+            5,
+            6,
+            7,
+            8
           ]
         }
       ],
@@ -597,7 +666,13 @@
           "type": "embed",
           "path": "embeds/20261106/charts/index.html?group=coverage&ui=20261106-p60#housing",
           "figure_title": "Residential ground-area coverage by housing type and district.",
-          "caption": "In the housing view, NEC-only coverage is 91.5% for public residential land, 53.4% for private residential land and 17.9% for rural settlements. Including DECC locations increases these figures to 97.1%, 58.9% and 20.7%, respectively. Coverage is expressed as a share of residential ground area."
+          "caption": "In the housing view, NEC-only coverage is 91.5% for public residential land, 53.4% for private residential land and 17.9% for rural settlements. Including DECC locations increases these figures to 97.1%, 58.9% and 20.7%, respectively. Coverage is expressed as a share of residential ground area.",
+          "citations": [
+            1,
+            5,
+            6,
+            7
+          ]
         },
         {
           "type": "heading",
@@ -642,7 +717,13 @@
         },
         {
           "type": "text",
-          "text": "The analysis combines 2021 population and land-use data with facility records from 2026. It measures accessibility through residential ground area and straight-line distance. Future work can incorporate building-level population, walking routes and service capacity to refine local planning."
+          "text": "The analysis combines 2021 population and land-use data with facility records from 2026. It measures accessibility through residential ground area and straight-line distance. Future work can incorporate building-level population, walking routes and service capacity to refine local planning.",
+          "citations": [
+            3,
+            5,
+            6,
+            7
+          ]
         }
       ],
       "after": [],
@@ -734,7 +815,7 @@
       "url": "https://portal.csdi.gov.hk/csdi-webpage/dataset/had_rcd_1634531497753_36049"
     }
   ],
-  "asset_revision": "20261106-green",
+  "asset_revision": "20261109-details",
   "cover_media": {
     "type": "image",
     "path": "assets/cover/tuen-mun-aged-blind-garden.jpg"

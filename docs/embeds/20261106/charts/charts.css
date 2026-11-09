@@ -10,3 +10,14 @@ button[aria-pressed=true]{background:#e4deef;color:#504561;border-color:#b9afd0}
 .matrix-panel.age .matrix{max-height:none}.matrices.paired{overflow:auto}.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.scenario-panel{min-width:0}.scenario-panel h2{font-size:15px}.scenario-panel p{font-size:11px;margin-bottom:12px}.scenario-matrix{display:grid;grid-template-columns:34px repeat(3,minmax(0,1fr));gap:6px;align-items:center}.scenario-matrix button{border:0;border-radius:4px;color:#493d60;min-height:34px}.scenario-matrix span{text-align:center;font-size:11px}@media(max-width:650px){.matrices.paired{grid-template-rows:1fr 1fr}.scenario-grid{grid-template-columns:1fr;gap:10px;overflow:auto}.scenario-panel h2{margin:4px 0}.scenario-panel p{margin-bottom:5px}.scenario-matrix button{min-height:24px}}
 
 .matrix{max-height:none}
+
+/* All marks share one visible hover, keyboard and pinned-selection treatment. */
+[data-inspect]{cursor:pointer}
+.scenario-matrix button:hover,.scenario-matrix button:focus-visible,.scenario-matrix button.picked,
+.cell:hover,.cell:focus-visible,.cell.picked{outline:2px solid #00bfae;outline-offset:1px;box-shadow:0 0 0 3px #00d7bc24,0 0 12px #00cdb766;filter:none}
+#chart-popup{position:fixed;z-index:1000;width:min(330px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:18px 20px;border:1px solid #c9bedc;border-radius:12px;background:#fff;box-shadow:0 8px 32px #39305226,0 0 0 1px #ffffffaa;color:#314752}
+#chart-popup h2{font-size:16px;line-height:1.4;margin:0 25px 13px 0;color:#453b59}
+#chart-popup .popup-close{position:absolute;right:8px;top:7px;border:0;background:transparent;font-size:22px;padding:2px 7px;line-height:1.2}
+#chart-popup dl{margin:0;display:grid;gap:3px}
+#chart-popup dt{font-size:11px;font-weight:bold;color:#6c607d;margin-top:8px}
+#chart-popup dd{margin:0;font-size:13px;line-height:1.5;overflow-wrap:anywhere}

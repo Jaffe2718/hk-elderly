@@ -78,6 +78,9 @@ def compose():
  cfg=apply_copy(cfg)
  from scripts.visual_20261108 import apply_visuals
  cfg=apply_visuals(cfg)
+ from scripts.citations_20261109 import apply_citations
+ cfg=apply_citations(cfg)
+ cfg['asset_revision']='20261109-details'
  (ROOT/'story.json').write_text(json.dumps(cfg,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  print('Composed six chapters with a short cover title and the approved 13-area model.')
 if __name__=='__main__':compose()
