@@ -314,6 +314,13 @@ def normalize_figure_captions(story):
     for node in nodes.values():
         if node.get('type')=='large-number' and node.get('data',{}).get('icon') in icons:
             node['data']['icon']=icons[node['data']['icon']]
+        if node.get('type')=='large-number':
+            data=node['data']
+            # Native numbers use a fixed relative font size. Keep long values
+            # within that canvas without losing precision or overriding its CSS.
+            if data.get('title','').endswith('%') and len(data['title'])>5:
+                data['title']=data['title'][:-1]
+                data['description']='% · '+data.get('description','')
     for parent in list(nodes.values()):
         children=parent.get('children')
         if not children:continue
