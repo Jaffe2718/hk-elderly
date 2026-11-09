@@ -17,5 +17,7 @@ def apply_visuals(cfg):
  # Keep the actual research wording; use one focal metric per case, with explicit baselines.
  metrics=[('11.69 ha','Newly covered residential land with either model A or the community venue. Wan Chai 131.','home'),('56.10 ha','Total additional residential coverage with A + C: 31.01 ha from A, then 25.09 ha from C. Ta Kwu Ling 620S.','analysis'),('92.3%','Community Hall gain relative to model A: 26.71 ha compared with 28.93 ha. Cheung Chau 920.','home')]
  for slide,(title,description,icon) in zip(spatial['slides'][4:7],metrics):slide['infographics']=[info(title,description,icon)]
+ from scripts.infographic_groups import apply_infographic_groups
+ cfg=apply_infographic_groups(cfg)
  cfg['publish_audience']='public'
  return cfg

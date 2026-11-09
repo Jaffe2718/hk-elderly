@@ -31,9 +31,20 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "65+",
-              "description": "The map shows older-resident counts; the joint screen uses their share of total population.",
-              "icon": "group"
+              "figure_title": "Population indicators",
+              "layout": "titled",
+              "values": [
+                {
+                  "title": "65+",
+                  "description": "Age group used in the main screen",
+                  "icon": "group"
+                },
+                {
+                  "title": "211",
+                  "description": "STPUGs in the census geography",
+                  "icon": "map"
+                }
+              ]
             }
           ]
         }
@@ -45,9 +56,30 @@
         },
         {
           "type": "infographic",
-          "title": "13",
-          "description": "Priority areas for community service review. Screened from 210 assessed STPUGs using two P60 conditions and an 800 m NEC radius.",
-          "icon": "pin"
+          "figure_title": "Study overview",
+          "layout": "stacked",
+          "values": [
+            {
+              "title": "210",
+              "description": "Assessed STPUGs",
+              "icon": "map"
+            },
+            {
+              "title": "215",
+              "description": "Distinct NEC locations",
+              "icon": "pin"
+            },
+            {
+              "title": "800 m",
+              "description": "Baseline radius",
+              "icon": "walking"
+            },
+            {
+              "title": "13",
+              "description": "Priority groups",
+              "icon": "check"
+            }
+          ]
         }
       ],
       "after": [],
@@ -77,9 +109,20 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "215 + 62",
-              "description": "215 distinct NEC locations in the baseline; 62 DECC locations in the alternative network.",
-              "icon": "pin"
+              "figure_title": "Elderly-centre network",
+              "layout": "compact",
+              "values": [
+                {
+                  "title": "215",
+                  "description": "Distinct NEC locations",
+                  "icon": "pin"
+                },
+                {
+                  "title": "62",
+                  "description": "DECC locations in the alternative network",
+                  "icon": "home"
+                }
+              ]
             }
           ]
         },
@@ -100,9 +143,25 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "210 / 211",
-              "description": "STPUGs with assessable residential coverage. Group 295 has no assigned residential cells.",
-              "icon": "analysis"
+              "figure_title": "Assessment coverage",
+              "layout": "basic",
+              "values": [
+                {
+                  "title": "211",
+                  "description": "Census groups",
+                  "icon": ""
+                },
+                {
+                  "title": "210",
+                  "description": "Assessed groups",
+                  "icon": ""
+                },
+                {
+                  "title": "1",
+                  "description": "Group without residential cells",
+                  "icon": ""
+                }
+              ]
             }
           ]
         }
@@ -239,9 +298,25 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "80 + 42",
-              "description": "80 groups have a 0% outside-area share; 42 have a 100% share. Another 88 fall between these endpoints.",
-              "icon": "analysis"
+              "figure_title": "Residential gap distribution",
+              "layout": "basic",
+              "values": [
+                {
+                  "title": "80",
+                  "description": "Groups with 0% beyond NEC 800 m",
+                  "icon": ""
+                },
+                {
+                  "title": "88",
+                  "description": "Groups between 0% and 100%",
+                  "icon": ""
+                },
+                {
+                  "title": "42",
+                  "description": "Groups with 100% beyond NEC 800 m",
+                  "icon": ""
+                }
+              ]
             }
           ]
         },
@@ -257,9 +332,25 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "13",
-              "description": "Groups meeting both P60 conditions: older-resident share and residential land beyond NEC 800 m.",
-              "icon": "pin"
+              "figure_title": "Joint P60 screen",
+              "layout": "titled",
+              "values": [
+                {
+                  "title": "~20%",
+                  "description": "65+ share cutoff (P60)",
+                  "icon": "group"
+                },
+                {
+                  "title": "~31%",
+                  "description": "Outside-area cutoff (P60)",
+                  "icon": "home"
+                },
+                {
+                  "title": "13",
+                  "description": "Groups meeting both conditions",
+                  "icon": "check"
+                }
+              ]
             }
           ]
         },
@@ -274,9 +365,25 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "800 m",
-              "description": "Baseline NEC coverage radius. Compare distance, age cohort and facility-network assumptions in the explorer.",
-              "icon": "walking"
+              "figure_title": "Distance scenarios",
+              "layout": "compact",
+              "values": [
+                {
+                  "title": "500 m",
+                  "description": "Shorter-radius comparison",
+                  "icon": "walking"
+                },
+                {
+                  "title": "800 m",
+                  "description": "Baseline coverage radius",
+                  "icon": "pin"
+                },
+                {
+                  "title": "1,000 m",
+                  "description": "Longer-radius comparison",
+                  "icon": "walking"
+                }
+              ]
             }
           ]
         },
@@ -292,9 +399,30 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "27",
-              "description": "Scenario combinations: 3 radii × 3 age-share percentiles × 3 outside-area percentiles.",
-              "icon": "analysis"
+              "figure_title": "Sensitivity combinations",
+              "layout": "stacked",
+              "values": [
+                {
+                  "title": "3",
+                  "description": "Distance radii",
+                  "icon": "walking"
+                },
+                {
+                  "title": "3",
+                  "description": "Age-share percentiles",
+                  "icon": "group"
+                },
+                {
+                  "title": "3",
+                  "description": "Outside-area percentiles",
+                  "icon": "home"
+                },
+                {
+                  "title": "27",
+                  "description": "Scenario combinations",
+                  "icon": "analysis"
+                }
+              ]
             }
           ]
         },
@@ -310,9 +438,30 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "11.69 ha",
-              "description": "Newly covered residential land with either model A or the community venue. Wan Chai 131.",
-              "icon": "home"
+              "figure_title": "Wan Chai indicators",
+              "layout": "compact",
+              "values": [
+                {
+                  "title": "5,290",
+                  "description": "Residents aged 65+",
+                  "icon": "group"
+                },
+                {
+                  "title": "20.20%",
+                  "description": "Older-resident share",
+                  "icon": "analysis"
+                },
+                {
+                  "title": "12.00",
+                  "description": "ha · residential land",
+                  "icon": "home"
+                },
+                {
+                  "title": "11.69",
+                  "description": "ha · newly covered with A or venue",
+                  "icon": "pin"
+                }
+              ]
             }
           ]
         },
@@ -328,9 +477,30 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "56.10 ha",
-              "description": "Total additional residential coverage with A + C: 31.01 ha from A, then 25.09 ha from C. Ta Kwu Ling 620S.",
-              "icon": "analysis"
+              "figure_title": "Ta Kwu Ling marginal gains",
+              "layout": "titled",
+              "values": [
+                {
+                  "title": "31.01",
+                  "description": "ha · model A gain",
+                  "icon": "pin"
+                },
+                {
+                  "title": "3.05",
+                  "description": "ha · B added after A",
+                  "icon": "home"
+                },
+                {
+                  "title": "25.09",
+                  "description": "ha · C added after A",
+                  "icon": "analysis"
+                },
+                {
+                  "title": "56.10",
+                  "description": "ha · A + C total gain",
+                  "icon": "check"
+                }
+              ]
             }
           ]
         },
@@ -346,9 +516,30 @@
           "infographics": [
             {
               "type": "infographic",
-              "title": "92.3%",
-              "description": "Community Hall gain relative to model A: 26.71 ha compared with 28.93 ha. Cheung Chau 920.",
-              "icon": "home"
+              "figure_title": "Cheung Chau alternatives",
+              "layout": "compact",
+              "values": [
+                {
+                  "title": "28.93",
+                  "description": "ha · model A gain",
+                  "icon": "pin"
+                },
+                {
+                  "title": "26.71",
+                  "description": "ha · Community Hall gain",
+                  "icon": "home"
+                },
+                {
+                  "title": "92.3%",
+                  "description": "Hall gain relative to model A",
+                  "icon": "analysis"
+                },
+                {
+                  "title": "4.01",
+                  "description": "ha · H2 added after the hall",
+                  "icon": "check"
+                }
+              ]
             }
           ]
         }

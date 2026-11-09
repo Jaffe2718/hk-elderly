@@ -475,12 +475,41 @@ def apply(cfg, baseline=None, cover_only=False):
         return Embed(embed_url(cfg, media['path']))
 
     figure_number=0
-    def infographic_figure(block, default_title):
+    class InfographicGroup(Infographic):
+        # Native StoryMaps grid/large-number schema, verified against the live renderer.
+        def __init__(self, block, caption):
+            super().__init__()
+            self.block, self.caption = block, caption
+        def _add_to_story(self, story=None, **kwargs):
+            import uuid, math
+            self._story, self._existing = story, True
+            values = self.block['values']
+            layout = self.block.get('layout', 'compact')
+            settings = {
+                'basic': dict(alignment='center', descriptionPosition='bottom'),
+                'stacked': dict(alignment='center', iconPosition='top', descriptionPosition='bottom'),
+                'compact': dict(alignment='start', iconPosition='start', descriptionPosition='bottom'),
+                'titled': dict(alignment='start', iconPosition='start', descriptionPosition='top'),
+            }[layout]
+            children=[]
+            for value in values:
+                node_id='n-'+uuid.uuid4().hex[:10]
+                data=dict(title=value['title'], description=value['description'], **settings)
+                if layout!='basic':data['icon']=value.get('icon','pin')
+                data['colors']={'title':'themeColor1','description':'bodyColor','icon':'themeColor1','background':'backgroundColor'}
+                story._properties['nodes'][node_id]={'type':'large-number','data':data}
+                children.append(node_id)
+            cols=2 if len(values) in [2,4] else 3
+            items=[dict(rowStart=i//cols,rowEnd=i//cols+1,colStart=i%cols,colEnd=i%cols+1) for i in range(len(values))]
+            story._properties['nodes'][self._node]={'type':'grid','data':{'rows':math.ceil(len(values)/cols),'cols':cols,'items':items,'caption':self.caption},'children':children,'config':{'size':'standard'}}
+
+    def figure_caption(title):
         nonlocal figure_number
         figure_number += 1
-        label = block.get('figure_title', default_title).rstrip('.')
-        description = f'Fig. {figure_number}. {label}. ' + block['description']
-        return Infographic(title=block['title'], description=description, icon=block.get('icon',''))
+        return f'<strong>Fig. {figure_number}. {html.escape(title.rstrip("."))}.</strong>'
+
+    def infographic_figure(block, default_title):
+        return InfographicGroup(block, figure_caption(block.get('figure_title',default_title)))
 
     def add_block(block):
         nonlocal figure_number
@@ -492,8 +521,7 @@ def apply(cfg, baseline=None, cover_only=False):
         elif kind == 'timeline':
             events=[TimelineEvent(contents=[Text(html.escape(e['title']),style=TextStyles.SUBHEADING),Text(html.escape(e['text']))]) for e in block['events']]
             story.add(Timeline(events=events,style=block.get('style','single-side')))
-            figure_number += 1
-            story.add(Text(f'<em>Fig. {figure_number}. Evidence reference dates.</em>',style=TextStyles.PARAGRAPH))
+            story.add(Text(figure_caption('Evidence reference dates'),style=TextStyles.PARAGRAPH))
         elif kind == 'table':
             story.add(native_table(block['rows']))
         elif kind in {'text', 'quote', 'heading'}:
@@ -505,10 +533,10 @@ def apply(cfg, baseline=None, cover_only=False):
                 story.add(Text(f'[{reference_number}] {source["html"]} <a href="{url}" target="_blank" rel="noopener noreferrer">{url}</a>'))
         else:
             content = make_media(block)
-            figure_number+=1
-            title=html.escape(block.get('figure_title',''))
-            caption=f'<strong>Fig. {figure_number}. {title}</strong> '+html.escape(block.get('caption',''))
-            story.add(content, caption=caption, alt_text=block.get('alt', block.get('caption', '')))
+            caption=figure_caption(block.get('figure_title','Figure'))
+            story.add(content, caption=caption, alt_text=block.get('alt',block.get('caption','')))
+            if block.get('caption'):
+                story.add(Text(html.escape(block['caption'])))
             if isinstance(content, Embed):
                 content.display = 'inline'
                 story._properties['nodes'][content._node].setdefault('config', {})['size'] = 'full'
