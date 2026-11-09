@@ -309,6 +309,11 @@ def normalize_figure_captions(story):
     """Use one native text style for visible captions on every figure type."""
     import uuid
     nodes=story._properties['nodes']
+    # StoryMaps uses its own icon catalog IDs, not arbitrary Calcite icon names.
+    icons={'map':'globe','pin':'pinEsri','walking':'personWalking','group':'people','home':'governmentBuilding','analysis':'magnifyingGlass','check':'flag'}
+    for node in nodes.values():
+        if node.get('type')=='large-number' and node.get('data',{}).get('icon') in icons:
+            node['data']['icon']=icons[node['data']['icon']]
     for parent in list(nodes.values()):
         children=parent.get('children')
         if not children:continue
