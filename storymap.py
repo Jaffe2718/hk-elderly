@@ -305,6 +305,27 @@ def configure_embeds(story):
             node['config']['size'] = 'wide'
 
 
+def normalize_figure_captions(story):
+    """Use one native text style for visible captions on every figure type."""
+    import uuid
+    nodes=story._properties['nodes']
+    for parent in list(nodes.values()):
+        children=parent.get('children')
+        if not children:continue
+        result=[]
+        for child in children:
+            result.append(child)
+            node=nodes[child]
+            if node.get('type') not in {'grid','embed'}:continue
+            caption=node.get('data',{}).get('caption','')
+            if not caption.startswith('<strong>Fig.'):continue
+            node['data'].pop('caption',None)
+            key='n-'+uuid.uuid4().hex[:10]
+            nodes[key]={'type':'text','data':{'type':'paragraph','text':caption,'textSize':'medium'}}
+            result.append(key)
+        parent['children']=result
+
+
 def publish_current(cfg, baseline, generated=None):
     """Publish reviewed content without changing its existing group-only audience."""
     from arcgis.gis import GIS
@@ -334,6 +355,7 @@ def publish_current(cfg, baseline, generated=None):
             raise RuntimeError('Staged graph navigation does not match configuration')
     configure_credits(story, cfg)
     configure_embeds(story)
+    normalize_figure_captions(story)
     configure_map_views(story, cfg)
     check_baseline(StoryMap(cfg['item_id'], gis=gis), cfg, baseline)
     # Keep publication metadata consistent while avoiding the SDK access='shared' bug.
@@ -586,6 +608,7 @@ def apply(cfg, baseline=None, cover_only=False):
             add_block(block)
     configure_credits(story, cfg)
     configure_embeds(story)
+    normalize_figure_captions(story)
     configure_map_views(story, cfg)
     navigation = next(c for c in story.contents if isinstance(c, Navigation))
     navigation.hidden = False
@@ -593,6 +616,7 @@ def apply(cfg, baseline=None, cover_only=False):
     story._properties['nodes'][navigation._node]['data']['links'] = [
         {'nodeId': heading._node} for heading in chapter_headings
     ]
+    normalize_figure_captions(story)
     (backup / 'generated.json').write_text(json.dumps(story._properties, ensure_ascii=False, indent=2), encoding='utf-8')
     # SDK 2.4.3 save() tries to reapply access='shared' via a missing
     # SharingGroupManager.update method. Prepare the same draft, then update
