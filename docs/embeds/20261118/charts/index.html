@@ -19,7 +19,7 @@ h1{font-size:21px;margin:16px 0 5px}p{margin:0 0 12px}.boards{display:grid;grid-
 dialog::backdrop{background:transparent}dialog form{float:right}dialog h2{font-size:17px;margin:3px 34px 10px 0}dialog p{overflow-wrap:anywhere}
 @media(max-width:650px){.boards{grid-template-columns:1fr;gap:8px}.row{grid-template-columns:95px 1fr}}
 </style>
-<nav aria-label="Statistics"><button data-tab="housing">Housing coverage</button><button data-tab="scenarios">27 scenarios</button><button data-tab="venue">Venue overlap</button></nav>
+<nav aria-label="Statistics"><button data-tab="housing">Housing coverage</button><button data-tab="districts">District coverage</button><button data-tab="scenarios">27 scenarios</button><button data-tab="venue">Venue overlap</button></nav>
 <main></main>
 <dialog aria-labelledby="detail-title"><form method="dialog"><button aria-label="Close details">×</button></form><h2 id="detail-title"></h2><div id="detail"></div></dialog>
 <script>
@@ -56,11 +56,12 @@ function bars(groups, names, max, unit) {
 fetch('data.json').then(response=>{if(!response.ok)throw Error('Chart data could not be loaded.');return response.json()}).then(data=>{
  function show(tab) {
   main.replaceChildren();document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tab===tab));
-  if(tab==='housing'){
+  if(tab==='housing'||tab==='districts'){
    create('h1','Residential ground area within 800 m');
    const labels=['Straight-line to NEC','Network to NEC','Network to NEC or DECC'];
    const key=create('div');key.className='legend';labels.forEach((name,i)=>{const e=create('span','● '+name,key);e.style.color=['#7b658d','#694782','#543772'][i];});
-   bars(data.housing.map(r=>({name:r.label,values:[r.eu_covered800_pct,r.net_covered800_pct,r.both_covered800_pct],details:['Unresolved under the NEC network threshold: '+pct(r.unknown_pct)]})),labels,100,'%');
+   if(tab==='districts')create('p','District totals group STPUGs by their district label.');
+   bars(data[tab].map(r=>({name:r.label,values:[r.eu_covered800_pct,r.net_covered800_pct,r.both_covered800_pct],details:['Unresolved under the NEC network threshold: '+pct(r.unknown_pct)]})),labels,100,'%');
   } else if(tab==='scenarios'){
    create('h1','Priority groups across 27 scenarios');create('p','Rows show age-share cutoffs. Columns show residential-gap cutoffs.');
    const boards=create('div');boards.className='boards';
@@ -83,7 +84,8 @@ fetch('data.json').then(response=>{if(!response.ok)throw Error('Chart data could
   create('p','Select a mark for details.').className='hint';
  }
  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>show(b.dataset.tab));
- show('housing');
+ const initial=location.hash.slice(1);
+ show(['housing','districts','scenarios','venue'].includes(initial)?initial:'housing');
 }).catch(e=>create('p',e.message));
 </script>
 </html>

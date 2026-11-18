@@ -22,6 +22,32 @@ def rows(source, filename):
         return list(csv.DictReader(handle))
 
 
+def district_coverage(source):
+    import numpy as np
+
+    areas = rows(source, "areas.csv")
+    with np.load(source / "analysis/residential_cells.npz", allow_pickle=False) as cells:
+        zones = cells["zone"]
+        valid = zones >= 0
+        counts = np.bincount(zones[valid], minlength=len(areas))
+        assert list(counts) == [int(row["res_cells"]) for row in areas]
+        fields = {"eu_covered800_pct": "euclidean", "net_covered800_pct": "net100",
+                  "both_covered800_pct": "both100"}
+        reached = {key: np.bincount(zones[valid], weights=cells[field][valid] <= 800,
+                                    minlength=len(areas)) for key, field in fields.items()}
+        unknown = np.bincount(zones[valid], weights=cells["coverage_status"][valid] >= 2,
+                              minlength=len(areas))
+    districts = sorted({r["district_en"] for r in areas if r["district_en"]})
+    result = []
+    for district in districts:
+        indices = [i for i, r in enumerate(areas) if r["district_en"] == district]
+        total = counts[indices].sum()
+        if total:
+            result.append({"label": district, "unknown_pct": float(100*unknown[indices].sum()/total),
+                           **{key: float(100*values[indices].sum()/total) for key, values in reached.items()}})
+    return result
+
+
 def build_embeds(source, output, gdb):
     maps = build_maps(source, output, gdb)
     explorer = DEST / "network"
@@ -33,27 +59,40 @@ def build_embeds(source, output, gdb):
     template = template.replace('href="leaflet.css"', 'href="../../../vendor/leaflet.css"')
     template = template.replace('src="leaflet.js"', 'src="../../../vendor/leaflet.js"')
     template = template.replace('main{max-width:1040px;margin:auto;padding:48px 24px}', '''
-main{display:flex;flex-direction:column;gap:6px;height:100dvh;padding:8px 10px;font:14px/1.4 Arial,sans-serif}
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.controls label{display:flex;align-items:center;gap:5px}
-.controls button,.controls input,.controls select{font:inherit;color:#183d40;padding:5px 7px;border:1px solid #a6c2bc;border-radius:4px;background:white;max-width:100%}
-.controls [hidden]{display:none}.controls select{max-width:min(100%,58vw)}
-[data-panel]{flex:1;min-height:0}.map{height:100%!important;min-height:225px}.map .leaflet-popup-content{max-height:200px;overflow:auto}
+*{box-sizing:border-box}main{height:100dvh;display:grid;grid-template-columns:210px minmax(0,1fr);font:14px/1.5 Arial,sans-serif}
+.explorer-controls{padding:16px 14px;overflow:auto;border-right:1px solid #e0e6e3;color:#172d29;background:white}
+.controls label,.controls legend{display:block;font-size:11px;font-weight:600;margin:10px 0 3px}
+.controls button,.controls input,.controls select{font:inherit;font-size:12px;color:#172d29;padding:6px;border:1px solid #e0e6e3;border-radius:5px;background:white;max-width:100%}
+.controls select{width:100%}.controls fieldset{border:0;padding:0;margin:0;display:flex;gap:4px}.controls button[aria-pressed=true]{background:#ded5eb;border-color:#baa8ce}
+.controls #reset-view{margin-top:8px}.controls input{width:68px}.controls [hidden]{display:none}
+#results{display:block;border-block:1px solid #e0e6e3;padding:10px 0;margin:10px 0;font-size:12px}
+.case-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.case-shortcuts h2{grid-column:1/-1;font:600 11px/1.5 Arial,sans-serif;margin:4px 0;padding:0;border:0;text-transform:uppercase}
+.map-stack,[data-panel]{height:100%;min-width:0;min-height:0}.map{height:100%!important}.map .leaflet-popup-content{max-height:200px;overflow:auto}
+@media(max-width:620px){main{grid-template-columns:1fr;grid-template-rows:minmax(0,180px) minmax(0,1fr)}
+.explorer-controls{padding:8px 12px;border-right:0;border-bottom:1px solid #e0e6e3}
+.controls{display:flex;align-items:end;gap:6px;flex-wrap:wrap}.controls #network-view{width:auto;max-width:190px}#results{margin:4px 0;padding:4px 0}}
 ''')
-    tabs = ['<div class="controls"><label for="network-view">Map view</label> <select id="network-view">' +
+    tabs = ['<aside class="explorer-controls" aria-label="Map controls"><div class="controls"><label for="network-view">View</label> <select id="network-view">' +
             "".join(f'<option value="{key}">{html.escape(maps[key])}</option>' for key in SELECTED) +
             '</select><button id="reset-view">Reset view</button>'
             '<form id="find-area" class="controls" aria-label="Find a census group"><label>STPUG '
             '<input id="area-code" size="5" placeholder="755" required></label><button>Find</button></form></div>'
             '<div id="screening-controls" class="controls">'
-            '<label>Radius <select id="radius"><option>500</option><option selected>800</option><option>1000</option></select> m</label>'
+            '<fieldset><legend>Distance threshold</legend><button data-distance="500" aria-pressed="false">500 m</button>'
+            '<button data-distance="800" aria-pressed="true">800 m</button><button data-distance="1000" aria-pressed="false">1,000 m</button></fieldset>'
             '<label>Age 65+ <select id="age-cut"><option>18</option><option selected>20</option><option>22</option></select>%</label>'
             '<label>Gap <select id="gap-cut"><option>20</option><option selected>30</option><option>40</option></select>%</label>'
-            '</div><output id="results" aria-live="polite"></output>']
+            '</div><output id="results" aria-live="polite"></output>'
+            '<div class="controls case-shortcuts"><h2>Route cases</h2>'
+            '<button data-case="08_case755">Sha Tin</button><button data-case="09_case231">Kowloon City</button>'
+            '<button data-case="10_case141">Western District</button></div></aside><div class="map-stack">']
     for index, key in enumerate(SELECTED):
         hidden = ' hidden' if index else ''
         tabs.append(f'<section data-panel="{key}"{hidden}><div class="map" data-key="{key}"><button>Load map</button></div></section>')
-    template = template.replace("<!-- STORY -->", "\n".join(tabs))
+    template = template.replace("<!-- STORY -->", "\n".join(tabs) + "</div>")
+    template = template.replace('const legend = L.control({position:"bottomleft"});',
+                                'const legend = L.control({position:"bottomright"});')
     template = template.replace("section.append(title);", '''section.append(title);
     const scenarioLabels = {"Priority": "Meets both cutoffs", "Higher ageing, lower gap": "Meets age cutoff only",
       "Lower ageing": "Below age cutoff", "Uncertain": "Unresolved at the gap cutoff", "Not assessed": "No residential cells"};
@@ -74,11 +113,12 @@ const output = document.getElementById("results");
 const find = document.getElementById("find-area");
 const activeFrame = () => document.querySelector('[data-key="' + select.value + '"]');
 const ref = id => document.getElementById(id);
+let radius = 800;
 function screen() {
   const frame = activeFrame();
   if (select.value !== "05_priority" || !frame.networkAreas) return;
   let selected = 0, uncertain = 0;
-  const radius = +ref("radius").value, age = +ref("age-cut").value, gap = +ref("gap-cut").value;
+  const age = +ref("age-cut").value, gap = +ref("gap-cut").value;
   const colours = {priority:"#9e83b6", uncertain:"#ddbd9c", below:"#f2edf7", ageOnly:"#ddd1e9", unassessed:"#a5adb0"};
   for (const [key, {item, attributes:a}] of frame.networkAreas) {
     const lo = a['net_out'+radius+'_lo'], hi = a['net_out'+radius+'_hi'];
@@ -115,6 +155,18 @@ function showView() {
   }
 }
 controls.addEventListener("change", screen);
+for (const button of document.querySelectorAll("[data-case]")) {
+  button.onclick = () => { select.value = button.dataset.case; showView(); };
+}
+for (const button of controls.querySelectorAll("[data-distance]")) {
+  button.onclick = () => {
+    radius = +button.dataset.distance;
+    for (const other of controls.querySelectorAll("[data-distance]")) {
+      other.setAttribute("aria-pressed", String(other === button));
+    }
+    screen();
+  };
+}
 ref("reset-view").onclick = () => activeFrame().resetNetworkView?.();
 find.onsubmit = event => {
   event.preventDefault();
@@ -168,6 +220,7 @@ showView();
         "housing": [{key: r[key] for key in ("label", "eu_covered800_pct", "net_covered800_pct",
                                               "both_covered800_pct", "unknown_pct")} for r in rows(source, "housing_access.csv")],
         "scenarios": rows(source, "sensitivity27.csv"),
+        "districts": district_coverage(source),
         "venue": rows(source, "venues_overlap_755.csv"),
     }
     for venue in data["venue"]:

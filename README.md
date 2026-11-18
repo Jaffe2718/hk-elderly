@@ -4,6 +4,8 @@ The November 18 edition is **Walking Access to Elderly Centres in Hong Kong**. I
 
 ## Network edition
 
+The current chapter order follows the rollback tag. `scripts/restore_network_layout.py SOURCE BASELINE OUTPUT --maps-from RECEIPT` stages the six chapters against a reviewed snapshot of the network story and preserves the existing Web Map IDs. Add `--publish` after deploying the embeds. Use the migration workflow below only to rebuild the original network handoff layout.
+
 `scripts/build_network_embeds.py SOURCE OUTPUT GDB` builds the 3D network explorer, SOP, charts and Web Map definitions from the supplied handoff. `GDB` is the extracted `3DPN_P2.gdb`. Case maps show the enabled pedestrian links in each case extent, with a separate highlight for the analysed route and dashed connectors. The straight-line and network gap comparisons share a fixed purple scale. The explorer runs the 27 combinations of radius and screening cutoffs, finds census groups by STPUG ID and synchronises its legend with the visible layers.
 
 After verifying GitHub Pages, run `scripts/build_network_story.py SOURCE OUTPUT GDB --based-on snapshots/REVIEWED_SNAPSHOT` from the ArcGIS Pro Python environment. Use the same output directory and its map receipt on subsequent runs. An initial migration can reuse existing Web Map IDs with `--maps-from RECEIPT`. The script targets the original item, validates dependencies and publishes the network edition. The standalone `storymap.py --prepare` workflow below rebuilds the archived straight-line model.

@@ -357,7 +357,7 @@ def normalize_figure_captions(story):
             node['data']['textSize']='small'
 
 
-def publish_current(cfg, baseline, generated=None):
+def publish_current(cfg, baseline, generated=None, *, refresh_map_views=True):
     """Publish reviewed content without changing its existing group-only audience."""
     from arcgis.gis import GIS
     from arcgis.apps.storymap import StoryMap, _utils
@@ -387,7 +387,8 @@ def publish_current(cfg, baseline, generated=None):
     configure_credits(story, cfg)
     configure_embeds(story)
     normalize_figure_captions(story)
-    configure_map_views(story, cfg)
+    if refresh_map_views:
+        configure_map_views(story, cfg)
     check_baseline(StoryMap(cfg['item_id'], gis=gis), cfg, baseline)
     # Keep publication metadata consistent while avoiding the SDK access='shared' bug.
     props = _utils.prepare_story_for_save(story, True, True, False, cfg['title'], None, _utils.get_version(story))

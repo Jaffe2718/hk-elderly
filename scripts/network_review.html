@@ -19,6 +19,7 @@ h4{margin:8px 0}.maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(
 .map-legend i{display:inline-block;width:15px;height:12px;flex:none}
 .map-layers{background:white;padding:6px 10px;border-radius:4px;box-shadow:0 2px 8px #0003;max-width:65vw}
 .map-layers label{display:flex;align-items:baseline;gap:6px;padding:3px 0}
+.context-tiles{filter:sepia(.65) hue-rotate(155deg) saturate(.7) brightness(1.03)}
 button{padding:10px 16px;background:#fff;border:1px solid #a6c2bc;border-radius:4px;cursor:pointer}
 .workflow details{padding:12px 16px;border-left:4px solid #087b82;background:#eef6f3;margin:8px 0}
 summary{cursor:pointer;font-weight:bold}.workflow p{margin:8px 0 0}
@@ -81,6 +82,9 @@ for (const frame of document.querySelectorAll(".map")) {
       frame.replaceChildren();
       frame.style.display = "block";
       const map = L.map(frame, {scrollWheelZoom: false, attributionControl: false});
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom:18,maxNativeZoom:16,className:"context-tiles",attribution:"Tiles © Esri, HERE, Garmin"
+      }).addTo(map);
       const overlays = {}, areas = new Map();
       L.control.attribution({prefix: false}).addAttribution("HKSAR Government CSDI · GEOG7302 Group 13").addTo(map);
       const latLng = ([x, y], sr) => sr.wkid === 4326 ? L.latLng(y, x) :
@@ -101,6 +105,7 @@ for (const frame of document.querySelectorAll(".map")) {
           const options = {pane, color: stroke, fillColor: fill, fillOpacity: layer.opacity ?? 1,
             weight: symbol.outline?.width ?? symbol.width ?? 1, interactive: !layer.disablePopup,
             dashArray: symbol.style === "esriSLSDash" ? "6 4" : null};
+          if (layer.id === "study_land") options.fillOpacity = .18;
           let item;
           if (g.rings) item = L.polygon(g.rings.map(ring => ring.map(pos)), options);
           else if (g.paths) item = L.polyline(g.paths.map(line => line.map(pos)), options);

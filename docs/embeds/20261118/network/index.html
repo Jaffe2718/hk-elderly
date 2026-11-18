@@ -9,12 +9,19 @@
 <style>
 body{margin:0;background:white;color:#304c52;font:18px/1.6 Georgia,serif}
 
-main{display:flex;flex-direction:column;gap:6px;height:100dvh;padding:8px 10px;font:14px/1.4 Arial,sans-serif}
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.controls label{display:flex;align-items:center;gap:5px}
-.controls button,.controls input,.controls select{font:inherit;color:#183d40;padding:5px 7px;border:1px solid #a6c2bc;border-radius:4px;background:white;max-width:100%}
-.controls [hidden]{display:none}.controls select{max-width:min(100%,58vw)}
-[data-panel]{flex:1;min-height:0}.map{height:100%!important;min-height:225px}.map .leaflet-popup-content{max-height:200px;overflow:auto}
+*{box-sizing:border-box}main{height:100dvh;display:grid;grid-template-columns:210px minmax(0,1fr);font:14px/1.5 Arial,sans-serif}
+.explorer-controls{padding:16px 14px;overflow:auto;border-right:1px solid #e0e6e3;color:#172d29;background:white}
+.controls label,.controls legend{display:block;font-size:11px;font-weight:600;margin:10px 0 3px}
+.controls button,.controls input,.controls select{font:inherit;font-size:12px;color:#172d29;padding:6px;border:1px solid #e0e6e3;border-radius:5px;background:white;max-width:100%}
+.controls select{width:100%}.controls fieldset{border:0;padding:0;margin:0;display:flex;gap:4px}.controls button[aria-pressed=true]{background:#ded5eb;border-color:#baa8ce}
+.controls #reset-view{margin-top:8px}.controls input{width:68px}.controls [hidden]{display:none}
+#results{display:block;border-block:1px solid #e0e6e3;padding:10px 0;margin:10px 0;font-size:12px}
+.case-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.case-shortcuts h2{grid-column:1/-1;font:600 11px/1.5 Arial,sans-serif;margin:4px 0;padding:0;border:0;text-transform:uppercase}
+.map-stack,[data-panel]{height:100%;min-width:0;min-height:0}.map{height:100%!important}.map .leaflet-popup-content{max-height:200px;overflow:auto}
+@media(max-width:620px){main{grid-template-columns:1fr;grid-template-rows:minmax(0,180px) minmax(0,1fr)}
+.explorer-controls{padding:8px 12px;border-right:0;border-bottom:1px solid #e0e6e3}
+.controls{display:flex;align-items:end;gap:6px;flex-wrap:wrap}.controls #network-view{width:auto;max-width:190px}#results{margin:4px 0;padding:4px 0}}
 
 h1,h2,h3,h4,summary,button{font-family:Arial,sans-serif;color:#062e30}
 h1{font-size:clamp(34px,7vw,62px);line-height:1.1;margin-block:0 20px}
@@ -26,6 +33,7 @@ h4{margin:8px 0}.maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(
 .map-legend i{display:inline-block;width:15px;height:12px;flex:none}
 .map-layers{background:white;padding:6px 10px;border-radius:4px;box-shadow:0 2px 8px #0003;max-width:65vw}
 .map-layers label{display:flex;align-items:baseline;gap:6px;padding:3px 0}
+.context-tiles{filter:sepia(.65) hue-rotate(155deg) saturate(.7) brightness(1.03)}
 button{padding:10px 16px;background:#fff;border:1px solid #a6c2bc;border-radius:4px;cursor:pointer}
 .workflow details{padding:12px 16px;border-left:4px solid #087b82;background:#eef6f3;margin:8px 0}
 summary{cursor:pointer;font-weight:bold}.workflow p{margin:8px 0 0}
@@ -34,7 +42,7 @@ a{color:#106c79}.status{padding:12px}
 </head>
 <body>
 <main>
-<div class="controls"><label for="network-view">Map view</label> <select id="network-view"><option value="05_priority">A revised shortlist for local service review</option><option value="03_network">Gap along the 3D pedestrian network</option><option value="02_euclidean">The straight-line baseline</option><option value="06_uncertainty">Where the model cannot classify access confidently</option><option value="08_case755">Local case 755</option><option value="09_case231">Local case 231</option><option value="10_case141">Local case 141</option><option value="15_case755_overlap">Sha Kok and Pok Hong: overlapping versus additional reach</option><option value="14_case920_venue">Cheung Chau Community Hall: modelled additional reach</option></select><button id="reset-view">Reset view</button><form id="find-area" class="controls" aria-label="Find a census group"><label>STPUG <input id="area-code" size="5" placeholder="755" required></label><button>Find</button></form></div><div id="screening-controls" class="controls"><label>Radius <select id="radius"><option>500</option><option selected>800</option><option>1000</option></select> m</label><label>Age 65+ <select id="age-cut"><option>18</option><option selected>20</option><option>22</option></select>%</label><label>Gap <select id="gap-cut"><option>20</option><option selected>30</option><option>40</option></select>%</label></div><output id="results" aria-live="polite"></output>
+<aside class="explorer-controls" aria-label="Map controls"><div class="controls"><label for="network-view">View</label> <select id="network-view"><option value="05_priority">A revised shortlist for local service review</option><option value="03_network">Gap along the 3D pedestrian network</option><option value="02_euclidean">The straight-line baseline</option><option value="06_uncertainty">Where the model cannot classify access confidently</option><option value="08_case755">Local case 755</option><option value="09_case231">Local case 231</option><option value="10_case141">Local case 141</option><option value="15_case755_overlap">Sha Kok and Pok Hong: overlapping versus additional reach</option><option value="14_case920_venue">Cheung Chau Community Hall: modelled additional reach</option></select><button id="reset-view">Reset view</button><form id="find-area" class="controls" aria-label="Find a census group"><label>STPUG <input id="area-code" size="5" placeholder="755" required></label><button>Find</button></form></div><div id="screening-controls" class="controls"><fieldset><legend>Distance threshold</legend><button data-distance="500" aria-pressed="false">500 m</button><button data-distance="800" aria-pressed="true">800 m</button><button data-distance="1000" aria-pressed="false">1,000 m</button></fieldset><label>Age 65+ <select id="age-cut"><option>18</option><option selected>20</option><option>22</option></select>%</label><label>Gap <select id="gap-cut"><option>20</option><option selected>30</option><option>40</option></select>%</label></div><output id="results" aria-live="polite"></output><div class="controls case-shortcuts"><h2>Route cases</h2><button data-case="08_case755">Sha Tin</button><button data-case="09_case231">Kowloon City</button><button data-case="10_case141">Western District</button></div></aside><div class="map-stack">
 <section data-panel="05_priority"><div class="map" data-key="05_priority"><button>Load map</button></div></section>
 <section data-panel="03_network" hidden><div class="map" data-key="03_network"><button>Load map</button></div></section>
 <section data-panel="02_euclidean" hidden><div class="map" data-key="02_euclidean"><button>Load map</button></div></section>
@@ -43,7 +51,7 @@ a{color:#106c79}.status{padding:12px}
 <section data-panel="09_case231" hidden><div class="map" data-key="09_case231"><button>Load map</button></div></section>
 <section data-panel="10_case141" hidden><div class="map" data-key="10_case141"><button>Load map</button></div></section>
 <section data-panel="15_case755_overlap" hidden><div class="map" data-key="15_case755_overlap"><button>Load map</button></div></section>
-<section data-panel="14_case920_venue" hidden><div class="map" data-key="14_case920_venue"><button>Load map</button></div></section>
+<section data-panel="14_case920_venue" hidden><div class="map" data-key="14_case920_venue"><button>Load map</button></div></section></div>
 </main>
 <script>
 window.networkMaps = Object.create(null);
@@ -106,6 +114,9 @@ for (const frame of document.querySelectorAll(".map")) {
       frame.replaceChildren();
       frame.style.display = "block";
       const map = L.map(frame, {scrollWheelZoom: false, attributionControl: false});
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom:18,maxNativeZoom:16,className:"context-tiles",attribution:"Tiles © Esri, HERE, Garmin"
+      }).addTo(map);
       const overlays = {}, areas = new Map();
       L.control.attribution({prefix: false}).addAttribution("HKSAR Government CSDI · GEOG7302 Group 13").addTo(map);
       const latLng = ([x, y], sr) => sr.wkid === 4326 ? L.latLng(y, x) :
@@ -126,6 +137,7 @@ for (const frame of document.querySelectorAll(".map")) {
           const options = {pane, color: stroke, fillColor: fill, fillOpacity: layer.opacity ?? 1,
             weight: symbol.outline?.width ?? symbol.width ?? 1, interactive: !layer.disablePopup,
             dashArray: symbol.style === "esriSLSDash" ? "6 4" : null};
+          if (layer.id === "study_land") options.fillOpacity = .18;
           let item;
           if (g.rings) item = L.polygon(g.rings.map(ring => ring.map(pos)), options);
           else if (g.paths) item = L.polyline(g.paths.map(line => line.map(pos)), options);
@@ -159,7 +171,7 @@ for (const frame of document.querySelectorAll(".map")) {
       const e = data.initialState.viewpoint.targetGeometry;
       const bounds = [latLng([e.xmin,e.ymin],e.spatialReference),latLng([e.xmax,e.ymax],e.spatialReference)];
       map.fitBounds(bounds);
-      const legend = L.control({position:"bottomleft"});
+      const legend = L.control({position:"bottomright"});
       legend.onAdd = () => {
         const result = makeLegend({...data, operationalLayers: data.operationalLayers.filter(
           layer => !overlays[layer.title] || map.hasLayer(overlays[layer.title])
@@ -206,11 +218,12 @@ const output = document.getElementById("results");
 const find = document.getElementById("find-area");
 const activeFrame = () => document.querySelector('[data-key="' + select.value + '"]');
 const ref = id => document.getElementById(id);
+let radius = 800;
 function screen() {
   const frame = activeFrame();
   if (select.value !== "05_priority" || !frame.networkAreas) return;
   let selected = 0, uncertain = 0;
-  const radius = +ref("radius").value, age = +ref("age-cut").value, gap = +ref("gap-cut").value;
+  const age = +ref("age-cut").value, gap = +ref("gap-cut").value;
   const colours = {priority:"#9e83b6", uncertain:"#ddbd9c", below:"#f2edf7", ageOnly:"#ddd1e9", unassessed:"#a5adb0"};
   for (const [key, {item, attributes:a}] of frame.networkAreas) {
     const lo = a['net_out'+radius+'_lo'], hi = a['net_out'+radius+'_hi'];
@@ -247,6 +260,18 @@ function showView() {
   }
 }
 controls.addEventListener("change", screen);
+for (const button of document.querySelectorAll("[data-case]")) {
+  button.onclick = () => { select.value = button.dataset.case; showView(); };
+}
+for (const button of controls.querySelectorAll("[data-distance]")) {
+  button.onclick = () => {
+    radius = +button.dataset.distance;
+    for (const other of controls.querySelectorAll("[data-distance]")) {
+      other.setAttribute("aria-pressed", String(other === button));
+    }
+    screen();
+  };
+}
 ref("reset-view").onclick = () => activeFrame().resetNetworkView?.();
 find.onsubmit = event => {
   event.preventDefault();
