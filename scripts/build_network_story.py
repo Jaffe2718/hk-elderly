@@ -169,6 +169,7 @@ def main():
             raise RuntimeError("Web Map readback failed for " + key)
         print(f"Verified map {key} / {item.id}", flush=True)
 
+    checkpoint()
     cfg = make_config(source, map_entries, receipt)
     (output / "native-story-config.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
     apply(cfg, args.based_on)

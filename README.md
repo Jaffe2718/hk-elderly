@@ -1,8 +1,14 @@
 # Group 13 StoryMap
 
-The current title is **Here Are the Service Gaps Close to Home!**. `story.json` controls the narrative, chapter order, layouts and asset references. `storymap.py` is the single editing entry point. All public text and derived assets are English.
+The November 18 edition is **Close to Home, Far on Foot?**. It uses the CSDI 3D Pedestrian Network and the fixed 20% age-share and 30% residential-gap screening thresholds. The earlier straight-line edition is archived at the `pre-3d-network-2026-11-18` tag.
 
-## Current analysis
+## Network edition
+
+`scripts/build_network_embeds.py SOURCE OUTPUT GDB` builds the 3D network explorer, SOP, charts and Web Map definitions from the supplied handoff. `GDB` is the extracted `3DPN_P2.gdb`. Case maps show the enabled pedestrian links in each case extent, with a separate highlight for the analysed route and dashed connectors. The straight-line and network gap comparisons share a fixed purple scale.
+
+After verifying GitHub Pages, run `scripts/build_network_story.py SOURCE OUTPUT GDB --based-on snapshots/REVIEWED_SNAPSHOT` from the ArcGIS Pro Python environment. Use the same output directory and its map receipt on subsequent runs. An initial migration can reuse existing Web Map IDs with `--maps-from RECEIPT`. The script targets the original item, validates dependencies and publishes the network edition. The standalone `storymap.py --prepare` workflow below rebuilds the archived straight-line model.
+
+## Archived straight-line analysis
 
 The November 6 model follows the updated proposal: select groups with both a 65+ population share at or above P60 and a residential-area share beyond NEC 800 m at or above P60. Each of the 210 assessed STPUGs has equal weight, and ties are included. The exact cutoffs are 19.913163372872837% and 30.75788624778998%. There are 13 selected areas; group 295 has no assigned residential cells and remains unassessed.
 
