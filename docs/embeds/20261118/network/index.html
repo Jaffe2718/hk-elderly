@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Close to Home, Far on Foot?</title>
+<link rel="stylesheet" href="../../../vendor/leaflet.css">
+<script src="../../../vendor/leaflet.js"></script>
+<style>
+body{margin:0;background:white;color:#304c52;font:18px/1.6 Georgia,serif}
+main{margin:auto;padding:10px 14px}.map{height:calc(100dvh - 72px)!important;min-height:280px}
+h1,h2,h3,h4,summary,button{font-family:Arial,sans-serif;color:#062e30}
+h1{font-size:clamp(34px,7vw,62px);line-height:1.1;margin-block:0 20px}
+h2{margin-block:64px 18px;padding-top:16px;border-top:1px solid #dce5e3}
+h4{margin:8px 0}.maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.map{height:360px;display:grid;place-items:center;background:#e1eff6}.map.leaflet-container{background:#e1eff6}
+.map-legend{font:12px/1.4 Arial,sans-serif;background:white;padding:9px 12px;max-height:135px;max-width:230px;overflow:auto;box-shadow:0 2px 8px #0003}
+.map-legend details+details{margin-top:6px}.map-legend span{display:flex;align-items:center;gap:7px;margin:4px 0}
+.map-legend i{display:inline-block;width:15px;height:12px;flex:none}
+button{padding:10px 16px;background:#fff;border:1px solid #a6c2bc;border-radius:4px;cursor:pointer}
+.workflow details{padding:12px 16px;border-left:4px solid #087b82;background:#eef6f3;margin:8px 0}
+summary{cursor:pointer;font-weight:bold}.workflow p{margin:8px 0 0}
+a{color:#106c79}.status{padding:12px}
+</style>
+</head>
+<body>
+<main>
+<label for="network-view">Map view</label> <select id="network-view"><option value="03_network">Gap along the 3D pedestrian network</option><option value="05_priority">A revised shortlist for local service review</option><option value="06_uncertainty">Where the model cannot classify access confidently</option><option value="08_case755">Local case 755</option><option value="09_case231">Local case 231</option><option value="10_case141">Local case 141</option><option value="15_case755_overlap">Sha Kok and Pok Hong: overlapping versus additional reach</option><option value="14_case920_venue">Cheung Chau Community Hall: modelled additional reach</option></select>
+<section data-panel="03_network"><div class="map" data-key="03_network"><button>Load map</button></div></section>
+<section data-panel="05_priority" hidden><div class="map" data-key="05_priority"><button>Load map</button></div></section>
+<section data-panel="06_uncertainty" hidden><div class="map" data-key="06_uncertainty"><button>Load map</button></div></section>
+<section data-panel="08_case755" hidden><div class="map" data-key="08_case755"><button>Load map</button></div></section>
+<section data-panel="09_case231" hidden><div class="map" data-key="09_case231"><button>Load map</button></div></section>
+<section data-panel="10_case141" hidden><div class="map" data-key="10_case141"><button>Load map</button></div></section>
+<section data-panel="15_case755_overlap" hidden><div class="map" data-key="15_case755_overlap"><button>Load map</button></div></section>
+<section data-panel="14_case920_venue" hidden><div class="map" data-key="14_case920_venue"><button>Load map</button></div></section>
+</main>
+<script>
+window.networkMaps = Object.create(null);
+const mapLoads = new Map();
+function loadMap(key) {
+  if (!mapLoads.has(key)) {
+    mapLoads.set(key, new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "webmaps/" + key + ".js";
+      script.onload = () => resolve(window.networkMaps[key]);
+      script.onerror = () => reject(Error("Map data could not be loaded."));
+      document.head.append(script);
+    }));
+  }
+  return mapLoads.get(key);
+}
+function makeLegend(data) {
+  const legend = document.createElement("aside");
+  legend.className = "map-legend";
+  legend.setAttribute("aria-label", "Map legend");
+  for (const layer of data.operationalLayers.filter(l => l.visibility && l.showLegend !== false)) {
+    const sub = layer.featureCollection.layers[0];
+    const r = sub.layerDefinition.drawingInfo.renderer;
+    const values = new Set(sub.featureSet.features.map(f => String(f.attributes[r.field1])));
+    const entries = r.classBreakInfos || r.uniqueValueInfos?.filter(i => values.has(String(i.value))) ||
+      [{label: r.label || layer.title, symbol: r.symbol}];
+    const section = document.createElement("details");
+    section.open = !legend.children.length;
+    const title = document.createElement("summary");
+    title.textContent = layer.title;
+    section.append(title);
+    for (const entry of entries) {
+      const row = document.createElement("span"), chip = document.createElement("i");
+      const [red,green,blue,alpha] = entry.symbol.color;
+      chip.style.backgroundColor = `rgba(${red},${green},${blue},${alpha / 255})`;
+      chip.style.clipPath = entry.symbol.style === "esriSMSDiamond" ? "polygon(50% 0,100% 50%,50% 100%,0 50%)" :
+        entry.symbol.type === "esriSFS" ? "polygon(0 0,100% 45%,100% 100%,0 100%)" : "none";
+      if (entry.symbol.type === "esriSLS") chip.style.height = "3px";
+      row.append(chip, document.createTextNode(entry.label));
+      section.append(row);
+    }
+    legend.append(section);
+  }
+  return legend;
+}
+for (const frame of document.querySelectorAll(".map")) {
+  frame.querySelector("button").addEventListener("click", async () => {
+    frame.innerHTML = '<p class="status" role="status">Loading map…</p>';
+    try {
+      const data = await loadMap(frame.dataset.key);
+      frame.replaceChildren();
+      frame.style.display = "block";
+      const map = L.map(frame, {scrollWheelZoom: false, attributionControl: false});
+      L.control.attribution({prefix: false}).addAttribution("HKSAR Government CSDI · GEOG7302 Group 13").addTo(map);
+      const latLng = ([x, y], sr) => sr.wkid === 4326 ? L.latLng(y, x) :
+        L.CRS.EPSG3857.unproject(L.point(x, y));
+      for (const layer of data.operationalLayers.filter(l => l.visibility)) {
+        const {layerDefinition: def, featureSet, popupInfo} = layer.featureCollection.layers[0];
+        const r = def.drawingInfo.renderer;
+        for (const feature of featureSet.features) {
+          const a = feature.attributes, g = feature.geometry, pos = xy => latLng(xy, featureSet.spatialReference);
+          const symbol = r.symbol || r.uniqueValueInfos?.find(c => String(c.value) === String(a[r.field1]))?.symbol ||
+            r.classBreakInfos?.find(c => a[r.field] != null && a[r.field] <= c.classMaxValue)?.symbol || r.defaultSymbol;
+          if (!symbol) continue;
+          const rgba = ([red,green,blue,alpha]) => `rgba(${red},${green},${blue},${alpha/255})`;
+          const fill = rgba(symbol.color), stroke = symbol.outline?.color ? rgba(symbol.outline.color) : fill;
+          const options = {color: stroke, fillColor: fill, fillOpacity: layer.opacity ?? 1,
+            weight: symbol.outline?.width ?? symbol.width ?? 1, interactive: !layer.disablePopup,
+            dashArray: symbol.style === "esriSLSDash" ? "6 4" : null};
+          let item;
+          if (g.rings) item = L.polygon(g.rings.map(ring => ring.map(pos)), options);
+          else if (g.paths) item = L.polyline(g.paths.map(line => line.map(pos)), options);
+          else if (g.x != null) {
+            const radius = symbol.size || 5;
+            if (symbol.style === "esriSMSDiamond") {
+              const marker = document.createElement("div");
+              marker.style.cssText = `width:100%;height:100%;background:${fill};border:1px solid white;transform:rotate(45deg)`;
+              item = L.marker(pos([g.x,g.y]), {icon:L.divIcon({className:"facility-marker",html:marker,iconSize:[radius,radius]})});
+            } else item = L.circleMarker(pos([g.x,g.y]), {...options,radius});
+          }
+          if (!item) continue;
+          if (popupInfo && !layer.disablePopup) {
+            const popup = document.createElement("div");
+            const title = document.createElement("strong");
+            title.textContent = popupInfo.title.replace(/\{([^}]+)\}/g, (_, key) => a[key] ?? "");
+            popup.append(title);
+            for (const f of popupInfo.fieldInfos.filter(f => f.visible && a[f.fieldName] != null)) {
+              const row = document.createElement("div");
+              row.textContent = `${f.label}: ${a[f.fieldName]}`;
+              popup.append(row);
+            }
+            item.bindPopup(popup);
+          }
+          item.addTo(map);
+        }
+      }
+      const e = data.initialState.viewpoint.targetGeometry;
+      map.fitBounds([latLng([e.xmin,e.ymin],e.spatialReference),latLng([e.xmax,e.ymax],e.spatialReference)]);
+      const legend = L.control({position:"bottomleft"});
+      legend.onAdd = () => {
+        const result = makeLegend(data);
+        L.DomEvent.disableClickPropagation(result);
+        L.DomEvent.disableScrollPropagation(result);
+        return result;
+      };
+      legend.addTo(map); frame.networkMap = map;
+    } catch (error) {
+      frame.textContent = error.message || "Map could not be displayed.";
+    }
+  });
+}
+
+const select = document.getElementById("network-view");
+function showView() {
+  for (const panel of document.querySelectorAll("[data-panel]")) {
+    panel.hidden = panel.dataset.panel !== select.value;
+    if (panel.hidden) continue;
+    const frame = panel.querySelector(".map");
+    if (frame.networkMap) frame.networkMap.invalidateSize();
+    else frame.querySelector("button")?.click();
+  }
+}
+select.onchange = showView;
+showView();
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Network coverage and screening</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:12px 18px;font:15px/1.45 Arial,sans-serif;color:#183d40;background:#fff}
+nav{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #e3ebea;padding-bottom:12px}
+button{cursor:pointer;color:inherit;border:1px solid #a9c2bd;border-radius:5px;background:white;padding:7px 10px}
+button[aria-pressed=true]{background:#d9ebe7;border-color:#558c86}
+button:hover,button:focus-visible,.selected{outline:2px solid #008a84;outline-offset:2px}
+h1{font-size:21px;margin:16px 0 5px}p{margin:0 0 12px}.boards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.matrix{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:5px;text-align:center;align-items:center}
+.matrix h2{grid-column:1/-1;font-size:16px;margin:8px 0}.matrix button{background:var(--fill);padding:6px 2px}
+.row{display:grid;grid-template-columns:minmax(92px,1fr) minmax(130px,4fr);gap:8px;margin:14px 0;align-items:center}
+.bars{display:grid;gap:5px}.bar{display:flex;align-items:center;gap:8px;text-align:left;padding:2px;border:0;width:100%;font-size:12px}
+.bar i{height:15px;min-width:3px;display:block;border-radius:3px}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-bottom:10px}
+.hint{font-size:13px;color:#526e6e}dialog{max-width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 24px);padding:16px 20px;border:1px solid #a9c2bd;border-radius:10px;box-shadow:0 5px 25px #12463a35;color:inherit;position:fixed;margin:0;inset:auto}
+dialog::backdrop{background:transparent}dialog form{float:right}dialog h2{font-size:17px;margin:3px 34px 10px 0}dialog p{overflow-wrap:anywhere}
+@media(max-width:650px){.boards{grid-template-columns:1fr;gap:8px}.row{grid-template-columns:95px 1fr}}
+</style>
+<nav aria-label="Statistics"><button data-tab="housing">Housing coverage</button><button data-tab="scenarios">27 scenarios</button><button data-tab="venue">Venue overlap</button></nav>
+<main></main>
+<dialog aria-labelledby="detail-title"><form method="dialog"><button aria-label="Close details">×</button></form><h2 id="detail-title"></h2><div id="detail"></div></dialog>
+<script>
+const main=document.querySelector('main'), dialog=document.querySelector('dialog');
+const create=(tag,value,parent=main)=>{const node=document.createElement(tag);if(value)node.textContent=value;parent.append(node);return node;};
+const palette=['#94a5b0','#3c9691','#bd956e'];
+const pct=value=>Number(value).toFixed(2)+'%';
+let picked;
+function inspect(button, title, lines) {
+  button.addEventListener('click',()=>{
+    picked?.classList.remove('selected');picked=button;button.classList.add('selected');
+    dialog.querySelector('h2').textContent=title;
+    const detail=dialog.querySelector('#detail');detail.replaceChildren();
+    lines.forEach(line=>create('p',line,detail));dialog.showModal();
+    const m=button.getBoundingClientRect(), d=dialog.getBoundingClientRect();
+    dialog.style.left=Math.max(12,Math.min(innerWidth-d.width-12,m.left+m.width/2-d.width/2))+'px';
+    dialog.style.top=Math.max(12,m.bottom+d.height+20<innerHeight?m.bottom+8:m.top-d.height-8)+'px';
+  });
+}
+dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
+dialog.addEventListener('close',()=>picked?.classList.remove('selected'));
+function bars(groups, names, max, unit) {
+  groups.forEach(group=>{
+    const row=create('div');row.className='row';create('strong',group.name,row);
+    const parent=create('div',null,row);parent.className='bars';
+    group.values.forEach((value,i)=>{
+      const button=create('button',null,parent);button.className='bar';
+      const mark=create('i',null,button);mark.style.width=(Number(value)/max*76)+'%';mark.style.background=palette[i];
+      create('span',Number(value).toFixed(2)+unit,button);
+      inspect(button,group.name+' · '+names[i],[Number(value).toFixed(2)+unit,...group.details]);
+    });
+  });
+}
+fetch('data.json').then(response=>{if(!response.ok)throw Error('Chart data could not be loaded.');return response.json()}).then(data=>{
+ function show(tab) {
+  main.replaceChildren();document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tab===tab));
+  if(tab==='housing'){
+   create('h1','Residential ground area within 800 m');
+   const labels=['Straight-line to NEC','Network to NEC','Network to NEC or DECC'];
+   const key=create('div');key.className='legend';labels.forEach((name,i)=>{const e=create('span','● '+name,key);e.style.color=['#4f6472','#166a65','#865427'][i];});
+   bars(data.housing.map(r=>({name:r.label,values:[r.eu_covered800_pct,r.net_covered800_pct,r.both_covered800_pct],details:['Unresolved under the NEC network threshold: '+pct(r.unknown_pct)]})),labels,100,'%');
+  } else if(tab==='scenarios'){
+   create('h1','Priority groups across 27 scenarios');create('p','Rows show age-share cutoffs. Columns show residential-gap cutoffs.');
+   const boards=create('div');boards.className='boards';
+   for(const d of [500,800,1000]){
+    const grid=create('section',null,boards);grid.className='matrix';create('h2',d.toLocaleString()+' m',grid);
+    ['Age','20%','30%','40%'].forEach(t=>create('span',t,grid));
+    for(const age of [18,20,22]){
+     create('span',age+'%',grid);
+     for(const gap of [20,30,40]){
+      const r=data.scenarios.find(s=>+s.distance_m===d&&+s.age_cut_pct===age&&+s.gap_cut_pct===gap);
+      const cell=create('button',r.priority_n,grid);cell.style.setProperty('--fill','hsl(170 29% '+(95-Number(r.priority_n)/4)+'%)');
+      inspect(cell,d.toLocaleString()+' m · '+age+'% age · '+gap+'% gap',[r.priority_n+' priority groups',r.uncertain_n+' uncertain groups','STPUGs: '+r.priority_ids.split('|').join(', ')]);
+     }
+    }
+   }
+  }else{
+   create('h1','Newly covered land in Sha Tin group 755');
+   bars(data.venue.map(r=>({name:r.name_en,values:[r.gain_ha],details:['Ground area from 10 m residential cells. The shared area counts once.']})),['Potential outreach coverage'],30,' ha');
+  }
+  create('p','Select a mark for details.').className='hint';
+ }
+ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+ show('housing');
+}).catch(e=>create('p',e.message));
+</script>
+</html>

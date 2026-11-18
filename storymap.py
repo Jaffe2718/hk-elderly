@@ -249,7 +249,8 @@ def configure_map_views(story, cfg):
         if not by_item.get(item_id):
             raise RuntimeError(f'No configured map view for {item_id}')
         media = by_item[item_id].pop(0)
-        data = json.loads(local_asset('assets/webmaps/' + media['webmap'] + '.json').read_text(encoding='utf-8'))
+        path = media.get('map_path') or ('assets/webmaps/' + media['webmap'] + '.json')
+        data = json.loads(local_asset(path).read_text(encoding='utf-8'))
         extent = data['initialState']['viewpoint']['targetGeometry']
         if media.get('bookmark'):
             extent = next(b['extent'] for b in data['bookmarks'] if b['name'].startswith(media['bookmark']))
