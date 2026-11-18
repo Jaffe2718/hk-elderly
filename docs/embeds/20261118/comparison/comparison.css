@@ -1,0 +1,21 @@
+*{box-sizing:border-box}
+html,body,main{width:100%;height:100%;margin:0}
+main{position:relative;isolation:isolate;overflow:hidden;background:#e1eff6;color:#243d40;font:13px/1.4 Arial,sans-serif}
+#map{position:absolute;inset:0;width:100%;height:100%;background:#e1eff6}
+.context-tiles{filter:sepia(.65) hue-rotate(155deg) saturate(.7) brightness(1.03)}
+#status{position:absolute;top:10px;left:14px;z-index:800;padding:6px 10px;margin:0;background:white}
+#divider{position:absolute;inset:0 auto 0 50%;width:2px;background:#fff;z-index:610;pointer-events:none;box-shadow:0 0 3px #223a4355}
+#handle{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);min-width:42px;min-height:38px;padding:6px;border:1px solid #afbfbe;border-radius:6px;background:white;color:#244447;font:600 12px Arial;cursor:ew-resize;pointer-events:auto;touch-action:none;box-shadow:0 2px 6px #223a4333}
+#handle:focus-visible,#reset:focus-visible{outline:2px solid #087e80;outline-offset:2px}
+.legend{position:absolute;bottom:30px;z-index:620;width:auto;max-width:calc(50% - 16px);background:#fffffff8;padding:7px 9px;border:1px solid #dfe5e4;border-radius:6px;box-shadow:0 2px 8px #223a431f}
+.left{left:10px}.right{right:10px}
+.legend h2{font-size:12px;margin:0 0 2px;line-height:1.2}
+.legend p{font-size:10px;margin:0 0 5px;color:#445f62}
+.legend ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 8px}
+.legend li{display:flex;align-items:center;gap:4px;font-size:10px;white-space:nowrap;min-height:12px}
+.legend i{width:11px;height:9px;flex:none;clip-path:polygon(0 0,100% 42%,100% 100%,0 100%)}
+.legend i.facility{width:7px;height:7px;margin:1px 2px;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+#reset{position:absolute;right:10px;top:10px;z-index:620;padding:6px 9px;border:1px solid #afbfbe;border-radius:5px;background:white;color:#244447;font:12px Arial;cursor:pointer}
+.leaflet-bottom .leaflet-control-attribution{max-width:98vw;font-size:9px}
+[hidden]{display:none!important}
+@media(max-width:460px){.legend{padding:5px 6px;bottom:25px}.left{left:6px}.right{right:6px}.legend h2{font-size:11px}.legend p{font-size:9px}.legend ul{gap:2px 5px}.legend li{font-size:9px}#handle{min-width:34px;min-height:34px}}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Slide across two aligned views of the same residential areas to compare the 800 m straight-line gap and the 3D pedestrian network gap lower bound.">
+<title>Straight-line and 3D network gaps</title>
+<link rel="stylesheet" href="../../../vendor/leaflet.css">
+<link rel="stylesheet" href="comparison.css">
+<script>window.networkMaps = Object.create(null);</script>
+<script defer src="../../../vendor/leaflet.js"></script>
+<script defer src="../network/webmaps/02_euclidean.js"></script>
+<script defer src="../network/webmaps/03_network.js"></script>
+<script defer src="comparison.js"></script>
+</head>
+<body>
+<main aria-label="Sliding comparison of residential gaps">
+  <div id="map" aria-label="Hong Kong residential gap comparison"></div>
+  <p id="status" role="status">Loading comparison…</p>
+  <div id="divider" hidden>
+    <button id="handle" type="button" role="slider" aria-label="Map comparison divider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span aria-hidden="true">◀ ▶</span></button>
+  </div>
+  <section id="left-legend" class="legend left" aria-label="Left map legend" hidden></section>
+  <section id="right-legend" class="legend right" aria-label="Right map legend" hidden></section>
+  <button id="reset" type="button" hidden>Reset view</button>
+</main>
+</body>
+</html>
