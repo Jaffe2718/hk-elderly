@@ -212,11 +212,20 @@ def main():
     parser.add_argument("baseline",type=Path)
     parser.add_argument("output",type=Path)
     parser.add_argument("--maps-from",type=Path,default=ROOT/"build/network-update/revision2/arcgis-receipt.json")
+    parser.add_argument("--config-from",type=Path,
+                        default=ROOT/"build/network-update/revision2/native-story-config.json")
     parser.add_argument("--publish",action="store_true")
     args=parser.parse_args()
-    cfg=read(args.baseline/"local-config.json")
+    # The generic inspection command records the archived story.json configuration.
+    # Start with the active network configuration and read the cover from ArcGIS.
+    cfg=read(args.config_from)
+    baseline_config=read(args.baseline/"local-config.json")
+    if cfg["item_id"] != baseline_config["item_id"]:
+        raise ValueError("The network configuration and snapshot target different StoryMap items.")
     tagged=json.loads(subprocess.check_output(["git","show",TAG+":story.json"],cwd=ROOT,encoding="utf-8"))
     data=read(args.baseline/"draft.json")
+    cover=next(node["data"] for node in data["nodes"].values() if node["type"] == "storycover")
+    cfg.update(title=cover["title"],subtitle=cover["summary"])
     receipt=read(args.maps_from)
     titles=assemble(data,tagged,args.source,receipt)
     cfg.update(asset_revision=REVISION,sections=[{"id":s["id"],"title":title,"slides":[]} for s,title in zip(tagged["sections"],titles)])
