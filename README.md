@@ -1,10 +1,10 @@
 # Group 13 StoryMap
 
-The November 18 edition is **Close to Home, Far on Foot?**. It uses the CSDI 3D Pedestrian Network and the fixed 20% age-share and 30% residential-gap screening thresholds. The earlier straight-line edition is archived at the `pre-3d-network-2026-11-18` tag.
+The November 18 edition is **Walking Access to Elderly Centres in Hong Kong**. It uses the CSDI 3D Pedestrian Network and the fixed 20% age-share and 30% residential-gap screening thresholds. The earlier straight-line edition is archived at the `pre-3d-network-2026-11-18` tag.
 
 ## Network edition
 
-`scripts/build_network_embeds.py SOURCE OUTPUT GDB` builds the 3D network explorer, SOP, charts and Web Map definitions from the supplied handoff. `GDB` is the extracted `3DPN_P2.gdb`. Case maps show the enabled pedestrian links in each case extent, with a separate highlight for the analysed route and dashed connectors. The straight-line and network gap comparisons share a fixed purple scale.
+`scripts/build_network_embeds.py SOURCE OUTPUT GDB` builds the 3D network explorer, SOP, charts and Web Map definitions from the supplied handoff. `GDB` is the extracted `3DPN_P2.gdb`. Case maps show the enabled pedestrian links in each case extent, with a separate highlight for the analysed route and dashed connectors. The straight-line and network gap comparisons share a fixed purple scale. The explorer runs the 27 combinations of radius and screening cutoffs, finds census groups by STPUG ID and synchronises its legend with the visible layers.
 
 After verifying GitHub Pages, run `scripts/build_network_story.py SOURCE OUTPUT GDB --based-on snapshots/REVIEWED_SNAPSHOT` from the ArcGIS Pro Python environment. Use the same output directory and its map receipt on subsequent runs. An initial migration can reuse existing Web Map IDs with `--maps-from RECEIPT`. The script targets the original item, validates dependencies and publishes the network edition. The standalone `storymap.py --prepare` workflow below rebuilds the archived straight-line model.
 

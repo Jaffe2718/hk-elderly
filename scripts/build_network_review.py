@@ -14,16 +14,16 @@ BOUNDARY = next(layer for layer in MAP_THEME["operationalLayers"] if layer["id"]
 LAND = next(layer for layer in MAP_THEME["operationalLayers"] if layer["id"] == "study_land")
 CATEGORIES = {
     "priority_transition": {
-        "Retained priority": "#9ebdb4", "New priority": "#18685e",
-        "Not selected": "#e7eae8", "Uncertain": "#ddbd9c",
+        "Retained priority": "#cbbcdc", "New priority": "#9e83b6",
+        "Not selected": "#f2edf7", "Uncertain": "#ddbd9c",
         "Not assessed": PALETTE["not_assessed"],
     },
     "screen_class": {
-        "Priority": "#18685e", "Higher ageing, lower gap": "#9ebdb4",
-        "Lower ageing": "#e7eae8", "Uncertain": "#ddbd9c",
+        "Priority": "#9e83b6", "Higher ageing, lower gap": "#ddd1e9",
+        "Lower ageing": "#f2edf7", "Uncertain": "#ddbd9c",
         "Not assessed": PALETTE["not_assessed"],
     },
-    "status": {0: "#e6ebe7", 1: "#b9c9c6", 2: "#ddbd9c", 3: "#bc936d", 4: "#946c4c"},
+    "status": {0: "#eee6f6", 1: "#c7b3dc", 2: "#ddbd9c", 3: "#bc936d", 4: "#946c4c"},
     "route_role": {
         "Network route": "#087b82", "Assumed entry connectors": "#b75d22",
         "Straight line to nearest NEC": "#536b78",
@@ -32,7 +32,7 @@ CATEGORIES = {
         "Residential cell": "#087b82", "Network target NEC": PALETTE["facility"],
         "Euclidean nearest NEC": "#536b78",
     },
-    "category": {"ShaKokOnly": "#a7c9bd", "Both": "#18685e", "PokHongOnly": "#b79b7a"},
+    "category": {"ShaKokOnly": "#d9c8e9", "Both": "#9e83b6", "PokHongOnly": "#b79b7a"},
 }
 
 
@@ -59,9 +59,11 @@ def build_maps(source, output, network_gdb=None):
                 "aliases": {"route_id": "CSDI route ID", "street": "Street"},
                 "style": {"type": "simple", "color": "#85969b", "width": 0.75,
                           "label": "Local pedestrian network"}})
-        for spec in entry["layers"]:
-            if entry["id"] in {"08_case755", "09_case231", "10_case141"} and spec["id"] in {"gains", "venues"}:
-                continue
+        specs = entry["layers"]
+        if entry["id"] in {"08_case755", "09_case231", "10_case141"}:
+            specs = [s for s in specs if s["id"] not in {"gains", "venues"}]
+        has_ramp = any(s.get("style", {}).get("type") == "breaks" for s in specs)
+        for spec in specs:
             style = spec.get("style", {})
             field = style.get("field")
             if style.get("type") == "breaks":
@@ -73,10 +75,13 @@ def build_maps(source, output, network_gdb=None):
             if field in CATEGORIES:
                 for category in style["classes"]:
                     category["color"] = CATEGORIES[field][category["value"]]
+                    if has_ramp and field == "screen_class":
+                        category["color"] = {"Priority": "#639989", "Higher ageing, lower gap": "#bbd8cc",
+                                             "Lower ageing": "#edf4ef"}.get(category["value"], category["color"])
             if spec["id"] in {"nec", "centres"}:
                 style.update(color=PALETTE["facility"], size=5.5)
             if spec["id"] == "gains":
-                style["color"] = "#4d897b"
+                style["color"] = "#4d897b" if has_ramp else "#9e83b6"
             layer = build["make_layer"](source, spec)
             sub = layer["featureCollection"]["layers"][0]
             renderer = sub["layerDefinition"]["drawingInfo"]["renderer"]
@@ -92,6 +97,12 @@ def build_maps(source, output, network_gdb=None):
                             category["label"] = "NEC for both distance measures"
             if spec["id"] in {"nec", "centres"}:
                 renderer["symbol"]["style"] = "esriSMSDiamond"
+            if spec["id"] in {"housing", "overlap"} and has_ramp:
+                for category in renderer["uniqueValueInfos"]:
+                    replacements = {"0": [229, 242, 234, 230], "1": [157, 194, 176, 230],
+                                    "ShaKokOnly": [167, 201, 189, 230], "Both": [24, 104, 94, 230]}
+                    if str(category["value"]) in replacements:
+                        category["symbol"]["color"] = replacements[str(category["value"])]
             if renderer["type"] == "uniqueValue":
                 observed = {str(row["attributes"][field]) for row in sub["featureSet"]["features"]}
                 declared = {str(category["value"]) for category in renderer["uniqueValueInfos"]}

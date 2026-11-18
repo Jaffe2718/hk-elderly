@@ -1,6 +1,6 @@
 'use strict';
 const steps=window.WORKFLOW_STEPS.map(([id,x,y,title,subtitle,stage,description,metric,details])=>({id,x,y,title,subtitle,stage,description,metric,details}));
-const links=[['census','prepare'],['sites','distance'],['land','distance'],['prepare','population'],['prepare','distance'],['distance','coverage'],['population','binary'],['coverage','binary'],['binary','checks'],['binary','cases'],['binary','review'],['checks','review']];
+const links=[["census","population"],["sites","distance"],["land","distance"],["prepare","distance"],["distance","coverage"],["population","binary"],["coverage","binary"],["binary","checks"],["binary","cases"],["cases","review"],["checks","review"]];
 const $=id=>document.getElementById(id),ns='http://www.w3.org/2000/svg';let selected=-1,scale=1,tx=0,ty=0,timer=null;
 function svg(tag,attrs,parent){const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);parent.append(e);return e}
 const palette={INPUT:'#245cb6',PROCESS:'#087b82',CONDITION:'#9d570e',MODEL:'#007e68',SENSITIVITY:'#8a562b',INTERPRETATION:'#334e61',OUTPUT:'#334e61'};

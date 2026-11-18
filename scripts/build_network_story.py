@@ -49,8 +49,10 @@ SLIDE_INFO = {
 def make_config(source, map_entries, receipt):
     narrative = read(source / "story/story_content.json")
     cfg = read(ROOT / "story.json")
-    cfg.update(title=narrative["title"], subtitle=narrative["subtitle"], publish_audience="public",
-               model_version="20261118-network", sections=[], asset_revision="20261118-network",
+    cfg.update(title="Walking Access to Elderly Centres in Hong Kong",
+               subtitle="A 3D pedestrian network study of residential coverage and outreach venues",
+               publish_audience="public",
+               model_version="20261118-network", sections=[], asset_revision="20261118-r2",
                cover_note="3D pedestrian network revision · 18 November 2026")
     cfg["credit_html"] += ' Pedestrian network data from the <a href="https://portal.csdi.gov.hk/csdi-webpage/dataset/landsd_rcd_1637222018065_52265">Lands Department and CSDI Portal</a>.'
     refs = read(ROOT / "assets/references.json")
@@ -97,7 +99,11 @@ def make_config(source, map_entries, receipt):
                                                  ("33", "Priority groups", "flag"),
                                                  ("210", "Assessed census groups", "map")))
         if i == 2:
-            section["after"].append(figure("Pedestrian routes and residential gaps", "network"))
+            section["after"] += [
+                {"type": "heading", "text": "Explore the walking network"},
+                figure("Pedestrian routes and residential gaps", "network"),
+                {"type": "text", "text": "Adjust the screening cutoffs, find a census group or switch to a route case. Use Layers to toggle pedestrian links, example routes and residential areas."},
+            ]
         if i == 4:
             section["after"].append(figure("Coverage and screening scenarios", "charts"))
         cfg["sections"].append(section)
