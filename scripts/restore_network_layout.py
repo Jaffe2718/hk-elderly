@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from scripts.build_network_embeds import rows
 from scripts.build_network_review import read
 from scripts.update_network_comparison import replace_comparison
+from scripts.update_network_editorial import revise
 from storymap import check_baseline, inspect_story, publish_current, save_draft
 
 TAG = "pre-3d-network-2026-11-18"
@@ -231,6 +232,7 @@ def main():
     titles=assemble(data,tagged,args.source,receipt)
     cfg.update(asset_revision=REVISION,sections=[{"id":s["id"],"title":title,"slides":[]} for s,title in zip(tagged["sections"],titles)])
     replace_comparison(data,cfg)
+    revise(data,cfg)
     args.output.mkdir(parents=True,exist_ok=True)
     for filename,obj in (("config.json",cfg),("generated.json",data)):
         (args.output/filename).write_text(json.dumps(obj,ensure_ascii=False,indent=2),encoding="utf-8")
